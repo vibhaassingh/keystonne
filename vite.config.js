@@ -2,11 +2,18 @@ import {defineConfig} from 'vite';
 import {hydrogen} from '@shopify/hydrogen/vite';
 import {oxygen} from '@shopify/mini-oxygen/vite';
 import {reactRouter} from '@react-router/dev/vite';
+import tailwindcss from '@tailwindcss/vite';
+import {fileURLToPath} from 'node:url';
 
 export default defineConfig({
-  plugins: [hydrogen(), oxygen(), reactRouter()],
+  plugins: [hydrogen(), oxygen(), reactRouter(), tailwindcss()],
   resolve: {
-    tsconfigPaths: true,
+    // Explicit alias matches the "~/* -> app/*" mapping in jsconfig.json.
+    // Needed because Hydrogen's implicit alias is lost once @tailwindcss/vite
+    // is added to the plugin pipeline.
+    alias: {
+      '~': fileURLToPath(new URL('./app', import.meta.url)),
+    },
   },
   build: {
     // Allow a strict Content-Security-Policy

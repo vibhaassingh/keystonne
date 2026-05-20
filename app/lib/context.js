@@ -44,7 +44,8 @@ export async function createHydrogenRouterContext(
       waitUntil,
       session,
       // Or detect from URL path based on locale subpath, cookies, or any other strategy
-      i18n: {language: 'EN', country: 'US'},
+      // Keystonne is India-only in Phase 1 (see CLAUDE.md §10).
+      i18n: {language: 'EN', country: 'IN'},
       cart: {
         queryFragment: CART_QUERY_FRAGMENT,
       },
