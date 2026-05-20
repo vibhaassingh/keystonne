@@ -3,11 +3,10 @@ import {ArrowRight} from 'lucide-react';
 import {ProductCard} from '~/components/ProductCard';
 
 /**
- * Horizontal row of featured products. Used on the home page (Sprint 3)
- * and as a "Related products" strip on the PDP later (Sprint 4).
- *
- * On desktop renders a grid; on small screens reflows to a single column.
- * Could be upgraded to a true horizontal-scroll carousel in Sprint 10 polish.
+ * Horizontal product row with the new Apple-style section header.
+ * The card visuals themselves are still the Sprint 3 ProductCard;
+ * Sprint 4 refines those into the denser commercial layout the brief
+ * specifies (rating · brand · specs · price-or-quote · dual CTA).
  */
 export function FeaturedRow({
   title,
@@ -17,11 +16,14 @@ export function FeaturedRow({
 }) {
   if (!products?.length) return null;
   return (
-    <section className="mx-auto max-w-[1400px] px-4 py-8 md:py-12">
-      <header className="mb-6 flex items-end justify-between">
+    <section className="mx-auto max-w-[1400px] px-4 py-10 md:px-6 md:py-14">
+      <header className="mb-7 flex flex-wrap items-end justify-between gap-3">
         <div>
-          {eyebrow && <span className="eyebrow">{eyebrow}</span>}
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+          {eyebrow && <span className="apple-eyebrow">{eyebrow}</span>}
+          <h2
+            className="mt-3 text-2xl font-semibold tracking-tight md:text-[32px]"
+            style={{color: 'var(--ks-ink)'}}
+          >
             {title}
           </h2>
         </div>
@@ -29,7 +31,8 @@ export function FeaturedRow({
           <Link
             to={viewAllTo}
             prefetch="intent"
-            className="hidden items-center gap-1 text-sm font-semibold text-brand-primary hover:underline md:inline-flex"
+            className="hidden items-center gap-1 text-[13px] font-medium md:inline-flex"
+            style={{color: 'var(--ks-blue)'}}
           >
             View all <ArrowRight className="h-4 w-4" />
           </Link>

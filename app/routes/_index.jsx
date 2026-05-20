@@ -1,4 +1,4 @@
-import {HeroCarousel} from '~/components/HeroCarousel';
+import {Hero} from '~/components/Hero';
 import {KitchenPlannerInput} from '~/components/KitchenPlannerInput';
 import {TrustStrip} from '~/components/TrustStrip';
 import {FeaturedCategoriesGrid} from '~/components/FeaturedCategoriesGrid';
@@ -7,16 +7,20 @@ import {PartnerPromoBand} from '~/components/PartnerPromoBand';
 import {products} from '~/lib/mock/products';
 
 /**
- * Storefront home — composes the chrome (in PageLayout) with the seven
- * Sprint 3 sections:
+ * Storefront home — Sprint 3 of the Apple-inspired redesign.
  *
- *   HeroCarousel
- *   KitchenPlannerInput   ("Build my kitchen" AI teaser)
- *   TrustStrip
- *   FeaturedCategoriesGrid (all 14)
- *   FeaturedRow            (8 cross-category products)
- *   PartnerPromoBand
- *   FeaturedRow            (bestsellers under ₹50K — "Add to cart" eligible)
+ * Composition (top to bottom):
+ *   1. Hero                          — one bright editorial container
+ *   2. KitchenPlannerInput           — quiet AI command module
+ *   3. TrustStrip                    — five precise procurement claims
+ *   4. FeaturedCategoriesGrid        — 14 compact category tiles
+ *   5. FeaturedRow (spotlight)       — hand-picked spec-grade products
+ *   6. PartnerPromoBand              — sample-commission module
+ *
+ * The second "Stock items — ready to ship" featured row from the
+ * previous version was removed to let the page breathe; stock items
+ * stay reachable from the catalog (and the new lead-time signal in
+ * the category grid surfaces "stock" directly).
  */
 
 export const meta = () => [
@@ -24,22 +28,16 @@ export const meta = () => [
   {
     name: 'description',
     content:
-      'Catalog, spec, quote, and source commercial kitchen equipment in India. For restaurants, hotels, cloud kitchens, and institutions.',
+      'Plan equipment, compare specs, request quotes, and manage partner-led projects from one procurement workspace. India-first commercial kitchen procurement.',
   },
 ];
 
 export default function Homepage() {
-  // Pick a varied subset for the first row, then the < ₹50K subset for the
-  // second row so visitors see both "browse + add to cart" and "request quote"
-  // patterns next to each other.
   const spotlight = products.slice(0, 4).concat(products.slice(4, 8));
-  const addToCartEligible = products.filter(
-    (p) => typeof p.priceINR === 'number' && p.priceINR < 50_000,
-  );
 
   return (
     <>
-      <HeroCarousel />
+      <Hero />
       <KitchenPlannerInput />
       <TrustStrip />
       <FeaturedCategoriesGrid />
@@ -50,14 +48,6 @@ export default function Homepage() {
         viewAllTo="/collections/all"
       />
       <PartnerPromoBand />
-      {addToCartEligible.length > 0 && (
-        <FeaturedRow
-          eyebrow="Ships within a week"
-          title="Stock items — ready to ship"
-          products={addToCartEligible}
-          viewAllTo="/collections/all"
-        />
-      )}
     </>
   );
 }
