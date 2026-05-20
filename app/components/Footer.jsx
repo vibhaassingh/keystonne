@@ -1,130 +1,150 @@
-import {Suspense} from 'react';
-import {Await, NavLink} from 'react-router';
+import {Link} from 'react-router';
+import {ShieldCheck, Truck, FileText, Wrench} from 'lucide-react';
+import {categories} from '~/lib/mock/categories';
+import {KeystonneLogo} from '~/components/KeystonneLogo';
 
 /**
- * @param {FooterProps}
+ * Fat 4-column footer. Density over white space — buyers come here looking
+ * for category links, partner CTAs, resources, and policy info.
+ *
+ * Original signature accepted `footer`, `header`, `publicStoreDomain` — we
+ * ignore them because our nav data is locked locally (CLAUDE.md §6).
  */
-export function Footer({footer: footerPromise, header, publicStoreDomain}) {
+export function Footer() {
   return (
-    <Suspense>
-      <Await resolve={footerPromise}>
-        {(footer) => (
-          <footer className="footer">
-            {footer?.menu && header.shop.primaryDomain?.url && (
-              <FooterMenu
-                menu={footer.menu}
-                primaryDomainUrl={header.shop.primaryDomain.url}
-                publicStoreDomain={publicStoreDomain}
-              />
-            )}
-          </footer>
-        )}
-      </Await>
-    </Suspense>
+    <footer className="mt-16 bg-slate-900 text-white/85">
+      {/* Trust strip — restated at the foot for buyers who scroll past it */}
+      <div className="border-b border-white/10">
+        <div className="mx-auto grid max-w-[1400px] grid-cols-2 gap-6 px-6 py-6 md:grid-cols-4">
+          <TrustItem
+            icon={Truck}
+            title="Pan-India freight"
+            sub="Included on every order"
+          />
+          <TrustItem
+            icon={FileText}
+            title="GST invoice"
+            sub="ITC-eligible on every purchase"
+          />
+          <TrustItem
+            icon={ShieldCheck}
+            title="1-year warranty"
+            sub="On all Keystonne equipment"
+          />
+          <TrustItem
+            icon={Wrench}
+            title="Installation"
+            sub="Included for orders above ₹10L"
+          />
+        </div>
+      </div>
+
+      {/* Link columns */}
+      <div className="mx-auto grid max-w-[1400px] grid-cols-2 gap-8 px-6 py-12 md:grid-cols-12">
+        {/* Brand + pitch */}
+        <div className="col-span-2 md:col-span-3">
+          <KeystonneLogo href={null} className="!h-8" />
+          <p className="mt-4 max-w-xs text-sm text-white/70">
+            India&apos;s commercial kitchen procurement platform. Catalog,
+            spec, quote, and source equipment for restaurants, hotels, cloud
+            kitchens, and institutions — all in one place.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-2 text-[11px] uppercase tracking-wider text-white/60">
+            <span className="rounded border border-white/15 px-2 py-1">
+              Made in India
+            </span>
+            <span className="rounded border border-white/15 px-2 py-1">
+              GST registered
+            </span>
+            <span className="rounded border border-white/15 px-2 py-1">
+              MSME-friendly
+            </span>
+          </div>
+        </div>
+
+        <FooterColumn title="Shop categories">
+          {categories.slice(0, 8).map((c) => (
+            <FooterLink key={c.slug} to={`/collections/${c.slug}`}>
+              {c.name}
+            </FooterLink>
+          ))}
+          <FooterLink to="/collections/all">View all categories →</FooterLink>
+        </FooterColumn>
+
+        <FooterColumn title="Solutions">
+          <FooterLink to="/business-type/cloud-kitchen">Cloud kitchens</FooterLink>
+          <FooterLink to="/business-type/cafe">Cafés</FooterLink>
+          <FooterLink to="/business-type/hotel-kitchen">Hotel kitchens</FooterLink>
+          <FooterLink to="/business-type/qsr">QSR</FooterLink>
+          <FooterLink to="/business-type/fine-dining">Fine dining</FooterLink>
+          <FooterLink to="/business-type/catering-kitchen">Catering</FooterLink>
+          <FooterLink to="/business-type/new-venture">New venture? →</FooterLink>
+        </FooterColumn>
+
+        <FooterColumn title="Partners">
+          <FooterLink to="/partner">Become a partner</FooterLink>
+          <FooterLink to="/partner/login">Partner sign in</FooterLink>
+          <FooterLink to="/partner/dashboard/resources">Partner resources</FooterLink>
+          <FooterLink to="/kitchen-planner">Kitchen planner</FooterLink>
+          <FooterLink to="/upload-boq">Upload your BOQ</FooterLink>
+          <FooterLink to="/quote">Request a quote</FooterLink>
+        </FooterColumn>
+
+        <FooterColumn title="Company">
+          <FooterLink to="/about">About Keystonne</FooterLink>
+          <FooterLink to="/contact">Contact sales</FooterLink>
+          <FooterLink to="/policies">Policies</FooterLink>
+          <FooterLink to="/policies/shipping-policy">Shipping</FooterLink>
+          <FooterLink to="/policies/refund-policy">Returns</FooterLink>
+        </FooterColumn>
+      </div>
+
+      {/* Legal bar */}
+      <div className="border-t border-white/10">
+        <div className="mx-auto flex max-w-[1400px] flex-col items-start gap-2 px-6 py-4 text-[12px] text-white/60 md:flex-row md:items-center md:justify-between">
+          <span>© {new Date().getFullYear()} Keystonne. All rights reserved.</span>
+          <span className="tabular">
+            Standard terms: 71% advance · 29% before dispatch · 4–7 working days delivery
+          </span>
+        </div>
+      </div>
+    </footer>
   );
 }
 
-/**
- * @param {{
- *   menu: FooterQuery['menu'];
- *   primaryDomainUrl: FooterProps['header']['shop']['primaryDomain']['url'];
- *   publicStoreDomain: string;
- * }}
- */
-function FooterMenu({menu, primaryDomainUrl, publicStoreDomain}) {
+function TrustItem({icon: Icon, title, sub}) {
   return (
-    <nav className="footer-menu" role="navigation">
-      {(menu || FALLBACK_FOOTER_MENU).items.map((item) => {
-        if (!item.url) return null;
-        // if the url is internal, we strip the domain
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-        const isExternal = !url.startsWith('/');
-        return isExternal ? (
-          <a href={url} key={item.id} rel="noopener noreferrer" target="_blank">
-            {item.title}
-          </a>
-        ) : (
-          <NavLink
-            end
-            key={item.id}
-            prefetch="intent"
-            style={activeLinkStyle}
-            to={url}
-          >
-            {item.title}
-          </NavLink>
-        );
-      })}
-    </nav>
+    <div className="flex items-start gap-3">
+      <Icon className="mt-0.5 h-5 w-5 shrink-0 text-brand-accent" />
+      <div>
+        <div className="text-sm font-semibold text-white">{title}</div>
+        <div className="text-[12px] text-white/70">{sub}</div>
+      </div>
+    </div>
   );
 }
 
-const FALLBACK_FOOTER_MENU = {
-  id: 'gid://shopify/Menu/199655620664',
-  items: [
-    {
-      id: 'gid://shopify/MenuItem/461633060920',
-      resourceId: 'gid://shopify/ShopPolicy/23358046264',
-      tags: [],
-      title: 'Privacy Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/privacy-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633093688',
-      resourceId: 'gid://shopify/ShopPolicy/23358013496',
-      tags: [],
-      title: 'Refund Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/refund-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633126456',
-      resourceId: 'gid://shopify/ShopPolicy/23358111800',
-      tags: [],
-      title: 'Shipping Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/shipping-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633159224',
-      resourceId: 'gid://shopify/ShopPolicy/23358079032',
-      tags: [],
-      title: 'Terms of Service',
-      type: 'SHOP_POLICY',
-      url: '/policies/terms-of-service',
-      items: [],
-    },
-  ],
-};
-
-/**
- * @param {{
- *   isActive: boolean;
- *   isPending: boolean;
- * }}
- */
-function activeLinkStyle({isActive, isPending}) {
-  return {
-    fontWeight: isActive ? 'bold' : undefined,
-    color: isPending ? 'grey' : 'white',
-  };
+function FooterColumn({title, children}) {
+  return (
+    <div className="md:col-span-2 lg:col-span-2">
+      <h4 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-white/60">
+        {title}
+      </h4>
+      <ul className="space-y-2 text-sm">{children}</ul>
+    </div>
+  );
 }
 
-/**
- * @typedef {Object} FooterProps
- * @property {Promise<FooterQuery|null>} footer
- * @property {HeaderQuery} header
- * @property {string} publicStoreDomain
- */
-
-/** @typedef {import('storefrontapi.generated').FooterQuery} FooterQuery */
-/** @typedef {import('storefrontapi.generated').HeaderQuery} HeaderQuery */
+function FooterLink({to, children}) {
+  return (
+    <li>
+      <Link
+        to={to}
+        prefetch="intent"
+        className="text-white/80 hover:text-white hover:underline"
+      >
+        {children}
+      </Link>
+    </li>
+  );
+}
