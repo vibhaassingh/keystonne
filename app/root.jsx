@@ -8,6 +8,7 @@ import {
   Scripts,
   ScrollRestoration,
   useRouteLoaderData,
+  useLocation,
 } from 'react-router';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import {QuoteCartProvider} from '~/lib/quoteCart';
@@ -172,10 +173,15 @@ export function Layout({children}) {
 export default function App() {
   /** @type {RootLoader} */
   const data = useRouteLoaderData('root');
+  const location = useLocation();
 
-  if (!data) {
-    return <Outlet />;
-  }
+  // Partner-dashboard routes provide their own chrome via PartnerShell, so
+  // we skip the storefront PageLayout to avoid double headers. We still
+  // need the QuoteCartProvider — a partner clicking "Storefront" returns
+  // to /  with the cart intact.
+  const isPartnerDashboard = location.pathname.startsWith('/partner/dashboard');
+
+  if (!data) return <Outlet />;
 
   return (
     <Analytics.Provider
@@ -184,9 +190,13 @@ export default function App() {
       consent={data.consent}
     >
       <QuoteCartProvider>
-        <PageLayout {...data}>
+        {isPartnerDashboard ? (
           <Outlet />
-        </PageLayout>
+        ) : (
+          <PageLayout {...data}>
+            <Outlet />
+          </PageLayout>
+        )}
       </QuoteCartProvider>
     </Analytics.Provider>
   );
