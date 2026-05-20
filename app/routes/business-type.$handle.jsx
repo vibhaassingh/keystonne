@@ -1,6 +1,6 @@
 import {Link, useParams} from 'react-router';
 import {
-  ArrowRight, ChevronRight, Wand2, MessageCircle, Quote, ArrowUpRight,
+  ArrowRight, ChevronRight, MessageCircle, Sparkles, Wand2, Quote, ArrowUpRight,
 } from 'lucide-react';
 import {businessTypeBySlug, businessTypes} from '~/lib/mock/businessTypes';
 import {categoryBySlug} from '~/lib/mock/categories';
@@ -10,10 +10,20 @@ import {RequestQuoteCTA} from '~/components/RequestQuoteCTA';
 import {cn} from '~/lib/utils/cn';
 
 /**
- * Templated landing page for every business type Keystonne sells to.
- * Driven by `app/lib/mock/businessTypes.js`. The 14 entries are locked
- * by CLAUDE.md §6 — the page handles unknown slugs by falling back to
- * the new-venture entry.
+ * Apple-style "solution" page for each of the 14 locked business types
+ * (CLAUDE.md §6 — slugs / names / IA do not change).
+ *
+ * Structure:
+ *   1. Editorial hero — eyebrow + display headline + procurement-pain
+ *      subhead + dual CTAs + a sample "at a glance" side panel
+ *   2. Pain points — three premium cards with numbered chips
+ *   3. AI planner band — a quiet pre-filled invite to the wizard
+ *   4. Suggested categories — neutral Apple cards
+ *   5. Suggested products — uses the updated FeaturedRow / ProductCard
+ *   6. Cross-link to other ventures
+ *   7. Sticky procurement strip
+ *
+ * Special-cased copy for `new-venture` per brief §10.
  */
 
 export const meta = ({params}) => {
@@ -21,7 +31,12 @@ export const meta = ({params}) => {
   const name = b?.name ?? 'Business type';
   return [
     {title: `${name} kitchens — Keystonne`},
-    {name: 'description', content: b?.tagline ?? 'Commercial kitchen equipment for India.'},
+    {
+      name: 'description',
+      content:
+        b?.tagline ??
+        'Commercial kitchen equipment specified for India.',
+    },
   ];
 };
 
@@ -39,300 +54,534 @@ export default function BusinessTypePage() {
     .map((slug) => productBySlug[slug])
     .filter(Boolean);
 
-  const Icon = b.icon;
+  const isNewVenture = b.slug === 'new-venture';
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative mx-auto max-w-[1400px] px-4 pt-8 md:px-6">
-        <div
-          className="relative overflow-hidden rounded-3xl text-white mesh-indigo"
-          style={{boxShadow: '0 30px 80px -30px rgba(10,13,20,0.45), inset 0 1px 0 rgba(255,255,255,0.08)'}}
-        >
-          <div className="pointer-events-none absolute inset-0">
-            <div className="absolute -top-16 -left-10 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
-            <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-white/[0.05] blur-3xl" />
-          </div>
-
-          <div className="relative grid gap-6 px-6 py-12 md:grid-cols-12 md:items-center md:px-14 md:py-20">
-            <div className="md:col-span-8">
-              <Breadcrumbs name={b.name} />
-
-              <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/90 backdrop-blur">
-                <Icon className="h-3.5 w-3.5" />
-                {b.hero.eyebrow}
-              </div>
-
-              <h1 className="mt-5 max-w-3xl text-[36px] font-semibold leading-[1.04] tracking-tight md:text-[56px]">
-                {b.hero.headline}
-              </h1>
-              <p className="mt-5 max-w-2xl text-base text-white/85 md:text-lg">
-                {b.hero.subhead}
-              </p>
-
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Link
-                  to={`/kitchen-planner?venture=${b.slug}`}
-                  prefetch="intent"
-                  className="inline-flex items-center gap-2 rounded-xl btn-accent px-5 py-3 text-sm font-semibold transition-transform hover:-translate-y-0.5"
-                >
-                  <Wand2 className="h-4 w-4" />
-                  {b.cta}
-                  <ArrowRight className="h-4 w-4 opacity-80" />
-                </Link>
-                <Link
-                  to="/quote"
-                  prefetch="intent"
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/5 px-5 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-white/10"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  Talk to a specialist
-                </Link>
-              </div>
-            </div>
-
-            {/* Stat panel */}
-            <aside className="md:col-span-4">
-              <div
-                className="rounded-2xl border border-white/25 bg-white/12 p-6 backdrop-blur-2xl"
-                style={{boxShadow: '0 20px 50px -20px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.28)'}}
-              >
-                <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/65">
-                  At a glance
-                </span>
-                <div className="tabular mt-2 text-3xl font-semibold text-white md:text-4xl">
-                  {b.name}
-                </div>
-                <p className="mt-2 text-sm text-white/75">{b.tagline}</p>
-
-                <div className="mt-5 rounded-xl bg-black/20 p-3 ring-1 ring-white/10">
-                  <div className="text-[11px] uppercase tracking-wider text-white/60">
-                    Categories spec'd most
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {cats.map((c) => (
-                      <span key={c.slug} className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] text-white/90">
-                        {c.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </aside>
-          </div>
-        </div>
-      </section>
-
-      {/* Pain points */}
-      <section className="mx-auto max-w-[1400px] px-4 py-12 md:px-6 md:py-16">
-        <header className="mb-8 max-w-xl">
-          <span className="eyebrow">What operators actually fight</span>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
-            {b.slug === 'new-venture'
-              ? 'The three problems first-time founders hit hardest.'
-              : `The three problems we hear from ${b.name.toLowerCase()} operators.`}
-          </h2>
-        </header>
-
-        <ul className="grid gap-4 md:grid-cols-3">
-          {b.pains.map((p, i) => (
-            <li key={p.title} className="card p-6">
-              <div className="flex items-center gap-3">
-                <div
-                  className="grid h-8 w-8 place-items-center rounded-lg text-white"
-                  style={{
-                    background: 'linear-gradient(135deg, var(--color-brand-primary-600), var(--color-brand-primary))',
-                    boxShadow: '0 6px 16px -8px rgba(67,56,202,0.5)',
-                  }}
-                >
-                  <span className="tabular text-[12px] font-semibold">0{i + 1}</span>
-                </div>
-                <h3 className="text-base font-semibold text-ink">{p.title}</h3>
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-gray-600">
-                {p.body}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Suggested categories */}
-      <section className="mx-auto max-w-[1400px] px-4 pb-12 md:px-6 md:pb-16">
-        <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <span className="eyebrow">Equipment for the spec</span>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
-              Categories you'll need first.
-            </h2>
-          </div>
-        </header>
-
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {cats.map((c) => {
-            const Icon = c.icon;
-            return (
-              <li key={c.slug}>
-                <Link
-                  to={`/collections/${c.slug}`}
-                  prefetch="intent"
-                  className="card card-hover group flex h-full flex-col gap-3 p-4"
-                >
-                  <div
-                    className="grid h-10 w-10 place-items-center rounded-xl text-white"
-                    style={{
-                      background: 'linear-gradient(135deg, var(--color-brand-primary-600), var(--color-brand-primary))',
-                      boxShadow: '0 6px 16px -8px rgba(67,56,202,0.5)',
-                    }}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-[13px] font-semibold text-ink">
-                      {c.name}
-                    </div>
-                    <div className="mt-1 line-clamp-2 text-[11px] text-gray-500">
-                      {c.blurb}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 text-[11px] font-semibold text-brand-primary opacity-0 transition-opacity group-hover:opacity-100">
-                    Shop <ArrowUpRight className="h-3 w-3" />
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-
-      {/* Suggested products */}
+      <Hero b={b} cats={cats} isNewVenture={isNewVenture} />
+      <Pains b={b} isNewVenture={isNewVenture} />
+      <PlannerBand b={b} isNewVenture={isNewVenture} />
+      <Categories cats={cats} b={b} />
       {products.length > 0 && (
-        <section className="mx-auto max-w-[1400px] px-4 pb-12 md:px-6 md:pb-16">
-          <header className="mb-6">
-            <span className="eyebrow">
-              {b.slug === 'new-venture'
-                ? 'Common starter kit'
-                : `Hand-picked for ${b.name.toLowerCase()}`}
-            </span>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
-              Start with these.
-            </h2>
-          </header>
-
-          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {products.map((p) => (
-              <li key={p.slug}>
-                <ProductCard product={p} />
-              </li>
-            ))}
-          </ul>
-        </section>
+        <SuggestedProducts b={b} products={products} isNewVenture={isNewVenture} />
       )}
-
-      {/* Testimonial — only if defined */}
-      {b.testimonial && (
-        <section className="mx-auto max-w-[1400px] px-4 pb-12 md:px-6 md:pb-16">
-          <div
-            className="relative overflow-hidden rounded-3xl px-6 py-12 md:px-14 md:py-16"
-            style={{
-              background:
-                'linear-gradient(135deg, rgba(99,102,241,0.10), rgba(245,158,11,0.08)), white',
-              border: '1px solid rgba(10,13,20,0.06)',
-              boxShadow: 'var(--shadow-glass)',
-            }}
-          >
-            <Quote className="h-10 w-10 text-brand-primary/30" />
-            <blockquote className="mt-4 max-w-3xl text-xl font-medium leading-snug text-ink md:text-2xl">
-              "{b.testimonial.quote}"
-            </blockquote>
-            <footer className="mt-6 text-sm text-gray-600">
-              <span className="font-semibold text-ink">{b.testimonial.name}</span>
-              {' — '}{b.testimonial.role}
-              {b.testimonial.location && (
-                <>, <span className="text-gray-500">{b.testimonial.location}</span></>
-              )}
-            </footer>
-          </div>
-        </section>
-      )}
-
-      {/* Cross-link to other types */}
-      <section className="mx-auto max-w-[1400px] px-4 pb-12 md:px-6 md:pb-16">
-        <header className="mb-5">
-          <span className="eyebrow">Or browse by venture</span>
-          <h2 className="mt-2 text-xl font-semibold tracking-tight text-ink md:text-2xl">
-            Building something else? We cover that too.
-          </h2>
-        </header>
-
-        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-          {businessTypes
-            .filter((bt) => bt.slug !== b.slug)
-            .map((bt) => {
-              const IconBt = bt.icon;
-              return (
-                <li key={bt.slug}>
-                  <Link
-                    to={`/business-type/${bt.slug}`}
-                    prefetch="intent"
-                    className={cn(
-                      'flex items-center gap-2 rounded-xl border border-gray-200 bg-white/80 px-3 py-2.5 text-[13px] font-medium text-ink backdrop-blur transition-colors hover:border-brand-primary hover:text-brand-primary',
-                      bt.slug === 'new-venture' && 'border-brand-accent/30 bg-brand-accent/5 text-brand-accent hover:border-brand-accent hover:text-brand-accent',
-                    )}
-                  >
-                    <IconBt className="h-4 w-4" />
-                    {bt.name}
-                  </Link>
-                </li>
-              );
-            })}
-        </ul>
-      </section>
-
+      {b.testimonial && <TestimonialPanel t={b.testimonial} />}
+      <CrossLink current={b.slug} />
       <RequestQuoteCTA />
     </>
   );
 }
 
+/* ── Hero ──────────────────────────────────────────────────────── */
+
+function Hero({b, cats, isNewVenture}) {
+  const Icon = b.icon;
+
+  // New-venture overrides per brief §10 — copy speaks to first-time
+  // founders, secondary CTA points back to the wizard rather than the catalog.
+  const eyebrow = isNewVenture
+    ? 'For first-time founders'
+    : b.hero.eyebrow;
+  const headlineMain = isNewVenture
+    ? 'Still shaping the concept?'
+    : b.hero.headline;
+  const headlineMuted = isNewVenture
+    ? 'Start with the kitchen.'
+    : null;
+  const subhead = isNewVenture
+    ? 'Tell us your menu, service model, city, and budget. Keystonne will turn it into a first equipment plan.'
+    : b.hero.subhead;
+
+  return (
+    <section className="mx-auto max-w-[1400px] px-4 pt-8 md:px-6 md:pt-12">
+      <div className="apple-hero relative overflow-hidden px-6 py-12 md:px-14 md:py-20">
+        <div className="grid gap-10 md:grid-cols-12 md:items-center">
+          <div className="md:col-span-7">
+            <Breadcrumbs name={b.name} />
+
+            <span className="apple-eyebrow mt-5">
+              <Icon className="h-3 w-3" strokeWidth={1.7} />
+              {eyebrow}
+            </span>
+
+            <h1 className="apple-display mt-4">
+              {headlineMain}
+              {headlineMuted && (
+                <>
+                  {' '}
+                  <span style={{color: 'var(--ks-muted)'}}>
+                    {headlineMuted}
+                  </span>
+                </>
+              )}
+            </h1>
+
+            <p
+              className="apple-subhead mt-5 max-w-xl"
+              style={{color: 'var(--ks-ink-2)'}}
+            >
+              {subhead}
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Link
+                to={`/kitchen-planner?venture=${b.slug}`}
+                prefetch="intent"
+                className="apple-button-primary"
+              >
+                <Wand2 className="h-4 w-4" />
+                {b.cta}
+                <ArrowRight className="h-4 w-4 opacity-70" />
+              </Link>
+              <Link
+                to={isNewVenture ? '/collections/all' : '/quote'}
+                prefetch="intent"
+                className="apple-button-ghost"
+              >
+                {isNewVenture ? (
+                  <>Browse the catalog</>
+                ) : (
+                  <>
+                    <MessageCircle className="h-4 w-4" />
+                    Talk to a specialist
+                  </>
+                )}
+              </Link>
+            </div>
+          </div>
+
+          {/* ── Sample stat panel — Apple-style "at a glance" card ── */}
+          <aside className="md:col-span-5">
+            <SamplePanel b={b} cats={cats} isNewVenture={isNewVenture} />
+          </aside>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SamplePanel({b, cats, isNewVenture}) {
+  const Icon = b.icon;
+  return (
+    <div
+      className="rounded-[var(--ks-radius-lg)] p-6"
+      style={{
+        background: 'var(--ks-card-solid)',
+        border: '1px solid var(--ks-line-soft)',
+        boxShadow: 'var(--ks-shadow-card)',
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <span className="apple-eyebrow">At a glance</span>
+        <span
+          className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em]"
+          style={{
+            background: '#f0f0f3',
+            color: 'var(--ks-ink)',
+          }}
+        >
+          <Icon className="h-3 w-3" strokeWidth={1.7} />
+          {b.name}
+        </span>
+      </div>
+
+      <div
+        className="mt-4 text-[22px] font-semibold leading-tight md:text-[24px]"
+        style={{color: 'var(--ks-ink)'}}
+      >
+        {b.tagline}
+      </div>
+
+      <div
+        className="mt-5 rounded-[var(--ks-radius-md)] p-4"
+        style={{
+          background: 'var(--ks-page-warm)',
+          border: '1px solid var(--ks-line-soft)',
+        }}
+      >
+        <div
+          className="text-[11px] font-semibold uppercase tracking-[0.10em]"
+          style={{color: 'var(--ks-muted)'}}
+        >
+          Categories typically spec'd
+        </div>
+        <ul className="mt-2.5 flex flex-wrap gap-1.5">
+          {cats.slice(0, 6).map((c) => (
+            <li
+              key={c.slug}
+              className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px]"
+              style={{
+                background: 'var(--ks-card-solid)',
+                border: '1px solid var(--ks-line-soft)',
+                color: 'var(--ks-ink-2)',
+              }}
+            >
+              {c.name}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <Link
+        to={`/kitchen-planner?venture=${b.slug}`}
+        prefetch="intent"
+        className="mt-5 inline-flex items-center gap-1 text-[13px] font-medium"
+        style={{color: 'var(--ks-blue)'}}
+      >
+        {isNewVenture
+          ? 'Start with the AI planner'
+          : `Plan a ${b.name.toLowerCase()} kitchen`}
+        <ArrowRight className="h-3.5 w-3.5" />
+      </Link>
+    </div>
+  );
+}
+
+/* ── Pains ─────────────────────────────────────────────────────── */
+
+function Pains({b, isNewVenture}) {
+  return (
+    <section className="mx-auto max-w-[1400px] px-4 py-12 md:px-6 md:py-16">
+      <header className="mb-8 max-w-2xl">
+        <span className="apple-eyebrow">What operators actually fight</span>
+        <h2
+          className="mt-3 text-2xl font-semibold tracking-tight md:text-[32px]"
+          style={{color: 'var(--ks-ink)'}}
+        >
+          {isNewVenture
+            ? 'The three problems first-time founders hit hardest.'
+            : `Three problems we hear from ${b.name.toLowerCase()} operators.`}
+        </h2>
+      </header>
+
+      <ul className="grid gap-3 md:grid-cols-3">
+        {b.pains.map((p, i) => (
+          <li
+            key={p.title}
+            className="premium-card flex h-full flex-col gap-3 p-6"
+          >
+            <div className="flex items-center gap-3">
+              <span
+                className="tabular grid h-8 w-8 place-items-center rounded-full text-[12px] font-semibold"
+                style={{
+                  background: 'var(--ks-ink)',
+                  color: '#ffffff',
+                }}
+              >
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3
+                className="text-[15px] font-semibold leading-snug"
+                style={{color: 'var(--ks-ink)'}}
+              >
+                {p.title}
+              </h3>
+            </div>
+            <p
+              className="text-[13px] leading-relaxed"
+              style={{color: 'var(--ks-ink-2)'}}
+            >
+              {p.body}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/* ── Planner band ──────────────────────────────────────────────── */
+
+function PlannerBand({b, isNewVenture}) {
+  // Per-venture, plain-language seed string that pre-fills the planner.
+  const seed = `${b.name} kitchen — ${b.tagline.toLowerCase().replace(/\.$/, '')}.`;
+  const href = `/kitchen-planner?venture=${b.slug}&q=${encodeURIComponent(seed)}`;
+
+  return (
+    <section className="mx-auto max-w-[1100px] px-4 py-8 md:px-6 md:py-12">
+      <div className="premium-panel p-6 md:p-9">
+        <div className="grid gap-6 md:grid-cols-12 md:items-center">
+          <div className="md:col-span-8">
+            <span className="apple-eyebrow">
+              <Sparkles className="h-3 w-3" style={{color: 'var(--ks-blue)'}} />
+              AI Kitchen Planner
+            </span>
+            <h2
+              className="mt-3 text-xl font-semibold tracking-tight md:text-2xl"
+              style={{color: 'var(--ks-ink)'}}
+            >
+              {isNewVenture
+                ? 'Describe what you’re building. We’ll plan the kitchen.'
+                : `Plan the ${b.name.toLowerCase()} you’re building, in five questions.`}
+            </h2>
+            <p
+              className="mt-2 max-w-xl text-[14px] leading-relaxed"
+              style={{color: 'var(--ks-ink-2)'}}
+            >
+              Cuisine, capacity, location, budget — anything the planner
+              should know. You&apos;ll receive a station-grouped equipment
+              plan and a first-pass capex estimate. The seed has been
+              pre-filled for {isNewVenture ? 'a new venture' : `a ${b.name.toLowerCase()}`}.
+            </p>
+          </div>
+          <div className="md:col-span-4 md:justify-self-end">
+            <Link
+              to={href}
+              prefetch="intent"
+              className="apple-button-primary"
+            >
+              <Wand2 className="h-4 w-4" />
+              Launch the planner
+              <ArrowRight className="h-4 w-4 opacity-70" />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Categories ────────────────────────────────────────────────── */
+
+function Categories({cats, b}) {
+  return (
+    <section className="mx-auto max-w-[1400px] px-4 py-12 md:px-6 md:py-16">
+      <header className="mb-7 max-w-2xl">
+        <span className="apple-eyebrow">Equipment for the spec</span>
+        <h2
+          className="mt-3 text-2xl font-semibold tracking-tight md:text-[32px]"
+          style={{color: 'var(--ks-ink)'}}
+        >
+          Categories you&apos;ll need first.
+        </h2>
+        <p
+          className="mt-2 max-w-xl text-[14px] leading-relaxed"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
+          A {b.name.toLowerCase()} usually starts with {cats.length} categories
+          on the spec sheet. Browse to compare; the planner will pull from
+          the same catalog.
+        </p>
+      </header>
+
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        {cats.map((c) => {
+          const Icon = c.icon;
+          return (
+            <li key={c.slug}>
+              <Link
+                to={`/collections/${c.slug}`}
+                prefetch="intent"
+                className="group flex h-full flex-col rounded-[var(--ks-radius-md)] p-4 transition-colors"
+                style={{
+                  background: 'var(--ks-card-solid)',
+                  border: '1px solid var(--ks-line-soft)',
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div
+                    className="grid h-9 w-9 place-items-center rounded-lg"
+                    style={{background: '#f0f0f3'}}
+                  >
+                    <Icon
+                      className="h-4 w-4"
+                      strokeWidth={1.6}
+                      style={{color: 'var(--ks-ink)'}}
+                    />
+                  </div>
+                  <ArrowUpRight
+                    className="h-3.5 w-3.5 opacity-0 transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
+                    style={{color: 'var(--ks-muted)'}}
+                  />
+                </div>
+                <div
+                  className="mt-3 text-[13px] font-semibold leading-snug"
+                  style={{color: 'var(--ks-ink)'}}
+                >
+                  {c.name}
+                </div>
+                <p
+                  className="mt-1 line-clamp-2 text-[11px] leading-snug"
+                  style={{color: 'var(--ks-ink-2)'}}
+                >
+                  {c.blurb}
+                </p>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+/* ── Suggested products row ────────────────────────────────────── */
+
+function SuggestedProducts({b, products, isNewVenture}) {
+  return (
+    <section className="mx-auto max-w-[1400px] px-4 py-8 md:px-6 md:py-12">
+      <header className="mb-7 max-w-2xl">
+        <span className="apple-eyebrow">
+          {isNewVenture
+            ? 'Common starter kit'
+            : `Hand-picked for ${b.name.toLowerCase()}`}
+        </span>
+        <h2
+          className="mt-3 text-2xl font-semibold tracking-tight md:text-[32px]"
+          style={{color: 'var(--ks-ink)'}}
+        >
+          Start with these.
+        </h2>
+      </header>
+
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {products.map((p) => (
+          <li key={p.slug}>
+            <ProductCard product={p} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/* ── Testimonial ───────────────────────────────────────────────── */
+
+function TestimonialPanel({t}) {
+  return (
+    <section className="mx-auto max-w-[1400px] px-4 py-8 md:px-6 md:py-12">
+      <div className="premium-panel relative overflow-hidden p-8 md:p-14">
+        <Quote
+          className="h-10 w-10"
+          strokeWidth={1.5}
+          style={{color: 'var(--ks-line)'}}
+        />
+        <blockquote
+          className="mt-4 max-w-3xl text-xl font-medium leading-snug md:text-2xl"
+          style={{color: 'var(--ks-ink)'}}
+        >
+          &ldquo;{t.quote}&rdquo;
+        </blockquote>
+        <footer
+          className="mt-6 text-sm"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
+          <span
+            className="font-semibold"
+            style={{color: 'var(--ks-ink)'}}
+          >
+            {t.name}
+          </span>
+          {' — '}
+          {t.role}
+          {t.location && (
+            <>
+              ,{' '}
+              <span style={{color: 'var(--ks-muted)'}}>{t.location}</span>
+            </>
+          )}
+        </footer>
+      </div>
+    </section>
+  );
+}
+
+/* ── Cross-link ────────────────────────────────────────────────── */
+
+function CrossLink({current}) {
+  return (
+    <section className="mx-auto max-w-[1400px] px-4 py-10 md:px-6 md:py-14">
+      <header className="mb-6 max-w-2xl">
+        <span className="apple-eyebrow">Or browse by venture</span>
+        <h2
+          className="mt-3 text-xl font-semibold tracking-tight md:text-2xl"
+          style={{color: 'var(--ks-ink)'}}
+        >
+          Building something else? We cover that too.
+        </h2>
+      </header>
+
+      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+        {businessTypes
+          .filter((bt) => bt.slug !== current)
+          .map((bt) => {
+            const Icon = bt.icon;
+            const isNewVenture = bt.slug === 'new-venture';
+            return (
+              <li key={bt.slug}>
+                <Link
+                  to={`/business-type/${bt.slug}`}
+                  prefetch="intent"
+                  className={cn(
+                    'flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-medium transition-colors',
+                  )}
+                  style={{
+                    background: isNewVenture
+                      ? 'var(--ks-blue-soft)'
+                      : 'var(--ks-card-solid)',
+                    color: isNewVenture
+                      ? 'var(--ks-blue)'
+                      : 'var(--ks-ink-2)',
+                    border: '1px solid ' + (isNewVenture ? 'rgba(0,113,227,0.18)' : 'var(--ks-line-soft)'),
+                  }}
+                >
+                  <Icon className="h-3.5 w-3.5" strokeWidth={1.6} />
+                  {bt.name}
+                </Link>
+              </li>
+            );
+          })}
+      </ul>
+    </section>
+  );
+}
+
+/* ── Bits ──────────────────────────────────────────────────────── */
+
 function Breadcrumbs({name}) {
   return (
-    <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-[12px] text-white/60">
-      <Link to="/" className="hover:text-white">Home</Link>
+    <nav
+      aria-label="Breadcrumb"
+      className="flex items-center gap-1 text-[12px]"
+      style={{color: 'var(--ks-muted)'}}
+    >
+      <Link to="/" className="hover:underline">Home</Link>
       <ChevronRight className="h-3 w-3" />
-      <span className="text-white/80">Build for…</span>
+      <span>Build for…</span>
       <ChevronRight className="h-3 w-3" />
-      <span className="text-white">{name}</span>
+      <span style={{color: 'var(--ks-ink)'}}>{name}</span>
     </nav>
   );
 }
 
-/**
- * Unknown slug → fallback to the new-venture entry rather than a 404.
- * Per CLAUDE.md §6, "new-venture" is the universal "I don't know yet" path.
- */
 function UnknownVenture() {
   return (
-    <section className="mx-auto max-w-2xl px-4 py-20 text-center">
-      <h1 className="text-2xl font-semibold text-ink">
-        We don't have a page for that venture yet.
+    <section className="mx-auto max-w-2xl px-4 py-24 text-center">
+      <h1
+        className="text-2xl font-semibold"
+        style={{color: 'var(--ks-ink)'}}
+      >
+        We don&apos;t have a page for that venture yet.
       </h1>
-      <p className="mt-2 text-sm text-gray-600">
-        But we work with operators in every commercial-kitchen format in
-        India. Start with the AI planner — describe your venture and
-        we'll suggest the right equipment.
+      <p
+        className="mt-2 text-sm"
+        style={{color: 'var(--ks-ink-2)'}}
+      >
+        Start with the AI planner — describe your venture and we&apos;ll
+        suggest the right equipment.
       </p>
       <div className="mt-6 flex justify-center gap-3">
         <Link
           to="/kitchen-planner"
-          className="inline-flex items-center gap-1.5 rounded-xl btn-accent px-5 py-3 text-sm font-semibold"
+          className="apple-button-primary"
         >
           Build my kitchen
         </Link>
         <Link
           to="/business-type/new-venture"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-gray-300 px-5 py-3 text-sm font-semibold text-ink hover:border-ink/40"
+          className="apple-button-ghost"
         >
-          I'm starting from scratch
+          I&apos;m starting from scratch
         </Link>
       </div>
     </section>
