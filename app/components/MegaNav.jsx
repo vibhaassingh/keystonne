@@ -1,13 +1,21 @@
 import {useState, useRef, useEffect} from 'react';
 import {Link, NavLink} from 'react-router';
-import {ChevronDown, Wand2} from 'lucide-react';
+import {ChevronDown, Sparkles} from 'lucide-react';
 import {categories} from '~/lib/mock/categories';
 import {cn} from '~/lib/utils/cn';
 
 /**
- * Frosted-glass primary nav band, sits below the sticky Header. Hover/focus
- * a category to reveal the wide flyout with subgroups. On mobile this whole
- * component is hidden — categories live in the slide-over drawer.
+ * Bright Apple-inspired category tray, sitting below the sticky header.
+ *
+ * Top row: all 14 catalog categories (slugs + names locked by CLAUDE.md
+ * §6 — do not rename). Hovering / focusing a category reveals a
+ * .premium-panel flyout with that category's subgroups in 3 columns,
+ * each item paired with a one-line procurement hint that doubles as
+ * tertiary search text.
+ *
+ * Active / hover state: graphite text + subtle underline marker. The
+ * previous indigo block has been retired so the row reads more like an
+ * Apple Store tray than a coloured navigation strip.
  */
 export function MegaNav() {
   const [openSlug, setOpenSlug] = useState(null);
@@ -24,7 +32,13 @@ export function MegaNav() {
   return (
     <nav
       aria-label="Browse categories"
-      className="relative hidden border-b border-black/5 bg-white/65 backdrop-blur-xl md:block"
+      className="relative hidden md:block"
+      style={{
+        background: 'rgba(255, 255, 255, 0.78)',
+        backdropFilter: 'saturate(180%) blur(20px)',
+        WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+        borderBottom: '1px solid var(--ks-line-soft)',
+      }}
       onMouseLeave={scheduleClose}
     >
       <div className="mx-auto flex max-w-[1400px] items-stretch px-2">
@@ -44,33 +58,49 @@ export function MegaNav() {
                 prefetch="intent"
                 className={({isActive}) =>
                   cn(
-                    'flex items-center gap-1 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium text-ink/80 transition-colors hover:text-brand-primary',
-                    isActive && 'text-brand-primary',
-                    openSlug === c.slug && 'text-brand-primary',
+                    'flex items-center gap-1 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition-colors',
+                    isActive && 'font-semibold',
                   )
                 }
+                style={({isActive}) => ({
+                  color: isActive || openSlug === c.slug
+                    ? 'var(--ks-ink)'
+                    : 'var(--ks-ink-2)',
+                })}
               >
                 {c.name}
                 {c.subgroups?.length ? (
-                  <ChevronDown className={cn(
-                    'h-3 w-3 opacity-50 transition-transform',
-                    openSlug === c.slug && 'rotate-180 opacity-90',
-                  )} />
+                  <ChevronDown
+                    className={cn(
+                      'h-3 w-3 transition-transform',
+                      openSlug === c.slug && 'rotate-180',
+                    )}
+                    style={{opacity: 0.45}}
+                  />
                 ) : null}
               </NavLink>
               {openSlug === c.slug && (
-                <span className="pointer-events-none absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-brand-primary" />
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-3 -bottom-px h-0.5 rounded-full"
+                  style={{background: 'var(--ks-ink)'}}
+                />
               )}
             </li>
           ))}
         </ul>
 
+        {/* New-venture sidetrack — blue ink (system / AI guidance link). */}
         <Link
           to="/business-type/new-venture"
           prefetch="intent"
-          className="ml-auto flex items-center gap-1.5 border-l border-black/5 px-4 py-2.5 text-[13px] font-semibold text-brand-accent hover:bg-brand-accent/10"
+          className="ml-auto flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium transition-colors"
+          style={{
+            color: 'var(--ks-blue)',
+            borderLeft: '1px solid var(--ks-line-soft)',
+          }}
         >
-          <Wand2 className="h-3.5 w-3.5" />
+          <Sparkles className="h-3.5 w-3.5" />
           New venture? Start here
         </Link>
       </div>
@@ -97,42 +127,62 @@ function MegaFlyout({slug, onMouseEnter, onMouseLeave}) {
       aria-label={`${cat.name} subcategories`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="absolute left-0 right-0 top-full z-30 glass-strong rounded-b-2xl text-ink"
-      style={{borderTop: 'none'}}
+      className="absolute left-0 right-0 top-full z-30"
+      style={{
+        background: 'var(--ks-card-solid)',
+        borderTop: '1px solid var(--ks-line-soft)',
+        borderBottom: '1px solid var(--ks-line)',
+        boxShadow: '0 24px 60px -20px rgba(0,0,0,0.10)',
+      }}
     >
-      <div className="mx-auto grid max-w-[1400px] grid-cols-12 gap-6 px-6 py-7">
-        <div className="col-span-3 border-r border-black/5 pr-6">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-12 gap-6 px-6 py-8">
+        {/* Left — category summary */}
+        <div
+          className="col-span-3 pr-6"
+          style={{borderRight: '1px solid var(--ks-line-soft)'}}
+        >
           <div className="flex items-center gap-2">
             <div
-              className="grid h-9 w-9 place-items-center rounded-xl text-white"
+              className="grid h-9 w-9 place-items-center rounded-xl"
               style={{
-                background: 'linear-gradient(135deg, var(--color-brand-primary-600), var(--color-brand-primary))',
-                boxShadow: '0 6px 16px -8px rgba(67,56,202,0.6)',
+                background: '#f0f0f3',
+                color: 'var(--ks-ink)',
               }}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-4 w-4" strokeWidth={1.6} />
             </div>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-primary">
-              Category
-            </span>
+            <span className="apple-eyebrow">Category</span>
           </div>
-          <h3 className="mt-3 text-lg font-semibold leading-tight">
+          <h3
+            className="mt-3 text-lg font-semibold leading-tight"
+            style={{color: 'var(--ks-ink)'}}
+          >
             {cat.name}
           </h3>
-          <p className="mt-2 text-sm text-gray-600">{cat.blurb}</p>
+          <p
+            className="mt-2 text-sm"
+            style={{color: 'var(--ks-ink-2)'}}
+          >
+            {cat.blurb}
+          </p>
           <Link
             to={`/collections/${cat.slug}`}
             prefetch="intent"
-            className="mt-4 inline-flex text-sm font-semibold text-brand-primary hover:underline"
+            className="mt-4 inline-flex items-center gap-1 text-sm font-medium"
+            style={{color: 'var(--ks-ink)'}}
           >
             Shop all {cat.name} →
           </Link>
         </div>
 
-        <div className="col-span-9 grid grid-cols-2 gap-x-8 gap-y-5 lg:grid-cols-3">
+        {/* Right — subgroup columns with procurement hints */}
+        <div className="col-span-9 grid grid-cols-2 gap-x-8 gap-y-6 lg:grid-cols-3">
           {(cat.subgroups || []).map((sg) => (
             <div key={sg.title}>
-              <h4 className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-gray-500">
+              <h4
+                className="mb-2 text-[11px] font-semibold uppercase tracking-[0.10em]"
+                style={{color: 'var(--ks-muted)'}}
+              >
                 {sg.title}
               </h4>
               <ul className="space-y-1.5">
@@ -141,7 +191,8 @@ function MegaFlyout({slug, onMouseEnter, onMouseLeave}) {
                     <Link
                       to={`/collections/${cat.slug}`}
                       prefetch="intent"
-                      className="text-sm text-ink/75 hover:text-brand-primary"
+                      className="text-sm transition-colors hover:underline"
+                      style={{color: 'var(--ks-ink-2)'}}
                     >
                       {item}
                     </Link>

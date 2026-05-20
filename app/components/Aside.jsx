@@ -50,12 +50,13 @@ export function Aside({children, heading, type}) {
           : 'pointer-events-none opacity-0',
       )}
     >
-      {/* Scrim */}
+      {/* Scrim — softer for the Apple-style shell. */}
       <button
         type="button"
         aria-label="Close panel"
         onClick={close}
-        className="absolute inset-0 bg-ink/40"
+        className="absolute inset-0"
+        style={{background: 'rgba(0,0,0,0.32)'}}
       />
 
       {/* Panel */}
