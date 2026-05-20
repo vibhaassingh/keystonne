@@ -1,10 +1,27 @@
 @import 'tailwindcss';
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Keystonne design tokens — liquid-glass refresh (2026).
-   Layered surfaces, mesh gradients, soft elevation. Tokens exposed as
-   utility classes (text-ink, bg-surface, ring-glass-border, etc.) and as
-   CSS variables (--color-ink) for inline-style use.
+   Keystonne design system — Apple-inspired premium (2026).
+
+   Structure:
+     · @theme   — minimal Tailwind tokens (font + status palette only)
+     · :root    — full --ks-* token set: surfaces, type, lines, action
+                  colours (amber / emerald / blue), radii, shadows
+     · @layer base — page wash, body type, focus ring, selection
+     · @layer components — composable apple-* / premium-* / spec-* /
+                  partner-* / wizard-* classes paired freely with
+                  Tailwind utilities
+
+   Action-colour discipline (applies across the whole app):
+     · amber   = procurement / commercial action (Add to quote, etc.)
+     · emerald = partner money / status / action
+     · blue    = system links + AI guidance
+     · ink     = default neutral
+
+   The legacy liquid-glass tokens (--color-glass-*, .glass, .card,
+   .btn-primary, .btn-accent, .eyebrow, .mesh-*) were stripped in
+   Sprint 9 of the redesign after every route migrated to Apple
+   classes. No back-compat layer remains.
    ─────────────────────────────────────────────────────────────────────── */
 @theme {
   /* Type — Inter Tight for display, Inter for body */
@@ -14,37 +31,8 @@
   --font-display:
     'Inter Tight', 'Inter', system-ui, sans-serif;
 
-  /* Core surfaces */
-  --color-ink: #0a0d14;            /* deep near-black with cool tint */
-  --color-ink-soft: #1a1f2e;       /* lifted dark surface */
-  --color-surface: #f7f7f5;        /* warm off-white page bg */
-  --color-surface-2: #ffffff;      /* elevated card bg */
-
-  /* Brand — richer indigo for depth */
-  --color-brand-primary: #3730a3;
-  --color-brand-primary-700: #312e81;
-  --color-brand-primary-600: #4338ca;
-  --color-brand-primary-500: #6366f1;
-  --color-brand-primary-50: #eef2ff;
-
-  /* Warm amber accent — for CTAs and sale flags */
-  --color-brand-accent: #f59e0b;
-  --color-brand-accent-hover: #d97706;
-  --color-brand-accent-50: #fff7ed;
-
-  /* Partner-portal accent — emerald */
-  --color-partner-accent: #059669;
-  --color-partner-accent-hover: #047857;
-  --color-partner-accent-50: #ecfdf5;
-
-  /* Glass surfaces */
-  --color-glass-tint: rgba(255, 255, 255, 0.62);
-  --color-glass-tint-strong: rgba(255, 255, 255, 0.86);
-  --color-glass-tint-dark: rgba(10, 13, 20, 0.55);
-  --color-glass-border: rgba(255, 255, 255, 0.55);
-  --color-glass-border-dark: rgba(255, 255, 255, 0.10);
-
-  /* Deal status palette */
+  /* Deal / quote / ledger status palette — referenced inline by
+     DealStatusPill, the quote-state pill, and ledger / timeline. */
   --color-status-draft: #6b7280;
   --color-status-submitted: #2563eb;
   --color-status-review: #7c3aed;
@@ -63,198 +51,15 @@
   --header-height: 4.5rem;
   --announcement-height: 2rem;
   --container-max: 1400px;
-
-  /* Refined shadow stack — used inline (--shadow-glass) and via utilities */
-  --shadow-glass-sm: 0 1px 2px rgba(10, 13, 20, 0.06), 0 1px 1px rgba(10, 13, 20, 0.03);
-  --shadow-glass: 0 8px 24px -8px rgba(10, 13, 20, 0.12), 0 2px 4px -2px rgba(10, 13, 20, 0.06);
-  --shadow-glass-lg: 0 24px 60px -12px rgba(10, 13, 20, 0.18), 0 8px 16px -8px rgba(10, 13, 20, 0.08);
-  --shadow-glass-glow: 0 0 0 1px rgba(99, 102, 241, 0.08), 0 12px 36px -12px rgba(99, 102, 241, 0.25);
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Base typography. Tailwind Preflight handles the reset; we add the
-   font-family, layered mesh background, and a couple of B2B-density tweaks.
-   ─────────────────────────────────────────────────────────────────────── */
-@layer base {
-  html {
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
-
-  body {
-    background-color: var(--color-surface);
-    color: var(--color-ink);
-    font-feature-settings: 'cv11', 'ss01', 'ss03';
-    /* Subtle mesh gradient — three soft radial orbs over the off-white base.
-       Fixed-attachment means the orbs stay put as content scrolls past. */
-    background-image:
-      radial-gradient(900px 600px at 0% -10%, rgba(99, 102, 241, 0.10), transparent 60%),
-      radial-gradient(800px 500px at 100% 0%, rgba(245, 158, 11, 0.08), transparent 55%),
-      radial-gradient(700px 500px at 50% 100%, rgba(5, 150, 105, 0.06), transparent 60%);
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-  }
-
-  h1, h2, h3, h4 {
-    font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.022em;
-    line-height: 1.08;
-  }
-
-  h1 {
-    letter-spacing: -0.035em;
-  }
-
-  /* Tabular figures for prices, dashboards, ledgers */
-  .tabular {
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* Accessible focus outline */
-  :focus-visible {
-    outline: 2px solid var(--color-brand-primary-500);
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
-
-  /* Disable selection highlight blue */
-  ::selection {
-    background: rgba(99, 102, 241, 0.18);
-    color: var(--color-ink);
-  }
-}
-
-/* ──────────────────────────────────────────────────────────────────────────
-   Liquid-glass utility surfaces. Used across header, cards, panels. The
-   key ingredient is backdrop-filter for the frosted effect — falls back to
-   a flat opaque colour on browsers without backdrop-filter support.
-   ─────────────────────────────────────────────────────────────────────── */
-@layer components {
-  .glass {
-    background: var(--color-glass-tint);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border: 1px solid var(--color-glass-border);
-    box-shadow: var(--shadow-glass);
-  }
-
-  .glass-strong {
-    background: var(--color-glass-tint-strong);
-    backdrop-filter: saturate(180%) blur(24px);
-    -webkit-backdrop-filter: saturate(180%) blur(24px);
-    border: 1px solid var(--color-glass-border);
-    box-shadow: var(--shadow-glass);
-  }
-
-  .glass-dark {
-    background: var(--color-glass-tint-dark);
-    backdrop-filter: saturate(180%) blur(22px);
-    -webkit-backdrop-filter: saturate(180%) blur(22px);
-    border: 1px solid var(--color-glass-border-dark);
-  }
-
-  /* Inner highlight + outer shadow that reads as a soft glass card */
-  .card {
-    background: var(--color-surface-2);
-    border-radius: 16px;
-    border: 1px solid rgba(10, 13, 20, 0.06);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.8),
-      0 1px 2px rgba(10, 13, 20, 0.04),
-      0 8px 24px -16px rgba(10, 13, 20, 0.12);
-    transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
-  }
-  .card-hover:hover {
-    border-color: rgba(10, 13, 20, 0.10);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.8),
-      0 4px 8px rgba(10, 13, 20, 0.06),
-      0 24px 48px -16px rgba(10, 13, 20, 0.18);
-    transform: translateY(-2px);
-  }
-
-  /* Filled button — primary action. Layered for depth. */
-  .btn-primary {
-    background-image: linear-gradient(180deg, #4338ca 0%, #3730a3 100%);
-    color: white;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.20),
-      0 1px 2px rgba(10, 13, 20, 0.10),
-      0 8px 24px -12px rgba(67, 56, 202, 0.45);
-  }
-  .btn-primary:hover {
-    background-image: linear-gradient(180deg, #4f46e5 0%, #4338ca 100%);
-  }
-
-  .btn-accent {
-    background-image: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
-    color: white;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.25),
-      0 1px 2px rgba(10, 13, 20, 0.10),
-      0 8px 24px -12px rgba(245, 158, 11, 0.45);
-  }
-  .btn-accent:hover {
-    background-image: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
-  }
-
-  /* Soft pill — used for eyebrows, badges */
-  .eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.25rem 0.625rem;
-    border-radius: 9999px;
-    background: rgba(99, 102, 241, 0.10);
-    color: var(--color-brand-primary);
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  /* Soft divider line — used inside glass surfaces */
-  .glass-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(10, 13, 20, 0.10), transparent);
-  }
-
-  /* Background mesh wash — applied to large hero surfaces */
-  .mesh-indigo {
-    background-image:
-      radial-gradient(600px 400px at 0% 0%, rgba(99, 102, 241, 0.35), transparent 60%),
-      radial-gradient(700px 500px at 100% 100%, rgba(67, 56, 202, 0.30), transparent 55%),
-      linear-gradient(180deg, #1e1b4b 0%, #0a0d14 100%);
-  }
-  .mesh-emerald {
-    background-image:
-      radial-gradient(600px 400px at 0% 0%, rgba(5, 150, 105, 0.40), transparent 60%),
-      radial-gradient(700px 500px at 100% 100%, rgba(16, 185, 129, 0.25), transparent 55%),
-      linear-gradient(180deg, #064e3b 0%, #022c22 100%);
-  }
-  .mesh-warm {
-    background-image:
-      radial-gradient(600px 400px at 0% 0%, rgba(245, 158, 11, 0.30), transparent 60%),
-      radial-gradient(700px 500px at 100% 100%, rgba(217, 119, 6, 0.25), transparent 55%),
-      linear-gradient(180deg, #451a03 0%, #0a0d14 100%);
-  }
-}
-
-/* ──────────────────────────────────────────────────────────────────────────
-   APPLE-INSPIRED PREMIUM TOKENS — Sprint 1 of the redesign brief.
-
-   Additive only. The liquid-glass tokens + classes above remain in place
-   for back-compat through Sprint 8; components migrate one route at a
-   time to the .apple-* / .premium-* / .spec-* / .partner-* / .wizard-*
-   surfaces below, then the legacy classes get removed in the final
-   polish sprint.
+   APPLE-INSPIRED PREMIUM TOKENS.
 
    Inspiration: bright graphite-white commerce, hairline UI, calm
-   gradients, editorial type, focused single-CTA pages. No Apple assets,
-   logos, exact-page clones, or protected copy used.
-   ─────────────────────────────────────────────────────────────────── */
+   gradients, editorial type, focused single-CTA pages. No Apple
+   assets, logos, exact-page clones, or protected copy used.
+   ─────────────────────────────────────────────────────────────── */
 :root {
   /* Surfaces ------------------------------------------------------- */
   --ks-page: #f5f5f7;            /* Page background — graphite-white */
@@ -288,7 +93,7 @@
   --ks-blue-dark: #0058b4;
   --ks-blue-soft: #e8f1fd;
 
-  /* Status (matches the existing --color-status-* palette) -------- */
+  /* Status (matches the --color-status-* palette) ----------------- */
   --ks-status-positive: #0a7f56;
   --ks-status-warn: #b86b00;
   --ks-status-negative: #c2410c;
@@ -320,15 +125,18 @@
   --ks-nav-border: rgba(0, 0, 0, 0.08);
 }
 
-/* Body — calm graphite-white wash replacing the indigo / amber mesh.
-   Existing components that target body-level dark surfaces (Header,
-   AnnouncementBar, Footer, PartnerShell topbar) overlay this entirely,
-   so the change is felt only in the gaps between cards — exactly the
-   gradient direction the brief asks for. */
+/* Body — calm graphite-white wash with a soft white halo at the top. */
 @layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
     background: var(--ks-page);
     color: var(--ks-ink);
+    font-feature-settings: 'cv11', 'ss01', 'ss03';
     background-image:
       radial-gradient(1100px 600px at 50% -220px,
         rgba(255, 255, 255, 0.95), transparent 72%),
@@ -339,7 +147,30 @@
     background-attachment: fixed;
   }
 
-  /* Apple-style selection — calmer than indigo */
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    line-height: 1.08;
+  }
+
+  h1 {
+    letter-spacing: -0.035em;
+  }
+
+  /* Tabular figures for prices, dashboards, ledgers */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Accessible focus outline — calm blue ring */
+  :focus-visible {
+    outline: 2px solid var(--ks-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Apple-style selection — soft blue */
   ::selection {
     background: rgba(0, 113, 227, 0.16);
     color: var(--ks-ink);
@@ -585,4 +416,3 @@
     background: var(--ks-line-soft);
   }
 }
-

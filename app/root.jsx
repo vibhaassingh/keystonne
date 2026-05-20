@@ -88,22 +88,35 @@ export function ErrorBoundary() {
   }
 
   return (
-    <section className="mx-auto max-w-xl px-4 py-20 text-center">
-      <div className="tabular text-[11px] uppercase tracking-wider text-gray-500">
+    <section className="mx-auto max-w-xl px-4 py-24 text-center">
+      <div
+        className="text-[11px] uppercase tracking-[0.10em]"
+        style={{
+          color: 'var(--ks-muted)',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
         Error {errorStatus}
       </div>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink">
+      <h1
+        className="mt-2 text-3xl font-semibold tracking-tight"
+        style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+      >
         Something went sideways.
       </h1>
       {errorMessage && (
-        <pre className="mt-4 overflow-x-auto rounded-xl border border-gray-200 bg-white p-4 text-left text-[12px] text-gray-700">
+        <pre
+          className="mt-5 overflow-x-auto rounded-xl p-4 text-left text-[12px]"
+          style={{
+            background: 'var(--ks-card-tint)',
+            border: '1px solid var(--ks-line-soft)',
+            color: 'var(--ks-ink-2)',
+          }}
+        >
           {errorMessage}
         </pre>
       )}
-      <a
-        href="/"
-        className="mt-6 inline-flex items-center gap-1.5 rounded-xl btn-primary px-4 py-2.5 text-sm font-semibold"
-      >
+      <a href="/" className="apple-button-primary mt-7 inline-flex">
         Back to home
       </a>
     </section>

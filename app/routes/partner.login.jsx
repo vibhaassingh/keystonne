@@ -56,8 +56,10 @@ export default function PartnerLogin() {
               ledger.
             </p>
 
-            {/* Disabled "real" form — visible to communicate Phase 2 intent */}
-            <form className="mt-6 grid gap-4" aria-disabled="true">
+            {/* Disabled "real" form — visible to communicate Phase 2 intent.
+                Use fieldset[disabled] so the semantics are valid (form role
+                doesn't support aria-disabled). */}
+            <fieldset className="mt-6 grid gap-4 border-0 p-0" disabled>
               <Field label="Mobile or email">
                 <DisabledInput placeholder="arjun@example.in or +91 98XXX XXXXX" />
               </Field>
@@ -77,7 +79,7 @@ export default function PartnerLogin() {
               >
                 Sign in
               </button>
-            </form>
+            </fieldset>
 
             <div
               className="mt-7 rounded-[var(--ks-radius-md)] p-5"

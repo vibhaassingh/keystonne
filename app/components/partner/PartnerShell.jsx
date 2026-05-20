@@ -7,7 +7,6 @@ import {
 import {KeystonneLogo} from '~/components/KeystonneLogo';
 import {usePartnerSession} from '~/lib/usePartnerSession';
 import {demoPartner} from '~/lib/mock/partner';
-import {cn} from '~/lib/utils/cn';
 
 /**
  * Wraps every /partner/dashboard/* route. Apple-inspired finance shell:
@@ -190,11 +189,7 @@ function Sidebar({onNavigate}) {
               end={end}
               onClick={onNavigate}
               prefetch="intent"
-              className={({isActive}) =>
-                cn(
-                  'group flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-colors',
-                )
-              }
+              className="group flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-colors"
               style={({isActive}) =>
                 isActive
                   ? {

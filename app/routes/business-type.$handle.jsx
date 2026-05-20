@@ -203,7 +203,7 @@ function SamplePanel({b, cats, isNewVenture}) {
           className="text-[11px] font-semibold uppercase tracking-[0.10em]"
           style={{color: 'var(--ks-muted)'}}
         >
-          Categories typically spec'd
+          Categories typically spec&apos;d
         </div>
         <ul className="mt-2.5 flex flex-wrap gap-1.5">
           {cats.slice(0, 6).map((c) => (

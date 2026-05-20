@@ -114,8 +114,8 @@ export default function DealDetail() {
               className="mt-5 space-y-5 pl-4"
               style={{borderLeft: '1px solid var(--ks-line-soft)'}}
             >
-              {deal.timeline.map((t, i) => (
-                <li key={i} className="relative">
+              {deal.timeline.map((t) => (
+                <li key={`${t.state}-${t.at}`} className="relative">
                   <div
                     className="absolute -left-[22px] top-1 grid h-3 w-3 place-items-center rounded-full"
                     style={{
@@ -188,8 +188,8 @@ export default function DealDetail() {
                   </tr>
                 </thead>
                 <tbody>
-                  {quote.lineItems.map((l, i) => (
-                    <tr key={i}>
+                  {quote.lineItems.map((l) => (
+                    <tr key={l.name}>
                       <td style={{color: 'var(--ks-ink)'}}>{l.name}</td>
                       <td className="num">{l.qty}</td>
                       <td className="num" style={{color: 'var(--ks-ink-2)'}}>

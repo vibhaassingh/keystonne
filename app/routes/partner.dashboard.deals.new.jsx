@@ -14,7 +14,7 @@ export const meta = () => [{title: 'Register a deal — Keystonne Partner'}];
 export default function NewDeal() {
   const {hydrated, isLoggedIn} = useRequirePartnerLogin();
   const navigate = useNavigate();
-  const [items, setItems] = useState([{sku: products[0].slug, qty: 1}]);
+  const [items, setItems] = useState([{uid: `l-${Date.now()}`, sku: products[0].slug, qty: 1}]);
   const [submitted, setSubmitted] = useState(false);
   const [refId, setRefId] = useState(null);
   const {register, handleSubmit, formState: {errors}} = useForm({
@@ -27,7 +27,10 @@ export default function NewDeal() {
   });
 
   function addItem() {
-    setItems((it) => [...it, {sku: products[0].slug, qty: 1}]);
+    setItems((it) => [
+      ...it,
+      {uid: `l-${Date.now()}-${it.length}`, sku: products[0].slug, qty: 1},
+    ]);
   }
   function removeItem(idx) {
     setItems((it) => it.filter((_, i) => i !== idx));
@@ -111,7 +114,7 @@ export default function NewDeal() {
               onClick={() => {
                 setSubmitted(false);
                 setRefId(null);
-                setItems([{sku: products[0].slug, qty: 1}]);
+                setItems([{uid: `l-${Date.now()}`, sku: products[0].slug, qty: 1}]);
               }}
               className="apple-button-primary"
             >
@@ -222,7 +225,7 @@ export default function NewDeal() {
                 const lineTotal = (p?.priceINR ?? 0) * line.qty;
                 return (
                   <li
-                    key={i}
+                    key={line.uid}
                     className="grid gap-3 rounded-xl p-3 md:grid-cols-12 md:items-center"
                     style={{
                       background: 'var(--ks-card-tint)',

@@ -77,7 +77,8 @@ export function Aside({children, heading, type}) {
             type="button"
             onClick={close}
             aria-label="Close"
-            className="grid h-8 w-8 place-items-center rounded text-gray-500 hover:bg-gray-100 hover:text-ink"
+            className="grid h-8 w-8 place-items-center rounded"
+            style={{color: 'var(--ks-muted)'}}
           >
             <X className="h-4 w-4" />
           </button>

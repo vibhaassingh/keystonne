@@ -44,7 +44,10 @@ function MobileCategoryAside() {
   return (
     <Aside type="mobile" heading="Browse Keystonne">
       <nav aria-label="Mobile menu" className="p-4">
-        <ul className="divide-y divide-gray-200">
+        <ul
+          className="divide-y"
+          style={{borderColor: 'var(--ks-line-soft)'}}
+        >
           {categories.map((c) => {
             const Icon = c.icon;
             return (
@@ -52,9 +55,14 @@ function MobileCategoryAside() {
                 <Link
                   to={`/collections/${c.slug}`}
                   prefetch="intent"
-                  className="flex items-center gap-3 py-3 text-sm font-medium text-ink"
+                  className="flex items-center gap-3 py-3 text-sm font-medium"
+                  style={{color: 'var(--ks-ink)'}}
                 >
-                  <Icon className="h-4 w-4 text-brand-primary" />
+                  <Icon
+                    className="h-4 w-4"
+                    style={{color: 'var(--ks-muted)'}}
+                    strokeWidth={1.6}
+                  />
                   {c.name}
                 </Link>
               </li>
@@ -62,18 +70,28 @@ function MobileCategoryAside() {
           })}
         </ul>
 
-        <div className="mt-6 space-y-2 rounded-md bg-brand-primary-50 p-4">
+        <div className="mt-6 space-y-2">
           <Link
             to="/kitchen-planner"
             prefetch="intent"
-            className="block rounded bg-brand-primary px-3 py-2 text-center text-sm font-semibold text-white"
+            className="block rounded-full px-4 py-2.5 text-center text-sm font-medium"
+            style={{
+              background: 'var(--ks-blue)',
+              color: '#ffffff',
+              border: '1px solid rgba(0,113,227,0.5)',
+            }}
           >
             Build my kitchen with AI
           </Link>
           <Link
             to="/partner"
             prefetch="intent"
-            className="block rounded border border-brand-primary px-3 py-2 text-center text-sm font-semibold text-brand-primary"
+            className="block rounded-full px-4 py-2.5 text-center text-sm font-medium"
+            style={{
+              background: 'var(--ks-card-solid)',
+              color: 'var(--ks-emerald-dark)',
+              border: '1px solid rgba(10,127,86,0.25)',
+            }}
           >
             Become a partner
           </Link>

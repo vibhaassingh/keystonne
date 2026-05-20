@@ -50,6 +50,14 @@ export default function ProductDetail() {
   const params = useParams();
   const product = productBySlug[params.handle];
 
+  // Hooks must run on every render in the same order — keep them above
+  // the early-return for missing products.
+  const [qty, setQty] = useState(1);
+  const [tab, setTab] = useState('specs');
+  const [justAdded, setJustAdded] = useState(false);
+  const {add} = useQuoteCart();
+  const {open} = useAside();
+
   if (!product) return <NotFound />;
 
   const cat = categoryBySlug[product.category];
@@ -59,12 +67,6 @@ export default function ProductDetail() {
   const {gst, total} = product.priceINR
     ? gstFor(product.priceINR)
     : {gst: 0, total: 0};
-
-  const [qty, setQty] = useState(1);
-  const [tab, setTab] = useState('specs');
-  const [justAdded, setJustAdded] = useState(false);
-  const {add} = useQuoteCart();
-  const {open} = useAside();
 
   function handleAdd() {
     add(product.slug, qty);

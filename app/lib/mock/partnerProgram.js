@@ -6,7 +6,7 @@
  */
 
 import {
-  ChefHat, Briefcase, Building2, Lightbulb, Wrench, ShoppingBag,
+  ChefHat, Briefcase, Building2, Lightbulb, Wrench,
 } from 'lucide-react';
 
 export const personas = [

@@ -199,8 +199,8 @@ export default function KitchenResults() {
             className="mt-5 space-y-4 text-sm leading-relaxed md:text-base"
             style={{color: 'var(--ks-ink-2)'}}
           >
-            {rec.narrative.map((p, i) => (
-              <p key={i}>{p}</p>
+            {rec.narrative.map((p) => (
+              <p key={p.slice(0, 32)}>{p}</p>
             ))}
           </div>
         </div>
@@ -340,7 +340,7 @@ export default function KitchenResults() {
                 <ul>
                   {g.items.map((item, i) => (
                     <li
-                      key={i}
+                      key={item.sku}
                       className="flex items-center gap-4 px-6 py-3"
                       style={{
                         borderBottom:

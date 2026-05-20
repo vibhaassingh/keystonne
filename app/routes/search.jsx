@@ -20,7 +20,9 @@ export default function SearchPage() {
     if (!q) return {productHits: [], categoryHits: [], ventureHits: []};
     return {
       productHits: products.filter((p) =>
-        (p.name + ' ' + p.blurb + ' ' + (p.category || '')).toLowerCase().includes(needle),
+        (p.name + ' ' + p.blurb + ' ' + (p.category || ''))
+          .toLowerCase()
+          .includes(needle),
       ),
       categoryHits: categories.filter((c) =>
         (c.name + ' ' + c.blurb).toLowerCase().includes(needle),
@@ -34,28 +36,43 @@ export default function SearchPage() {
   const total = productHits.length + categoryHits.length + ventureHits.length;
 
   return (
-    <section className="mx-auto max-w-[1400px] px-4 py-10 md:px-6 md:py-12">
+    <section className="mx-auto max-w-[1400px] px-4 py-10 md:px-6 md:py-14">
       <header className="mb-8">
-        <span className="eyebrow">Search</span>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+        <span className="apple-eyebrow">Search</span>
+        <h1
+          className="mt-3 text-[28px] font-semibold tracking-tight md:text-[36px]"
+          style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+        >
           {q ? <>Results for &ldquo;{q}&rdquo;</> : 'Search the Keystonne catalog'}
         </h1>
         {q && (
-          <p className="mt-1 text-sm text-gray-600">
-            {total} match{total === 1 ? '' : 'es'} across catalog, categories, and venture types.
+          <p
+            className="mt-2 text-sm"
+            style={{color: 'var(--ks-ink-2)'}}
+          >
+            {total} match{total === 1 ? '' : 'es'} across catalog,
+            categories, and venture types.
           </p>
         )}
       </header>
 
       <form method="get" action="/search" role="search" className="mb-10">
         <div className="relative max-w-2xl">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2"
+            style={{color: 'var(--ks-muted)'}}
+          />
           <input
             type="search"
             name="q"
             defaultValue={q}
             placeholder="Try: refrigerator, espresso, work table, hotel kitchen…"
-            className="h-11 w-full rounded-xl border border-gray-300 bg-white pl-10 pr-3 text-sm text-ink placeholder:text-gray-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/15"
+            className="h-11 w-full rounded-full pl-10 pr-3 text-sm focus:outline-none"
+            style={{
+              background: 'var(--ks-card-tint)',
+              border: '1px solid var(--ks-line-soft)',
+              color: 'var(--ks-ink)',
+            }}
           />
         </div>
       </form>
@@ -65,15 +82,20 @@ export default function SearchPage() {
       ) : total === 0 ? (
         <EmptyResults q={q} />
       ) : (
-        <div className="space-y-10">
+        <div className="space-y-12">
           {productHits.length > 0 && (
             <section>
-              <h2 className="mb-4 text-lg font-semibold text-ink">
+              <h2
+                className="mb-4 text-lg font-semibold"
+                style={{color: 'var(--ks-ink)'}}
+              >
                 Products ({productHits.length})
               </h2>
               <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {productHits.map((p) => (
-                  <li key={p.slug}><ProductCard product={p} /></li>
+                  <li key={p.slug}>
+                    <ProductCard product={p} />
+                  </li>
                 ))}
               </ul>
             </section>
@@ -111,20 +133,38 @@ export default function SearchPage() {
 function ResultsList({title, items}) {
   return (
     <section>
-      <h2 className="mb-4 text-lg font-semibold text-ink">{title}</h2>
+      <h2
+        className="mb-4 text-lg font-semibold"
+        style={{color: 'var(--ks-ink)'}}
+      >
+        {title}
+      </h2>
       <ul className="grid gap-2 md:grid-cols-2">
         {items.map((it) => (
           <li key={it.key}>
             <Link
               to={it.to}
               prefetch="intent"
-              className="card card-hover flex items-center gap-3 p-4"
+              className="premium-card flex items-center gap-3 p-4"
             >
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-semibold text-ink">{it.label}</div>
-                <div className="line-clamp-1 text-[12px] text-gray-500">{it.sub}</div>
+                <div
+                  className="text-sm font-semibold"
+                  style={{color: 'var(--ks-ink)'}}
+                >
+                  {it.label}
+                </div>
+                <div
+                  className="line-clamp-1 text-[12px]"
+                  style={{color: 'var(--ks-muted)'}}
+                >
+                  {it.sub}
+                </div>
               </div>
-              <ChevronRight className="h-4 w-4 text-gray-400" />
+              <ChevronRight
+                className="h-4 w-4"
+                style={{color: 'var(--ks-muted)'}}
+              />
             </Link>
           </li>
         ))}
@@ -135,12 +175,22 @@ function ResultsList({title, items}) {
 
 function EmptyPrompt() {
   return (
-    <div className="card p-10 text-center">
-      <Search className="mx-auto h-8 w-8 text-gray-400" />
-      <h2 className="mt-4 text-base font-semibold text-ink">
+    <div className="premium-panel p-12 text-center">
+      <Search
+        className="mx-auto h-8 w-8"
+        style={{color: 'var(--ks-muted)'}}
+        strokeWidth={1.6}
+      />
+      <h2
+        className="mt-4 text-base font-semibold"
+        style={{color: 'var(--ks-ink)'}}
+      >
         Search the catalog, categories, and venture types.
       </h2>
-      <p className="mt-2 text-sm text-gray-600">
+      <p
+        className="mt-2 text-sm"
+        style={{color: 'var(--ks-ink-2)'}}
+      >
         Try a product name (&ldquo;reach-in fridge&rdquo;), a category
         (&ldquo;refrigeration&rdquo;), or a venture (&ldquo;cloud kitchen&rdquo;).
       </p>
@@ -150,24 +200,31 @@ function EmptyPrompt() {
 
 function EmptyResults({q}) {
   return (
-    <div className="card p-10 text-center">
-      <h2 className="text-base font-semibold text-ink">
+    <div className="premium-panel p-12 text-center">
+      <h2
+        className="text-base font-semibold"
+        style={{color: 'var(--ks-ink)'}}
+      >
         No matches for &ldquo;{q}&rdquo;.
       </h2>
-      <p className="mt-2 text-sm text-gray-600">
+      <p
+        className="mt-2 text-sm"
+        style={{color: 'var(--ks-ink-2)'}}
+      >
         Try a broader term, or describe your kitchen to the AI planner —
         we&apos;ll suggest the right equipment.
       </p>
-      <div className="mt-4 flex justify-center gap-3">
+      <div className="mt-5 flex flex-wrap justify-center gap-3">
         <Link
-          to="/collections/all"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-ink hover:border-ink/40"
+          to="/collections/refrigeration"
+          className="apple-button-ghost"
         >
-          Browse all categories
+          Browse categories
         </Link>
         <Link
           to="/kitchen-planner"
-          className="inline-flex items-center gap-1.5 rounded-xl btn-primary px-4 py-2.5 text-sm font-semibold"
+          className="apple-button-primary"
+          style={{background: 'var(--ks-blue)', borderColor: 'rgba(0,113,227,0.5)'}}
         >
           Use the AI planner
         </Link>

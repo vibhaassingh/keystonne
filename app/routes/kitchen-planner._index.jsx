@@ -4,7 +4,6 @@ import {
   ArrowRight, ChevronLeft, ChevronRight, Sparkles, Wand2, Check,
 } from 'lucide-react';
 import {businessTypes} from '~/lib/mock/businessTypes';
-import {cn} from '~/lib/utils/cn';
 
 /**
  * Five-step Kitchen Wizard. Apple-style setup flow on the graphite-white

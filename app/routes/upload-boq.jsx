@@ -300,11 +300,11 @@ export default function UploadBoq() {
                 </tr>
               </thead>
               <tbody>
-                {matched.map((r, i) => {
+                {matched.map((r) => {
                   const p = products.find((p) => p.slug === r.matched);
                   const lineTotal = (p?.priceINR ?? 0) * r.qty;
                   return (
-                    <tr key={i}>
+                    <tr key={r.matched}>
                       <td
                         className="italic"
                         style={{color: 'var(--ks-ink-2)'}}
@@ -368,9 +368,9 @@ export default function UploadBoq() {
                     bundle into the same invoice.
                   </p>
                   <ul className="mt-3 space-y-2 text-[13px]">
-                    {unmatched.map((r, i) => (
+                    {unmatched.map((r) => (
                       <li
-                        key={i}
+                        key={r.raw}
                         className="flex items-start gap-2"
                         style={{color: '#5b3300'}}
                       >

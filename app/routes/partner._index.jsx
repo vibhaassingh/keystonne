@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {Link} from 'react-router';
 import {
   ArrowRight, ArrowUpRight, ChevronDown, Handshake, ShieldCheck,
-  Wallet, TrendingUp, Calendar, FileText, Check,
+  Wallet, TrendingUp, FileText, Check,
 } from 'lucide-react';
 import {
   personas, tiers, commissionRates, howItWorks, faqs,

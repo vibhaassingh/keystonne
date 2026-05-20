@@ -4,7 +4,7 @@ import {Construction, ArrowRight} from 'lucide-react';
 /**
  * Placeholder per CLAUDE.md §6 — admin console is Phase 2. We render a
  * scoping note so anyone landing on /admin sees exactly what's planned
- * instead of a 404.
+ * instead of a 404. Apple-style premium-card grid.
  */
 
 export const meta = () => [{title: 'Admin — Coming in Phase 2'}];
@@ -22,14 +22,26 @@ const PHASE2_MODULES = [
 
 export default function AdminPlaceholder() {
   return (
-    <section className="mx-auto max-w-[1100px] px-4 py-16 md:px-6 md:py-20">
-      <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-brand-primary-50 text-brand-primary">
-        <Construction className="h-7 w-7" />
+    <section className="mx-auto max-w-[1100px] px-4 py-16 md:px-6 md:py-24">
+      <div
+        className="mx-auto grid h-16 w-16 place-items-center rounded-2xl"
+        style={{
+          background: 'var(--ks-blue-soft)',
+          color: 'var(--ks-blue-dark)',
+        }}
+      >
+        <Construction className="h-7 w-7" strokeWidth={1.6} />
       </div>
-      <h1 className="mt-5 text-3xl font-semibold tracking-tight text-ink md:text-4xl">
+      <h1
+        className="mt-6 text-[32px] font-semibold tracking-tight md:text-[44px]"
+        style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+      >
         Admin console — coming in Phase 2.
       </h1>
-      <p className="mt-3 max-w-2xl text-sm text-gray-600 md:text-base">
+      <p
+        className="mt-3 max-w-2xl text-sm md:text-base"
+        style={{color: 'var(--ks-ink-2)'}}
+      >
         Phase 1 is a demo-grade build of the partner + buyer surfaces.
         The internal admin console ships with the Supabase wire-up in
         Phase 2 — these are the modules planned for that release.
@@ -37,12 +49,25 @@ export default function AdminPlaceholder() {
 
       <ul className="mt-10 grid gap-3 md:grid-cols-2">
         {PHASE2_MODULES.map((m) => (
-          <li key={m.name} className="card p-5">
-            <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-primary">
+          <li key={m.name} className="premium-card p-6">
+            <div
+              className="text-[10px] font-medium uppercase tracking-[0.10em]"
+              style={{color: 'var(--ks-muted)'}}
+            >
               Module
             </div>
-            <div className="mt-1 text-base font-semibold text-ink">{m.name}</div>
-            <p className="mt-2 text-sm text-gray-600">{m.body}</p>
+            <div
+              className="mt-1.5 text-base font-semibold"
+              style={{color: 'var(--ks-ink)'}}
+            >
+              {m.name}
+            </div>
+            <p
+              className="mt-2 text-sm"
+              style={{color: 'var(--ks-ink-2)'}}
+            >
+              {m.body}
+            </p>
           </li>
         ))}
       </ul>
@@ -50,14 +75,14 @@ export default function AdminPlaceholder() {
       <div className="mt-10 flex flex-wrap gap-3">
         <Link
           to="/partner"
-          className="inline-flex items-center gap-2 rounded-xl btn-primary px-5 py-3 text-sm font-semibold"
+          className="apple-button-primary"
         >
           Partner programme
           <ArrowRight className="h-4 w-4" />
         </Link>
         <Link
           to="/"
-          className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-ink hover:border-ink/40"
+          className="apple-button-ghost"
         >
           Back to storefront
         </Link>

@@ -27,7 +27,6 @@ const SKU_OK = new Set(products.map((p) => p.slug));
 function ok(sku) {
   if (!SKU_OK.has(sku)) {
     // Surface bad mock SKUs loudly in dev rather than failing silently.
-    // eslint-disable-next-line no-console
     console.warn(`[wizard] Unknown SKU referenced: ${sku}`);
   }
   return sku;

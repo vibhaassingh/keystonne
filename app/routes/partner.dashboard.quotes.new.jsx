@@ -22,10 +22,15 @@ const inputStyle = {
 export default function QuoteBuilder() {
   const {hydrated, isLoggedIn} = useRequirePartnerLogin();
   const [dealId, setDealId] = useState(deals[1].id);
-  const [items, setItems] = useState([{sku: products[0].slug, qty: 1}]);
+  const [items, setItems] = useState([
+    {uid: `q-${Date.now()}`, sku: products[0].slug, qty: 1},
+  ]);
 
   function addItem() {
-    setItems((it) => [...it, {sku: products[0].slug, qty: 1}]);
+    setItems((it) => [
+      ...it,
+      {uid: `q-${Date.now()}-${it.length}`, sku: products[0].slug, qty: 1},
+    ]);
   }
   function removeItem(idx) {
     setItems((it) => it.filter((_, i) => i !== idx));
@@ -132,7 +137,7 @@ export default function QuoteBuilder() {
             <ul className="space-y-3">
               {lines.map((line, i) => (
                 <li
-                  key={i}
+                  key={line.uid}
                   className="grid gap-3 rounded-xl p-3 md:grid-cols-12 md:items-center"
                   style={{
                     background: 'var(--ks-card-tint)',
