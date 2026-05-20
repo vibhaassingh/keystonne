@@ -1,7 +1,7 @@
 import {useMemo} from 'react';
 import {Link, useSearchParams} from 'react-router';
 import {
-  ArrowRight, ChevronLeft, FileText, Wand2, Sparkles, Quote, ShoppingCart, Check,
+  ArrowRight, ChevronLeft, FileText, Wand2, Sparkles, Quote, ShoppingCart,
 } from 'lucide-react';
 import {businessTypeBySlug} from '~/lib/mock/businessTypes';
 import {productBySlug} from '~/lib/mock/products';
@@ -10,7 +10,6 @@ import {useQuoteCart} from '~/lib/quoteCart';
 import {formatINR} from '~/lib/utils/formatINR';
 import {gstFor} from '~/lib/utils/formatGST';
 import {categoryBySlug} from '~/lib/mock/categories';
-import {cn} from '~/lib/utils/cn';
 
 export const meta = () => [
   {title: 'Your kitchen plan — Keystonne'},
@@ -28,9 +27,11 @@ export default function KitchenResults() {
   const cuisines = (params.get('cuisines') || '').split(',').filter(Boolean);
   const description = params.get('q') || '';
 
-  const rec = useMemo(() => recommendFor(ventureSlug, sizeBucketFor(covers)), [ventureSlug, covers]);
+  const rec = useMemo(
+    () => recommendFor(ventureSlug, sizeBucketFor(covers)),
+    [ventureSlug, covers],
+  );
 
-  // Resolve recommended equipment into real product objects + line totals.
   const groups = rec.equipment.map((g) => {
     const items = g.items.map((it) => {
       const p = productBySlug[it.sku];
@@ -60,76 +61,112 @@ export default function KitchenResults() {
   }
 
   return (
-    <section className="mx-auto max-w-[1400px] px-4 py-10 md:px-6 md:py-14">
-      {/* Hero summary */}
-      <div
-        className="relative overflow-hidden rounded-3xl text-white mesh-indigo"
-        style={{boxShadow: '0 30px 80px -30px rgba(10,13,20,0.45), inset 0 1px 0 rgba(255,255,255,0.08)'}}
-      >
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-16 -left-10 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-white/[0.05] blur-3xl" />
-        </div>
-
-        <div className="relative grid gap-6 px-6 py-12 md:grid-cols-12 md:items-center md:px-14 md:py-16">
-          <div className="md:col-span-8">
+    <section className="mx-auto max-w-[1400px] px-4 py-10 md:px-6 md:py-16">
+      {/* Editorial summary header */}
+      <div className="apple-hero overflow-hidden">
+        <div className="grid gap-8 px-6 py-12 md:grid-cols-12 md:items-center md:px-14 md:py-16">
+          <div className="md:col-span-7">
             <Link
               to="/kitchen-planner"
-              className="inline-flex items-center gap-1 text-[12px] font-semibold text-white/70 hover:text-white"
+              className="inline-flex items-center gap-1 text-[12px] font-medium"
+              style={{color: 'var(--ks-muted)'}}
             >
               <ChevronLeft className="h-3.5 w-3.5" /> Adjust inputs
             </Link>
 
-            <div className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/90 backdrop-blur">
-              <Sparkles className="h-3 w-3" />
+            <span
+              className="apple-eyebrow mt-4"
+              style={{color: 'var(--ks-blue-dark)'}}
+            >
+              <Sparkles
+                className="h-3 w-3"
+                style={{color: 'var(--ks-blue)'}}
+              />
               Your plan
-            </div>
-            <h1 className="mt-4 text-[34px] font-semibold leading-[1.04] tracking-tight md:text-[48px]">
+            </span>
+            <h1
+              className="mt-3 text-[34px] font-semibold leading-[1.04] tracking-tight md:text-[52px]"
+              style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+            >
               {rec.headline}
             </h1>
 
             <ul className="mt-5 flex flex-wrap gap-2 text-[12px]">
               <Pill icon={Icon} text={venture.name} />
               <Pill text={`${covers} covers × ${sittings} sittings`} />
-              <Pill text={`${covers * sittings} covers/day`} />
-              {cuisines.slice(0, 3).map((c) => <Pill key={c} text={c} />)}
-              {cuisines.length > 3 && <Pill text={`+${cuisines.length - 3} more`} />}
+              <Pill text={`${covers * sittings} covers/day`} accent="ink" />
+              {cuisines.slice(0, 3).map((c) => (
+                <Pill key={c} text={c} />
+              ))}
+              {cuisines.length > 3 && (
+                <Pill text={`+${cuisines.length - 3} more`} />
+              )}
             </ul>
 
             {description && (
-              <blockquote className="mt-5 max-w-2xl rounded-xl border border-white/15 bg-white/5 p-4 text-[14px] italic text-white/85 backdrop-blur">
-                <Quote className="mb-2 h-4 w-4 text-white/40" />
+              <blockquote
+                className="mt-6 max-w-2xl rounded-2xl p-5 text-[14px] italic"
+                style={{
+                  background: 'var(--ks-card-tint)',
+                  border: '1px solid var(--ks-line-soft)',
+                  color: 'var(--ks-ink-2)',
+                }}
+              >
+                <Quote
+                  className="mb-2 h-4 w-4"
+                  style={{color: 'var(--ks-muted)'}}
+                />
                 {description}
               </blockquote>
             )}
           </div>
 
-          {/* Estimate panel */}
-          <aside className="md:col-span-4">
-            <div
-              className="rounded-2xl border border-white/25 bg-white/12 p-6 backdrop-blur-2xl"
-              style={{boxShadow: '0 20px 50px -20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.28)'}}
-            >
-              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/65">
+          {/* Estimate panel — calm white card on hero */}
+          <aside className="md:col-span-5">
+            <div className="commercial-buy-box">
+              <span
+                className="apple-eyebrow"
+                style={{color: 'var(--ks-muted)'}}
+              >
                 Capex estimate
               </span>
-              <div className="tabular mt-2 text-4xl font-semibold text-white">
+              <div
+                className="mt-3 text-[44px] font-semibold leading-none md:text-[56px]"
+                style={{
+                  color: 'var(--ks-ink)',
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.022em',
+                }}
+              >
                 {formatINR(grandTotal)}
               </div>
-              <p className="mt-1 text-[12px] text-white/70">
-                All-in: equipment + GST + {installationIncluded ? 'installation included' : `installation (${formatINR(installation)})`}
+              <p
+                className="mt-2 text-[13px]"
+                style={{color: 'var(--ks-muted)'}}
+              >
+                All-in: equipment + GST +{' '}
+                {installationIncluded
+                  ? 'installation included'
+                  : `installation (${formatINR(installation)})`}
               </p>
-              <ul className="mt-5 space-y-1 text-[13px]">
+              <ul
+                className="mt-5 space-y-2 text-[13px]"
+                style={{borderTop: '1px solid var(--ks-line-soft)', paddingTop: '1rem'}}
+              >
                 <Row k="Equipment subtotal" v={formatINR(subtotal)} />
                 <Row k="GST · 18%" v={formatINR(gst)} muted />
-                <Row k="Installation" v={installationIncluded ? 'Included' : formatINR(installation)} muted />
+                <Row
+                  k="Installation"
+                  v={installationIncluded ? 'Included' : formatINR(installation)}
+                  muted
+                />
                 <Row k="Freight (pan-India)" v="Included" muted />
               </ul>
               <div className="mt-5 space-y-2">
                 <Link
                   to="/quote"
                   onClick={addAllToCart}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-brand-primary"
+                  className="apple-button-amber w-full justify-center"
                 >
                   <FileText className="h-4 w-4" />
                   Request as a single quote
@@ -137,7 +174,7 @@ export default function KitchenResults() {
                 <button
                   type="button"
                   onClick={addAllToCart}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur hover:bg-white/15"
+                  className="apple-button-ghost w-full justify-center"
                 >
                   <ShoppingCart className="h-4 w-4" />
                   Add all to cart
@@ -149,38 +186,69 @@ export default function KitchenResults() {
       </div>
 
       {/* Narrative */}
-      <section className="mt-12 grid gap-6 md:grid-cols-12">
+      <section className="mt-14 grid gap-8 md:grid-cols-12">
         <div className="md:col-span-7">
-          <span className="eyebrow">How a chef would set this up</span>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+          <span className="apple-eyebrow">How a chef would set this up</span>
+          <h2
+            className="mt-3 text-[26px] font-semibold tracking-tight md:text-[32px]"
+            style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+          >
             The workflow we&apos;d build around.
           </h2>
-          <div className="mt-5 space-y-4 text-sm leading-relaxed text-gray-700 md:text-base">
+          <div
+            className="mt-5 space-y-4 text-sm leading-relaxed md:text-base"
+            style={{color: 'var(--ks-ink-2)'}}
+          >
             {rec.narrative.map((p, i) => (
               <p key={i}>{p}</p>
             ))}
           </div>
         </div>
         <aside className="md:col-span-5">
-          <div className="card p-5">
-            <span className="eyebrow">Stations</span>
-            <ul className="mt-4 space-y-2">
+          <div className="premium-panel p-6">
+            <span className="apple-eyebrow">Stations</span>
+            <ul className="mt-4 space-y-3">
               {rec.stations.map((s, i) => (
                 <li key={s} className="flex items-start gap-3">
-                  <span className="tabular grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-primary-50 text-[11px] font-bold text-brand-primary">
-                    {i + 1}
+                  <span
+                    className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-semibold"
+                    style={{
+                      background: 'var(--ks-card-tint)',
+                      border: '1px solid var(--ks-line-soft)',
+                      color: 'var(--ks-ink)',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {String(i + 1).padStart(2, '0')}
                   </span>
-                  <span className="text-sm text-ink">{s}</span>
+                  <span
+                    className="pt-0.5 text-sm"
+                    style={{color: 'var(--ks-ink)'}}
+                  >
+                    {s}
+                  </span>
                 </li>
               ))}
             </ul>
           </div>
-          <div className="mt-4 rounded-2xl border border-dashed border-brand-accent/30 bg-brand-accent/5 p-4 text-[12px] text-gray-700">
-            <div className="flex items-center gap-1.5 font-semibold text-brand-accent">
+          <div
+            className="mt-4 rounded-2xl p-5"
+            style={{
+              background: 'var(--ks-blue-soft)',
+              border: '1px solid rgba(0,113,227,0.18)',
+            }}
+          >
+            <div
+              className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.10em]"
+              style={{color: 'var(--ks-blue-dark)'}}
+            >
               <Sparkles className="h-3.5 w-3.5" />
               A real LLM ships Phase 4
             </div>
-            <p className="mt-1">
+            <p
+              className="mt-2 text-[12px]"
+              style={{color: 'var(--ks-blue-dark)'}}
+            >
               For Phase 1, recommendations come from a curated dataset of
               ~30 venture × scale combinations. The architecture is
               identical to the LLM-backed version we&apos;ll ship next.
@@ -190,14 +258,20 @@ export default function KitchenResults() {
       </section>
 
       {/* Equipment groups */}
-      <section className="mt-12">
+      <section className="mt-14">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <span className="eyebrow">The kit</span>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+            <span className="apple-eyebrow">The kit</span>
+            <h2
+              className="mt-3 text-[26px] font-semibold tracking-tight md:text-[32px]"
+              style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+            >
               Equipment, grouped by category.
             </h2>
-            <p className="mt-1 text-sm text-gray-600">
+            <p
+              className="mt-1 text-sm"
+              style={{color: 'var(--ks-ink-2)'}}
+            >
               {groups.reduce((s, g) => s + g.items.length, 0)} line items
               across {groups.length} categories.
             </p>
@@ -205,7 +279,7 @@ export default function KitchenResults() {
           <button
             type="button"
             onClick={addAllToCart}
-            className="inline-flex items-center gap-1.5 rounded-xl btn-accent px-4 py-2.5 text-sm font-semibold"
+            className="apple-button-amber"
           >
             <ShoppingCart className="h-4 w-4" />
             Add all to cart
@@ -219,55 +293,114 @@ export default function KitchenResults() {
             )];
             const CatIcon = cat?.icon ?? Sparkles;
             return (
-              <li key={g.category} className="card overflow-hidden">
-                <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-4">
+              <li key={g.category} className="premium-panel overflow-hidden">
+                <div
+                  className="flex items-center gap-3 px-6 py-5"
+                  style={{borderBottom: '1px solid var(--ks-line-soft)'}}
+                >
                   <div
-                    className="grid h-9 w-9 place-items-center rounded-xl text-white"
+                    className="grid h-10 w-10 place-items-center rounded-xl"
                     style={{
-                      background: 'linear-gradient(135deg, var(--color-brand-primary-600), var(--color-brand-primary))',
+                      background: 'var(--ks-card-tint)',
+                      color: 'var(--ks-ink)',
+                      border: '1px solid var(--ks-line-soft)',
                     }}
                   >
-                    <CatIcon className="h-4 w-4" />
+                    <CatIcon className="h-4 w-4" strokeWidth={1.6} />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-base font-semibold text-ink">{g.category}</h3>
-                    <p className="text-[12px] text-gray-500">
+                    <h3
+                      className="text-base font-semibold"
+                      style={{color: 'var(--ks-ink)'}}
+                    >
+                      {g.category}
+                    </h3>
+                    <p
+                      className="text-[12px]"
+                      style={{color: 'var(--ks-muted)'}}
+                    >
                       {g.items.length} item{g.items.length !== 1 ? 's' : ''}
                     </p>
                   </div>
-                  <div className="tabular text-right">
-                    <div className="text-[11px] uppercase tracking-wider text-gray-500">Group subtotal</div>
-                    <div className="text-sm font-semibold text-ink">
+                  <div className="text-right">
+                    <div
+                      className="text-[10px] font-medium uppercase tracking-[0.10em]"
+                      style={{color: 'var(--ks-muted)'}}
+                    >
+                      Group subtotal
+                    </div>
+                    <div
+                      className="text-sm font-semibold"
+                      style={{color: 'var(--ks-ink)', fontVariantNumeric: 'tabular-nums'}}
+                    >
                       {g.groupSubtotal > 0 ? formatINR(g.groupSubtotal) : 'On quote'}
                     </div>
                   </div>
                 </div>
-                <ul className="divide-y divide-gray-100">
+                <ul>
                   {g.items.map((item, i) => (
-                    <li key={i} className="flex items-center gap-4 px-5 py-3">
+                    <li
+                      key={i}
+                      className="flex items-center gap-4 px-6 py-3"
+                      style={{
+                        borderBottom:
+                          i === g.items.length - 1
+                            ? 'none'
+                            : '1px solid var(--ks-line-soft)',
+                      }}
+                    >
                       {item.product ? (
                         <div
                           className="h-12 w-12 shrink-0 rounded-lg"
-                          style={{background: `linear-gradient(135deg, ${item.product.accent}, #00000022)`}}
+                          style={{
+                            background: `linear-gradient(135deg, ${item.product.accent}, rgba(0,0,0,0.06))`,
+                            border: '1px solid var(--ks-line-soft)',
+                          }}
                         />
                       ) : (
-                        <div className="h-12 w-12 shrink-0 rounded-lg bg-gray-100" />
+                        <div
+                          className="h-12 w-12 shrink-0 rounded-lg"
+                          style={{
+                            background: 'var(--ks-card-tint)',
+                            border: '1px solid var(--ks-line-soft)',
+                          }}
+                        />
                       )}
                       <div className="min-w-0 flex-1">
                         <Link
                           to={item.product ? `/products/${item.product.slug}` : '#'}
-                          className="text-sm font-semibold text-ink hover:text-brand-primary"
+                          className="text-sm font-semibold"
+                          style={{color: 'var(--ks-ink)'}}
                         >
                           {item.product?.name ?? item.sku}
                         </Link>
                         {item.note && (
-                          <div className="text-[12px] italic text-gray-500">{item.note}</div>
+                          <div
+                            className="text-[12px] italic"
+                            style={{color: 'var(--ks-muted)'}}
+                          >
+                            {item.note}
+                          </div>
                         )}
                       </div>
-                      <div className="tabular text-right text-sm">
-                        <div className="text-gray-500">Qty <span className="font-semibold text-ink">{item.qty}</span></div>
+                      <div className="text-right text-sm">
+                        <div style={{color: 'var(--ks-muted)'}}>
+                          Qty{' '}
+                          <span
+                            style={{
+                              color: 'var(--ks-ink)',
+                              fontWeight: 600,
+                              fontVariantNumeric: 'tabular-nums',
+                            }}
+                          >
+                            {item.qty}
+                          </span>
+                        </div>
                       </div>
-                      <div className="tabular w-28 text-right text-sm font-semibold text-ink">
+                      <div
+                        className="w-28 text-right text-sm font-semibold"
+                        style={{color: 'var(--ks-ink)', fontVariantNumeric: 'tabular-nums'}}
+                      >
                         {item.lineTotal != null ? formatINR(item.lineTotal) : 'On quote'}
                       </div>
                     </li>
@@ -280,13 +413,20 @@ export default function KitchenResults() {
       </section>
 
       {/* Final CTA */}
-      <div className="mt-10 rounded-3xl border border-gray-200 bg-white/85 p-6 backdrop-blur md:p-10" style={{boxShadow: 'var(--shadow-glass)'}}>
+      <div className="apple-hero mt-12 p-7 md:p-12">
         <div className="grid gap-4 md:grid-cols-12 md:items-center">
           <div className="md:col-span-8">
-            <h3 className="text-xl font-semibold text-ink md:text-2xl">
+            <span className="apple-eyebrow">Next step</span>
+            <h3
+              className="mt-3 text-[22px] font-semibold tracking-tight md:text-[28px]"
+              style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+            >
               Ready to turn this into a quote?
             </h3>
-            <p className="mt-2 text-sm text-gray-600">
+            <p
+              className="mt-2 text-sm md:text-base"
+              style={{color: 'var(--ks-ink-2)'}}
+            >
               We&apos;ll add every item to your cart and route you to the
               quote form. You can edit the list there.
             </p>
@@ -295,7 +435,7 @@ export default function KitchenResults() {
             <Link
               to="/quote"
               onClick={addAllToCart}
-              className="inline-flex items-center gap-2 rounded-xl btn-primary px-5 py-3 text-sm font-semibold"
+              className="apple-button-amber"
             >
               <FileText className="h-4 w-4" />
               Request a quote
@@ -303,9 +443,13 @@ export default function KitchenResults() {
             </Link>
             <Link
               to="/kitchen-planner"
-              className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-ink hover:border-ink/40"
+              className="apple-button-ghost"
             >
-              <Wand2 className="h-4 w-4 text-brand-accent" />
+              <Wand2
+                className="h-4 w-4"
+                style={{color: 'var(--ks-blue)'}}
+                strokeWidth={1.6}
+              />
               Plan another
             </Link>
           </div>
@@ -315,10 +459,25 @@ export default function KitchenResults() {
   );
 }
 
-function Pill({icon: Icon, text}) {
+function Pill({icon: Icon, text, accent}) {
   return (
-    <li className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-white/90 backdrop-blur">
-      {Icon && <Icon className="h-3 w-3" />}
+    <li
+      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1"
+      style={
+        accent === 'ink'
+          ? {
+              background: 'var(--ks-ink)',
+              color: '#ffffff',
+              border: '1px solid var(--ks-ink)',
+            }
+          : {
+              background: 'var(--ks-card-solid)',
+              color: 'var(--ks-ink-2)',
+              border: '1px solid var(--ks-line)',
+            }
+      }
+    >
+      {Icon && <Icon className="h-3 w-3" strokeWidth={1.8} />}
       {text}
     </li>
   );
@@ -327,8 +486,15 @@ function Pill({icon: Icon, text}) {
 function Row({k, v, muted}) {
   return (
     <li className="flex items-baseline justify-between gap-3">
-      <span className={muted ? 'text-white/60' : 'text-white/80'}>{k}</span>
-      <span className="tabular font-semibold text-white">{v}</span>
+      <span style={{color: muted ? 'var(--ks-muted)' : 'var(--ks-ink-2)'}}>
+        {k}
+      </span>
+      <span
+        className="font-semibold"
+        style={{color: 'var(--ks-ink)', fontVariantNumeric: 'tabular-nums'}}
+      >
+        {v}
+      </span>
     </li>
   );
 }

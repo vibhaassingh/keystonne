@@ -9,27 +9,27 @@ import {formatINR} from '~/lib/utils/formatINR';
 import {cn} from '~/lib/utils/cn';
 
 /**
- * Placeholder BOQ upload page. In Phase 1 we don't actually parse PDFs —
- * the "Parse" button fires a mock 1.5s delay then renders a plausible
- * line-item table with confidence scores so the demo viewer can see what
- * the LLM-backed version will deliver in Phase 4.
+ * BOQ upload placeholder. Apple-style drop-zone in a premium-panel with
+ * dashed blue border (blue is the AI guidance accent). "Parse" fires a
+ * mock 1.5s delay then renders a plausible matched/unmatched line-item
+ * table — confidence scores get calm ks-soft tints, the action below is
+ * amber (procurement intent: converts to a quote).
  */
 
 export const meta = () => [
   {title: 'Upload your BOQ — Keystonne'},
 ];
 
-// Pretend the LLM extracted these from the uploaded PDF.
 const MOCK_PARSE_RESULT = [
-  {raw: 'SS Work Table 6 ft x 30"',                      matched: 'ss-work-table-6ft',           qty: 4, confidence: 0.98},
-  {raw: 'Two-Door Vertical Reach-In Refrigerator',       matched: 'reach-in-fridge-two-door',    qty: 2, confidence: 0.96},
-  {raw: 'Chinese Range — 2 Burner + 1 Tank',             matched: 'two-burner-chinese-range',    qty: 1, confidence: 0.92},
-  {raw: 'Bain Marie 4-pan',                              matched: 'bain-marie-4-pan',            qty: 2, confidence: 0.99},
-  {raw: '4-Burner Bhatti, Tawa Plate',                   matched: 'four-burner-indian-bhatti',   qty: 1, confidence: 0.95},
-  {raw: 'Undercounter Dishwasher (60 racks/hr)',         matched: 'undercounter-dishwasher',     qty: 1, confidence: 0.97},
-  {raw: '8x4 ft SS Prep Table w/ 2 drawers',             matched: 'ss-work-table-8ft-drawers',   qty: 1, confidence: 0.93},
-  {raw: 'Wall canopy hood w/ ESP, 6 ft',                 matched: 'wall-canopy-hood-6ft',        qty: 1, confidence: 0.94},
-  {raw: 'Steam-jacketed kettle, 50 L (handi pulao)',     matched: null,                          qty: 1, confidence: 0.41, note: 'No catalog match — quote separately'},
+  {raw: 'SS Work Table 6 ft x 30"',                  matched: 'ss-work-table-6ft',          qty: 4, confidence: 0.98},
+  {raw: 'Two-Door Vertical Reach-In Refrigerator',   matched: 'reach-in-fridge-two-door',   qty: 2, confidence: 0.96},
+  {raw: 'Chinese Range — 2 Burner + 1 Tank',         matched: 'two-burner-chinese-range',   qty: 1, confidence: 0.92},
+  {raw: 'Bain Marie 4-pan',                          matched: 'bain-marie-4-pan',           qty: 2, confidence: 0.99},
+  {raw: '4-Burner Bhatti, Tawa Plate',               matched: 'four-burner-indian-bhatti',  qty: 1, confidence: 0.95},
+  {raw: 'Undercounter Dishwasher (60 racks/hr)',     matched: 'undercounter-dishwasher',    qty: 1, confidence: 0.97},
+  {raw: '8x4 ft SS Prep Table w/ 2 drawers',         matched: 'ss-work-table-8ft-drawers',  qty: 1, confidence: 0.93},
+  {raw: 'Wall canopy hood w/ ESP, 6 ft',             matched: 'wall-canopy-hood-6ft',       qty: 1, confidence: 0.94},
+  {raw: 'Steam-jacketed kettle, 50 L (handi pulao)', matched: null,                          qty: 1, confidence: 0.41, note: 'No catalog match — quote separately'},
 ];
 
 export default function UploadBoq() {
@@ -71,16 +71,28 @@ export default function UploadBoq() {
   }, 0);
 
   return (
-    <section className="mx-auto max-w-[1100px] px-4 py-10 md:px-6 md:py-14">
-      <header className="mb-8">
-        <span className="eyebrow">
-          <Sparkles className="h-3 w-3" />
+    <section className="mx-auto max-w-[1100px] px-4 py-10 md:px-6 md:py-16">
+      <header className="mb-9">
+        <span
+          className="apple-eyebrow"
+          style={{color: 'var(--ks-blue-dark)'}}
+        >
+          <Sparkles
+            className="h-3 w-3"
+            style={{color: 'var(--ks-blue)'}}
+          />
           BOQ → Quote
         </span>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink md:text-4xl">
+        <h1
+          className="mt-3 text-[32px] font-semibold tracking-tight md:text-[44px]"
+          style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+        >
           Upload your BOQ. We&apos;ll turn it into a quote.
         </h1>
-        <p className="mt-2 max-w-2xl text-sm text-gray-600 md:text-base">
+        <p
+          className="mt-3 max-w-2xl text-sm md:text-base"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
           Drop a PDF, DOCX, or Excel BOQ from your architect or consultant.
           We extract every line, match it to our catalog, and flag anything
           that needs a custom quote.
@@ -89,39 +101,64 @@ export default function UploadBoq() {
 
       {!parsed ? (
         <div
-          className={cn(
-            'card border-2 border-dashed p-12 text-center transition-colors',
-            filename
-              ? 'border-brand-primary bg-brand-primary-50'
-              : 'border-gray-300 bg-white',
-          )}
+          className="rounded-[var(--ks-radius-xl)] p-12 text-center transition-colors"
+          style={{
+            background: filename ? 'var(--ks-blue-soft)' : 'var(--ks-card-solid)',
+            border: filename
+              ? '2px dashed rgba(0,113,227,0.45)'
+              : '2px dashed var(--ks-line)',
+            boxShadow: 'var(--ks-shadow-card)',
+          }}
         >
-          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand-primary text-white">
-            <Upload className="h-6 w-6" />
+          <div
+            className="mx-auto grid h-14 w-14 place-items-center rounded-2xl"
+            style={
+              filename
+                ? {background: 'var(--ks-blue)', color: '#ffffff'}
+                : {
+                    background: 'var(--ks-card-tint)',
+                    color: 'var(--ks-ink)',
+                    border: '1px solid var(--ks-line-soft)',
+                  }
+            }
+          >
+            <Upload className="h-6 w-6" strokeWidth={1.6} />
           </div>
           {filename ? (
             <>
-              <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[12px] font-semibold text-ink">
-                <FileText className="h-3.5 w-3.5 text-brand-primary" />
+              <div
+                className="mt-5 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[12px] font-medium"
+                style={{
+                  background: 'var(--ks-card-solid)',
+                  border: '1px solid var(--ks-line-soft)',
+                  color: 'var(--ks-ink)',
+                }}
+              >
+                <FileText
+                  className="h-3.5 w-3.5"
+                  style={{color: 'var(--ks-blue)'}}
+                />
                 {filename}
                 <button
                   type="button"
                   onClick={reset}
                   aria-label="Remove file"
-                  className="text-gray-400 hover:text-red-600"
+                  style={{color: 'var(--ks-muted)'}}
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
               </div>
-              <div className="mt-5">
+              <div className="mt-6">
                 <button
                   type="button"
                   onClick={parse}
                   disabled={parsing}
-                  className={cn(
-                    'inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-colors',
-                    parsing ? 'bg-gray-200 text-gray-500' : 'btn-primary',
-                  )}
+                  className="apple-button-primary"
+                  style={
+                    parsing
+                      ? undefined
+                      : {background: 'var(--ks-blue)', borderColor: 'rgba(0,113,227,0.5)'}
+                  }
                 >
                   {parsing ? (
                     <>
@@ -140,13 +177,19 @@ export default function UploadBoq() {
             </>
           ) : (
             <>
-              <h2 className="mt-4 text-lg font-semibold text-ink">
+              <h2
+                className="mt-5 text-lg font-semibold"
+                style={{color: 'var(--ks-ink)'}}
+              >
                 Drop your BOQ here
               </h2>
-              <p className="mt-1 text-sm text-gray-600">
+              <p
+                className="mt-1 text-sm"
+                style={{color: 'var(--ks-muted)'}}
+              >
                 PDF · DOCX · XLSX · CSV up to 10 MB
               </p>
-              <label className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-xl btn-primary px-5 py-3 text-sm font-semibold">
+              <label className="apple-button-primary mt-6 inline-flex cursor-pointer">
                 Choose file
                 <input
                   type="file"
@@ -155,7 +198,10 @@ export default function UploadBoq() {
                   className="hidden"
                 />
               </label>
-              <p className="mt-3 text-[11px] text-gray-500">
+              <p
+                className="mt-4 text-[11px]"
+                style={{color: 'var(--ks-muted)'}}
+              >
                 Demo mode — file isn&apos;t uploaded anywhere. Click any
                 file to see the mock parse result.
               </p>
@@ -165,17 +211,31 @@ export default function UploadBoq() {
       ) : (
         <div className="space-y-6">
           {/* Summary banner */}
-          <div className="card flex flex-wrap items-center justify-between gap-3 p-5">
+          <div className="premium-panel flex flex-wrap items-center justify-between gap-3 p-6">
             <div className="flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-100 text-emerald-700">
-                <Check className="h-5 w-5" />
+              <div
+                className="grid h-11 w-11 place-items-center rounded-2xl"
+                style={{
+                  background: 'var(--ks-emerald-soft)',
+                  color: 'var(--ks-emerald-dark)',
+                }}
+              >
+                <Check className="h-5 w-5" strokeWidth={1.6} />
               </div>
               <div>
-                <div className="text-sm font-semibold text-ink">
-                  Parsed {MOCK_PARSE_RESULT.length} lines · matched {matched.length}
+                <div
+                  className="text-sm font-semibold"
+                  style={{color: 'var(--ks-ink)'}}
+                >
+                  Parsed {MOCK_PARSE_RESULT.length} lines · matched{' '}
+                  {matched.length}
                 </div>
-                <div className="text-[12px] text-gray-500">
-                  {filename ?? 'your-boq.pdf'} · {unmatched.length} item{unmatched.length !== 1 ? 's' : ''} need a custom quote
+                <div
+                  className="text-[12px]"
+                  style={{color: 'var(--ks-muted)'}}
+                >
+                  {filename ?? 'your-boq.pdf'} · {unmatched.length} item
+                  {unmatched.length !== 1 ? 's' : ''} need a custom quote
                 </div>
               </div>
             </div>
@@ -183,14 +243,16 @@ export default function UploadBoq() {
               <button
                 type="button"
                 onClick={reset}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 py-2 text-[12px] font-semibold text-ink hover:border-ink/40"
+                className="apple-button-ghost"
+                style={{padding: '0.5rem 0.9rem', fontSize: '12px'}}
               >
                 Upload another
               </button>
               <Link
                 to="/quote"
                 onClick={addMatchedToCart}
-                className="inline-flex items-center gap-1.5 rounded-xl btn-primary px-3 py-2 text-[12px] font-semibold"
+                className="apple-button-amber"
+                style={{padding: '0.5rem 0.9rem', fontSize: '12px'}}
               >
                 <FileText className="h-3.5 w-3.5" />
                 Request as a quote
@@ -199,49 +261,73 @@ export default function UploadBoq() {
           </div>
 
           {/* Matched */}
-          <div className="card overflow-hidden">
-            <div className="border-b border-gray-100 px-5 py-4">
-              <h2 className="text-base font-semibold text-ink">Matched to catalog ({matched.length})</h2>
-              <p className="text-[12px] text-gray-500">
-                Total: <span className="tabular font-semibold text-ink">{formatINR(matchedTotal)}</span> + 18% GST
+          <div className="premium-panel overflow-hidden">
+            <div
+              className="px-6 py-5"
+              style={{borderBottom: '1px solid var(--ks-line-soft)'}}
+            >
+              <h2
+                className="text-base font-semibold"
+                style={{color: 'var(--ks-ink)'}}
+              >
+                Matched to catalog ({matched.length})
+              </h2>
+              <p
+                className="text-[12px]"
+                style={{color: 'var(--ks-muted)'}}
+              >
+                Total:{' '}
+                <span
+                  style={{
+                    color: 'var(--ks-ink)',
+                    fontWeight: 600,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {formatINR(matchedTotal)}
+                </span>{' '}
+                + 18% GST
               </p>
             </div>
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">
+            <table className="spec-hairline-table">
+              <thead>
                 <tr>
-                  <th className="px-5 py-3">Raw line</th>
-                  <th className="px-5 py-3">Matched product</th>
-                  <th className="tabular px-5 py-3 text-right">Qty</th>
-                  <th className="tabular px-5 py-3 text-right">Confidence</th>
-                  <th className="tabular px-5 py-3 text-right">Line total</th>
+                  <th>Raw line</th>
+                  <th>Matched product</th>
+                  <th className="num">Qty</th>
+                  <th className="num">Confidence</th>
+                  <th className="num">Line total</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody>
                 {matched.map((r, i) => {
                   const p = products.find((p) => p.slug === r.matched);
                   const lineTotal = (p?.priceINR ?? 0) * r.qty;
                   return (
                     <tr key={i}>
-                      <td className="px-5 py-3 italic text-gray-700">"{r.raw}"</td>
-                      <td className="px-5 py-3">
-                        <Link to={`/products/${r.matched}`} className="font-medium text-ink hover:text-brand-primary">
+                      <td
+                        className="italic"
+                        style={{color: 'var(--ks-ink-2)'}}
+                      >
+                        &ldquo;{r.raw}&rdquo;
+                      </td>
+                      <td>
+                        <Link
+                          to={`/products/${r.matched}`}
+                          className="font-medium"
+                          style={{color: 'var(--ks-ink)'}}
+                        >
                           {p?.name}
                         </Link>
                       </td>
-                      <td className="tabular px-5 py-3 text-right">{r.qty}</td>
-                      <td className="tabular px-5 py-3 text-right">
-                        <span
-                          className={cn(
-                            'rounded-full px-2 py-0.5 text-[11px] font-semibold',
-                            r.confidence >= 0.95 ? 'bg-emerald-100 text-emerald-700'
-                            : r.confidence >= 0.85 ? 'bg-amber-100 text-amber-700'
-                            : 'bg-red-100 text-red-700',
-                          )}
-                        >
-                          {Math.round(r.confidence * 100)}%
-                        </span>
+                      <td className="num">{r.qty}</td>
+                      <td className="num">
+                        <ConfidencePill v={r.confidence} />
                       </td>
-                      <td className="tabular px-5 py-3 text-right font-semibold text-ink">
+                      <td
+                        className="num"
+                        style={{color: 'var(--ks-ink)', fontWeight: 600}}
+                      >
                         {formatINR(lineTotal)}
                       </td>
                     </tr>
@@ -253,26 +339,55 @@ export default function UploadBoq() {
 
           {/* Unmatched */}
           {unmatched.length > 0 && (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+            <div
+              className="rounded-[var(--ks-radius-lg)] p-6"
+              style={{
+                background: '#fff8eb',
+                border: '1px solid rgba(184,107,0,0.22)',
+              }}
+            >
               <div className="flex items-start gap-3">
-                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+                <AlertCircle
+                  className="mt-0.5 h-5 w-5 shrink-0"
+                  style={{color: 'var(--ks-amber-dark)'}}
+                />
                 <div className="flex-1">
-                  <div className="text-sm font-semibold text-amber-900">
+                  <div
+                    className="text-sm font-semibold"
+                    style={{color: '#7a4500'}}
+                  >
                     Need a custom quote ({unmatched.length})
                   </div>
-                  <p className="mt-1 text-[12px] text-amber-900/75">
+                  <p
+                    className="mt-1 text-[12px]"
+                    style={{color: '#7a4500'}}
+                  >
                     These lines don&apos;t match a catalog item — usually
                     means they&apos;re custom fabrication or in a category
                     we project-price. We&apos;ll quote them separately and
                     bundle into the same invoice.
                   </p>
-                  <ul className="mt-3 space-y-1.5 text-[13px] text-amber-900/80">
+                  <ul className="mt-3 space-y-2 text-[13px]">
                     {unmatched.map((r, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-600" />
+                      <li
+                        key={i}
+                        className="flex items-start gap-2"
+                        style={{color: '#5b3300'}}
+                      >
+                        <span
+                          className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
+                          style={{background: 'var(--ks-amber-dark)'}}
+                        />
                         <span>
-                          <span className="italic">"{r.raw}"</span>
-                          {r.note && <span className="ml-2 text-amber-900/60">· {r.note}</span>}
+                          <span className="italic">&ldquo;{r.raw}&rdquo;</span>
+                          {r.note && (
+                            <span
+                              className="ml-2"
+                              style={{color: '#7a4500', opacity: 0.75}}
+                            >
+                              · {r.note}
+                            </span>
+                          )}
                         </span>
                       </li>
                     ))}
@@ -284,5 +399,34 @@ export default function UploadBoq() {
         </div>
       )}
     </section>
+  );
+}
+
+function ConfidencePill({v}) {
+  const styles =
+    v >= 0.95
+      ? {
+          background: 'var(--ks-emerald-soft)',
+          color: 'var(--ks-emerald-dark)',
+          border: '1px solid rgba(10,127,86,0.22)',
+        }
+      : v >= 0.85
+      ? {
+          background: '#fff4dd',
+          color: 'var(--ks-amber-dark)',
+          border: '1px solid rgba(184,107,0,0.22)',
+        }
+      : {
+          background: 'rgba(194,65,12,0.10)',
+          color: '#9a3412',
+          border: '1px solid rgba(194,65,12,0.25)',
+        };
+  return (
+    <span
+      className={cn('rounded-full px-2 py-0.5 text-[11px] font-medium')}
+      style={{...styles, fontVariantNumeric: 'tabular-nums'}}
+    >
+      {Math.round(v * 100)}%
+    </span>
   );
 }

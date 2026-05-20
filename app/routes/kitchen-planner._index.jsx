@@ -7,18 +7,16 @@ import {businessTypes} from '~/lib/mock/businessTypes';
 import {cn} from '~/lib/utils/cn';
 
 /**
- * Five-step Kitchen Wizard (CLAUDE.md §11 / §7). Steps:
+ * Five-step Kitchen Wizard. Apple-style setup flow on the graphite-white
+ * wash: ink stepper, premium-panel stage container, calm pill chips,
+ * blue AI accent on the final "Build my kitchen" CTA (blue is the AI
+ * guidance colour). Steps and data shape preserved from Phase 1.
  *
- *   1. Venture type   (or "I'm starting from scratch")
- *   2. Menu / cuisine (tag chips + free text)
- *   3. Capacity       (covers / orders per service + sittings)
- *   4. Budget         (capex band)
- *   5. → Results      (navigates to /kitchen-planner/results with the
- *                      collected payload encoded as querystring)
- *
- * Visually: same mesh-glass treatment as the hero so the wizard feels
- * native to the storefront. Pre-fills from any `?q=` / `?venture=`
- * query string sent from the home hero or a business-type page.
+ *   1. Venture           (or "I'm starting from scratch")
+ *   2. Menu / cuisine    (tag chips + free text)
+ *   3. Capacity          (covers / sittings)
+ *   4. Budget            (capex band)
+ *   5. → Results         (navigate to /kitchen-planner/results)
  */
 
 export const meta = () => [
@@ -41,9 +39,9 @@ const BUDGET_BANDS = [
 
 const STEPS = [
   {n: 1, label: 'Venture', hint: 'What kind of place are you building?'},
-  {n: 2, label: 'Cuisine', hint: 'What\'s the menu look like?'},
-  {n: 3, label: 'Scale',   hint: 'How many covers / orders per service?'},
-  {n: 4, label: 'Budget',  hint: 'What\'s the capex band?'},
+  {n: 2, label: 'Cuisine', hint: "What's the menu look like?"},
+  {n: 3, label: 'Scale',   hint: 'How many covers per service?'},
+  {n: 4, label: 'Budget',  hint: "What's the capex band?"},
   {n: 5, label: 'Plan',    hint: 'Get your recommended kitchen.'},
 ];
 
@@ -61,8 +59,6 @@ export default function KitchenPlanner() {
     budget: '5-15l',
   });
 
-  // If a description prefilled, jump to step 2 (cuisine) so the user lands
-  // somewhere relevant. Venture stays empty until they pick.
   useEffect(() => {
     if (data.venture) setStep(2);
     else if (data.description) setStep(2);
@@ -84,7 +80,6 @@ export default function KitchenPlanner() {
     if (step < 5) {
       setStep((s) => s + 1);
     } else {
-      // Encode as querystring and route to results.
       const q = new URLSearchParams({
         venture: data.venture,
         cuisines: data.cuisines.join(','),
@@ -98,29 +93,47 @@ export default function KitchenPlanner() {
   }
 
   return (
-    <section className="mx-auto max-w-[1100px] px-4 py-10 md:px-6 md:py-14">
-      <header className="mb-8 flex items-center justify-between gap-4">
+    <section className="mx-auto max-w-[1100px] px-4 py-10 md:px-6 md:py-16">
+      <header className="mb-9 flex items-center justify-between gap-4">
         <div>
-          <span className="eyebrow">
-            <Sparkles className="h-3 w-3" />
+          <span
+            className="apple-eyebrow"
+            style={{color: 'var(--ks-blue-dark)'}}
+          >
+            <Sparkles
+              className="h-3 w-3"
+              style={{color: 'var(--ks-blue)'}}
+            />
             AI Kitchen Planner
           </span>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink md:text-4xl">
+          <h1
+            className="mt-3 text-[32px] font-semibold tracking-tight md:text-[44px]"
+            style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+          >
             Spec a kitchen in five questions.
           </h1>
         </div>
-        <span className="hidden text-[12px] text-gray-500 md:inline">
+        <span
+          className="hidden text-[12px] md:inline"
+          style={{color: 'var(--ks-muted)'}}
+        >
           Free · No login required · ~3 minutes
         </span>
       </header>
 
       <Stepper current={step} onJump={(n) => n < step && setStep(n)} />
 
-      <div className="mt-8 card p-6 md:p-9">
-        <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-primary">
+      <div className="mt-8 premium-panel p-7 md:p-10">
+        <div
+          className="text-[11px] font-medium uppercase tracking-[0.10em]"
+          style={{color: 'var(--ks-blue-dark)'}}
+        >
           Step {step} of 5
         </div>
-        <h2 className="text-xl font-semibold text-ink md:text-2xl">
+        <h2
+          className="mt-2 text-xl font-semibold md:text-2xl"
+          style={{color: 'var(--ks-ink)', letterSpacing: '-0.012em'}}
+        >
           {STEPS[step - 1].hint}
         </h2>
 
@@ -138,7 +151,7 @@ export default function KitchenPlanner() {
           type="button"
           onClick={() => setStep((s) => Math.max(1, s - 1))}
           disabled={step === 1}
-          className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-ink hover:border-ink/40 disabled:opacity-40"
+          className="apple-button-ghost justify-center disabled:opacity-40"
         >
           <ChevronLeft className="h-4 w-4" />
           Back
@@ -147,12 +160,20 @@ export default function KitchenPlanner() {
           type="button"
           onClick={next}
           disabled={!canAdvance()}
-          className={cn(
-            'inline-flex items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-sm font-semibold',
-            canAdvance()
-              ? step === 5 ? 'btn-accent' : 'btn-primary'
-              : 'bg-gray-200 text-gray-500',
-          )}
+          className={
+            !canAdvance()
+              ? 'apple-button-ghost justify-center'
+              : step === 5
+              ? 'apple-button-primary justify-center'
+              : 'apple-button-primary justify-center'
+          }
+          style={
+            !canAdvance()
+              ? {opacity: 0.5, cursor: 'not-allowed'}
+              : step === 5
+              ? {background: 'var(--ks-blue)', borderColor: 'rgba(0,113,227,0.5)'}
+              : undefined
+          }
         >
           {step === 5 ? (
             <>
@@ -161,12 +182,18 @@ export default function KitchenPlanner() {
               <ArrowRight className="h-4 w-4 opacity-80" />
             </>
           ) : (
-            <>Continue<ChevronRight className="h-4 w-4" /></>
+            <>
+              Continue
+              <ChevronRight className="h-4 w-4" />
+            </>
           )}
         </button>
       </div>
 
-      <p className="mt-6 text-center text-[11px] text-gray-500">
+      <p
+        className="mt-7 text-center text-[11px]"
+        style={{color: 'var(--ks-muted)'}}
+      >
         Phase 1 demo — recommendations come from a curated mock dataset.
         The real LLM kicks in in Phase 4.
       </p>
@@ -182,32 +209,57 @@ function Stepper({current, onJump}) {
       {STEPS.map((s) => {
         const state =
           s.n < current ? 'done' : s.n === current ? 'now' : 'upcoming';
+        const isClickable = state !== 'upcoming';
         return (
           <li key={s.n}>
             <button
               type="button"
               onClick={() => onJump?.(s.n)}
-              disabled={state === 'upcoming'}
-              className={cn(
-                'flex w-full items-center gap-2 rounded-xl border bg-white/70 p-3 text-left transition-colors backdrop-blur',
-                state === 'now'
-                  ? 'border-brand-primary shadow-[0_8px_24px_-12px_rgba(67,56,202,0.35)]'
-                  : state === 'done'
-                  ? 'border-emerald-300 hover:border-emerald-500'
-                  : 'border-gray-200 opacity-60',
-              )}
+              disabled={!isClickable}
+              className="flex w-full items-center gap-2 rounded-2xl p-3 text-left transition-colors"
+              style={{
+                background:
+                  state === 'now'
+                    ? 'var(--ks-card-solid)'
+                    : state === 'done'
+                    ? 'var(--ks-emerald-soft)'
+                    : 'var(--ks-card-tint)',
+                border:
+                  state === 'now'
+                    ? '1px solid var(--ks-ink)'
+                    : state === 'done'
+                    ? '1px solid rgba(10,127,86,0.22)'
+                    : '1px solid var(--ks-line-soft)',
+                opacity: state === 'upcoming' ? 0.6 : 1,
+                boxShadow: state === 'now' ? 'var(--ks-shadow-card)' : 'none',
+              }}
             >
               <div
-                className={cn(
-                  'tabular grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-bold',
-                  state === 'done' && 'bg-emerald-600 text-white',
-                  state === 'now' && 'bg-brand-primary text-white',
-                  state === 'upcoming' && 'bg-gray-100 text-gray-500',
-                )}
+                className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-semibold"
+                style={{
+                  background:
+                    state === 'done'
+                      ? 'var(--ks-emerald)'
+                      : state === 'now'
+                      ? 'var(--ks-ink)'
+                      : 'var(--ks-line-soft)',
+                  color: state === 'upcoming' ? 'var(--ks-muted)' : '#ffffff',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
               >
                 {state === 'done' ? <Check className="h-3.5 w-3.5" /> : s.n}
               </div>
-              <div className="text-[12px] font-semibold uppercase tracking-wider text-gray-600">
+              <div
+                className="text-[11px] font-medium uppercase tracking-[0.10em]"
+                style={{
+                  color:
+                    state === 'now'
+                      ? 'var(--ks-ink)'
+                      : state === 'done'
+                      ? 'var(--ks-emerald-dark)'
+                      : 'var(--ks-muted)',
+                }}
+              >
                 {s.label}
               </div>
             </button>
@@ -231,29 +283,40 @@ function StepVenture({data, patch}) {
             <button
               type="button"
               onClick={() => patch({venture: b.slug})}
-              className={cn(
-                'flex w-full items-start gap-3 rounded-xl border bg-white p-3.5 text-left transition-colors',
-                active
-                  ? 'border-brand-primary ring-2 ring-brand-primary/20'
-                  : 'border-gray-200 hover:border-ink/40',
-              )}
+              className="flex w-full items-start gap-3 rounded-2xl p-3.5 text-left transition-colors"
+              style={{
+                background: active ? 'var(--ks-card-solid)' : 'var(--ks-card-tint)',
+                border: active
+                  ? '1px solid var(--ks-ink)'
+                  : '1px solid var(--ks-line-soft)',
+                boxShadow: active ? 'var(--ks-shadow-card)' : 'none',
+              }}
             >
               <div
-                className={cn(
-                  'grid h-10 w-10 shrink-0 place-items-center rounded-xl',
-                  active ? 'text-white' : 'bg-gray-100 text-gray-600',
-                )}
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl"
                 style={
                   active
-                    ? {background: 'linear-gradient(135deg, var(--color-brand-primary-600), var(--color-brand-primary))'}
-                    : undefined
+                    ? {background: 'var(--ks-ink)', color: '#ffffff'}
+                    : {
+                        background: 'var(--ks-card-solid)',
+                        color: 'var(--ks-ink-2)',
+                        border: '1px solid var(--ks-line-soft)',
+                      }
                 }
               >
-                <Icon className="h-5 w-5" />
+                <Icon className="h-5 w-5" strokeWidth={1.6} />
               </div>
               <div>
-                <div className="text-sm font-semibold text-ink">{b.name}</div>
-                <div className="mt-0.5 line-clamp-2 text-[11px] text-gray-500">
+                <div
+                  className="text-sm font-semibold"
+                  style={{color: 'var(--ks-ink)'}}
+                >
+                  {b.name}
+                </div>
+                <div
+                  className="mt-0.5 line-clamp-2 text-[11px]"
+                  style={{color: 'var(--ks-muted)'}}
+                >
                   {b.tagline}
                 </div>
               </div>
@@ -275,7 +338,10 @@ function StepCuisine({data, patch}) {
   }
   return (
     <>
-      <div className="mb-4 text-[12px] font-semibold text-gray-600">
+      <div
+        className="mb-4 text-[12px]"
+        style={{color: 'var(--ks-ink-2)'}}
+      >
         Pick what your kitchen will cook — multi-select.
       </div>
       <ul className="flex flex-wrap gap-1.5">
@@ -286,12 +352,14 @@ function StepCuisine({data, patch}) {
               <button
                 type="button"
                 onClick={() => toggleCuisine(t)}
-                className={cn(
-                  'inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition-colors',
-                  active
-                    ? 'border-brand-primary bg-brand-primary text-white'
-                    : 'border-gray-300 bg-white text-ink hover:border-ink/40',
-                )}
+                className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium transition-colors"
+                style={{
+                  background: active ? 'var(--ks-ink)' : 'var(--ks-card-solid)',
+                  color: active ? '#ffffff' : 'var(--ks-ink)',
+                  border: active
+                    ? '1px solid var(--ks-ink)'
+                    : '1px solid var(--ks-line)',
+                }}
               >
                 {active && <Check className="h-3 w-3" />}
                 {t}
@@ -301,8 +369,11 @@ function StepCuisine({data, patch}) {
         })}
       </ul>
 
-      <label className="mt-6 block">
-        <div className="mb-1.5 text-[12px] font-semibold text-gray-700">
+      <label className="mt-7 block">
+        <div
+          className="mb-2 text-[12px] font-medium"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
           Anything else? (Optional)
         </div>
         <textarea
@@ -310,7 +381,12 @@ function StepCuisine({data, patch}) {
           value={data.description}
           onChange={(e) => patch({description: e.target.value})}
           placeholder="e.g. We focus on specialty coffee, all-day breakfast, light bakes. Already have a 4ft hood vent in the unit."
-          className="w-full resize-none rounded-xl border border-gray-300 bg-white px-3.5 py-3 text-sm text-ink placeholder:text-gray-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/15"
+          className="w-full resize-none rounded-xl px-3.5 py-3 text-sm focus:outline-none"
+          style={{
+            background: '#fafafa',
+            border: '1px solid var(--ks-line-soft)',
+            color: 'var(--ks-ink)',
+          }}
         />
       </label>
     </>
@@ -319,32 +395,49 @@ function StepCuisine({data, patch}) {
 
 function StepScale({data, patch}) {
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid gap-7 md:grid-cols-2">
       <div>
-        <div className="text-[12px] font-semibold text-gray-700">
+        <div
+          className="text-[12px] font-medium"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
           Covers / orders per service
         </div>
         <div className="mt-3 flex items-center gap-3">
           <input
             type="range"
-            min={20} max={500} step={10}
+            min={20}
+            max={500}
+            step={10}
             value={data.coversPerService}
             onChange={(e) => patch({coversPerService: Number(e.target.value)})}
-            className="flex-1 accent-brand-primary"
+            className="flex-1"
+            style={{accentColor: 'var(--ks-ink)'}}
           />
-          <span className="tabular w-16 text-right text-lg font-semibold text-ink">
+          <span
+            className="w-16 text-right text-lg font-semibold"
+            style={{color: 'var(--ks-ink)', fontVariantNumeric: 'tabular-nums'}}
+          >
             {data.coversPerService}
           </span>
         </div>
-        <p className="mt-2 text-[12px] text-gray-500">
-          {data.coversPerService <= 60 ? 'Small — single hot line covers it.' :
-           data.coversPerService <= 150 ? 'Medium — multi-station kitchen.' :
-           'Large — banquet / multi-outlet capacity.'}
+        <p
+          className="mt-2 text-[12px]"
+          style={{color: 'var(--ks-muted)'}}
+        >
+          {data.coversPerService <= 60
+            ? 'Small — single hot line covers it.'
+            : data.coversPerService <= 150
+            ? 'Medium — multi-station kitchen.'
+            : 'Large — banquet / multi-outlet capacity.'}
         </p>
       </div>
 
       <div>
-        <div className="text-[12px] font-semibold text-gray-700">
+        <div
+          className="text-[12px] font-medium"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
           Sittings per day
         </div>
         <div className="mt-3 grid grid-cols-4 gap-1.5">
@@ -353,20 +446,27 @@ function StepScale({data, patch}) {
               key={n}
               type="button"
               onClick={() => patch({sittings: n})}
-              className={cn(
-                'rounded-xl border px-3 py-2 text-sm font-semibold transition-colors',
-                data.sittings === n
-                  ? 'border-brand-primary bg-brand-primary text-white'
-                  : 'border-gray-300 bg-white text-ink hover:border-ink/40',
-              )}
+              className="rounded-xl px-3 py-2 text-sm font-semibold transition-colors"
+              style={{
+                background:
+                  data.sittings === n ? 'var(--ks-ink)' : 'var(--ks-card-solid)',
+                color: data.sittings === n ? '#ffffff' : 'var(--ks-ink)',
+                border:
+                  data.sittings === n
+                    ? '1px solid var(--ks-ink)'
+                    : '1px solid var(--ks-line)',
+              }}
             >
               {n}
             </button>
           ))}
         </div>
-        <p className="mt-2 text-[12px] text-gray-500">
+        <p
+          className="mt-2 text-[12px]"
+          style={{color: 'var(--ks-muted)'}}
+        >
           Restaurants typically run 2 sittings (lunch + dinner). Cloud
-          kitchens run 1 continuous. Hotels run 3-4.
+          kitchens run 1 continuous. Hotels run 3 – 4.
         </p>
       </div>
     </div>
@@ -383,18 +483,35 @@ function StepBudget({data, patch}) {
             <button
               type="button"
               onClick={() => patch({budget: b.value})}
-              className={cn(
-                'flex w-full items-center justify-between gap-3 rounded-xl border bg-white px-4 py-3 text-left transition-colors',
-                active
-                  ? 'border-brand-primary ring-2 ring-brand-primary/20'
-                  : 'border-gray-300 hover:border-ink/40',
-              )}
+              className="flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left transition-colors"
+              style={{
+                background: active ? 'var(--ks-card-solid)' : 'var(--ks-card-tint)',
+                border: active
+                  ? '1px solid var(--ks-ink)'
+                  : '1px solid var(--ks-line-soft)',
+                boxShadow: active ? 'var(--ks-shadow-card)' : 'none',
+              }}
             >
               <div>
-                <div className="text-sm font-semibold text-ink">{b.label}</div>
-                <div className="text-[12px] text-gray-500">{b.hint}</div>
+                <div
+                  className="text-sm font-semibold"
+                  style={{color: 'var(--ks-ink)'}}
+                >
+                  {b.label}
+                </div>
+                <div
+                  className="text-[12px]"
+                  style={{color: 'var(--ks-muted)'}}
+                >
+                  {b.hint}
+                </div>
               </div>
-              {active && <Check className="h-4 w-4 text-brand-primary" />}
+              {active && (
+                <Check
+                  className="h-4 w-4"
+                  style={{color: 'var(--ks-ink)'}}
+                />
+              )}
             </button>
           </li>
         );
@@ -406,17 +523,32 @@ function StepBudget({data, patch}) {
 function StepReview({data}) {
   const venture = businessTypes.find((b) => b.slug === data.venture);
   return (
-    <div className="space-y-3 text-sm">
-      <p className="text-gray-600">
+    <div className="space-y-4 text-sm">
+      <p style={{color: 'var(--ks-ink-2)'}}>
         Confirm the inputs — we&apos;ll generate a category-grouped
         equipment plan, narrative, and instant capex estimate on the next
         page.
       </p>
-      <ul className="rounded-xl border border-gray-200 bg-white/70 p-4 backdrop-blur">
-        <ReviewRow k="Venture"  v={venture?.name ?? '—'} />
-        <ReviewRow k="Cuisine"  v={data.cuisines.length ? data.cuisines.join(' · ') : '—'} />
-        <ReviewRow k="Scale"    v={`${data.coversPerService} covers per service × ${data.sittings} sittings = ${data.coversPerService * data.sittings} covers/day`} />
-        <ReviewRow k="Budget"   v={BUDGET_BANDS.find((b) => b.value === data.budget)?.label ?? '—'} />
+      <ul
+        className="rounded-2xl p-5"
+        style={{
+          background: 'var(--ks-card-tint)',
+          border: '1px solid var(--ks-line-soft)',
+        }}
+      >
+        <ReviewRow k="Venture" v={venture?.name ?? '—'} />
+        <ReviewRow
+          k="Cuisine"
+          v={data.cuisines.length ? data.cuisines.join(' · ') : '—'}
+        />
+        <ReviewRow
+          k="Scale"
+          v={`${data.coversPerService} covers per service × ${data.sittings} sittings = ${data.coversPerService * data.sittings} covers/day`}
+        />
+        <ReviewRow
+          k="Budget"
+          v={BUDGET_BANDS.find((b) => b.value === data.budget)?.label ?? '—'}
+        />
         {data.description && <ReviewRow k="Notes" v={data.description} />}
       </ul>
     </div>
@@ -425,9 +557,22 @@ function StepReview({data}) {
 
 function ReviewRow({k, v}) {
   return (
-    <li className="flex items-baseline justify-between gap-3 py-1.5">
-      <span className="text-[12px] uppercase tracking-wider text-gray-500">{k}</span>
-      <span className="text-right font-medium text-ink">{v}</span>
+    <li
+      className="flex items-baseline justify-between gap-3 py-2"
+      style={{borderBottom: '1px solid var(--ks-line-soft)'}}
+    >
+      <span
+        className="text-[11px] uppercase tracking-[0.08em]"
+        style={{color: 'var(--ks-muted)'}}
+      >
+        {k}
+      </span>
+      <span
+        className="text-right font-medium"
+        style={{color: 'var(--ks-ink)'}}
+      >
+        {v}
+      </span>
     </li>
   );
 }
