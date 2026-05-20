@@ -1,10 +1,10 @@
 import {useState, useMemo} from 'react';
 import {Link} from 'react-router';
-import {Plus, Search, ChevronRight, Filter} from 'lucide-react';
+import {Plus, Search, ChevronRight} from 'lucide-react';
 import {PartnerShell} from '~/components/partner/PartnerShell';
 import {DealStatusPill} from '~/components/partner/DealStatusPill';
 import {useRequirePartnerLogin} from '~/lib/usePartnerSession';
-import {deals, DEAL_STATE_META} from '~/lib/mock/deals';
+import {deals} from '~/lib/mock/deals';
 import {formatINR} from '~/lib/utils/formatINR';
 import {formatDate} from '~/lib/utils/formatDate';
 import {cn} from '~/lib/utils/cn';
@@ -13,9 +13,9 @@ export const meta = () => [{title: 'Deals — Keystonne Partner'}];
 
 const FILTERS = [
   {value: 'all',       label: 'All'},
-  {value: 'open',      label: 'Open'},        // not lost / expired / paid
-  {value: 'attention', label: 'Attention'},   // conflict + submitted
-  {value: 'closed',    label: 'Closed'},      // won/installed/accrued/approved/paid
+  {value: 'open',      label: 'Open'},
+  {value: 'attention', label: 'Attention'},
+  {value: 'closed',    label: 'Closed'},
   {value: 'lost',      label: 'Lost / expired'},
 ];
 
@@ -50,52 +50,76 @@ export default function PartnerDeals() {
 
   return (
     <PartnerShell>
-      <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
+      <header className="mb-7 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <span className="eyebrow">Deals</span>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+          <span className="apple-eyebrow">Deals</span>
+          <h1
+            className="mt-3 text-[28px] font-semibold tracking-tight md:text-[34px]"
+            style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+          >
             Every project, every state.
           </h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <p
+            className="mt-2 text-sm"
+            style={{color: 'var(--ks-ink-2)'}}
+          >
             {deals.length} deals total · {visible.length} shown
           </p>
         </div>
         <Link
           to="/partner/dashboard/deals/new"
-          className="inline-flex items-center gap-1.5 rounded-xl btn-primary px-4 py-2.5 text-sm font-semibold"
+          className="partner-action"
         >
           <Plus className="h-4 w-4" />
           Register a deal
         </Link>
       </header>
 
-      <div className="mb-4 grid gap-3 md:grid-cols-12">
+      <div className="mb-5 grid gap-3 md:grid-cols-12">
         <div className="md:col-span-7">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Search
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2"
+              style={{color: 'var(--ks-muted)'}}
+            />
             <input
               type="search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search projects, clients, or KD-IDs"
-              className="h-10 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-3 text-sm text-ink placeholder:text-gray-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/15"
+              className="h-11 w-full rounded-full pl-10 pr-3 text-sm focus:outline-none"
+              style={{
+                background: 'var(--ks-card-tint)',
+                border: '1px solid var(--ks-line-soft)',
+                color: 'var(--ks-ink)',
+              }}
             />
           </div>
         </div>
         <div className="md:col-span-5">
-          <div className="flex items-center gap-1 rounded-xl border border-gray-200 bg-white p-1">
-            <Filter className="ml-2 h-3.5 w-3.5 text-gray-400" />
+          <div
+            className="flex items-center gap-1 rounded-full p-1"
+            style={{
+              background: 'var(--ks-card-tint)',
+              border: '1px solid var(--ks-line-soft)',
+            }}
+          >
             {FILTERS.map((f) => (
               <button
                 key={f.value}
                 type="button"
                 onClick={() => setFilter(f.value)}
                 className={cn(
-                  'flex-1 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold transition-colors',
-                  filter === f.value
-                    ? 'bg-brand-primary text-white'
-                    : 'text-gray-600 hover:bg-gray-100',
+                  'flex-1 rounded-full px-2.5 py-1.5 text-[12px] font-medium transition-colors',
                 )}
+                style={
+                  filter === f.value
+                    ? {
+                        background: 'var(--ks-ink)',
+                        color: '#ffffff',
+                      }
+                    : {color: 'var(--ks-ink-2)'}
+                }
               >
                 {f.label}
               </button>
@@ -104,59 +128,74 @@ export default function PartnerDeals() {
         </div>
       </div>
 
-      <div className="card overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">
+      <div className="premium-panel overflow-hidden">
+        <table className="spec-hairline-table">
+          <thead>
             <tr>
-              <th className="px-5 py-3">Project</th>
-              <th className="px-5 py-3">Client</th>
-              <th className="tabular px-5 py-3 text-right">Est. value</th>
-              <th className="px-5 py-3 text-right">Registered</th>
-              <th className="px-5 py-3 text-right">Status</th>
-              <th className="px-2 py-3" />
+              <th>Project</th>
+              <th>Client</th>
+              <th className="num">Est. value</th>
+              <th className="num">Registered</th>
+              <th className="num">Status</th>
+              <th />
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody>
             {visible.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-5 py-12 text-center text-sm text-gray-500">
+                <td
+                  colSpan={6}
+                  className="py-12 text-center text-sm"
+                  style={{color: 'var(--ks-muted)'}}
+                >
                   No deals match your filters.
                 </td>
               </tr>
             )}
             {visible.map((d) => (
-              <tr key={d.id} className="hover:bg-gray-50">
-                <td className="px-5 py-4">
+              <tr key={d.id}>
+                <td>
                   <Link
                     to={`/partner/dashboard/deals/${d.id}`}
-                    className="font-semibold text-ink hover:text-brand-primary"
+                    className="font-semibold"
+                    style={{color: 'var(--ks-ink)'}}
                   >
                     {d.project}
                   </Link>
-                  <div className="text-[11px] text-gray-500">
+                  <div
+                    className="text-[11px]"
+                    style={{color: 'var(--ks-muted)'}}
+                  >
                     {d.id} · {d.city}
                   </div>
                 </td>
-                <td className="px-5 py-4 text-gray-700">
+                <td style={{color: 'var(--ks-ink-2)'}}>
                   {d.client}
-                  <div className="text-[11px] text-gray-500">
+                  <div
+                    className="text-[11px]"
+                    style={{color: 'var(--ks-muted)'}}
+                  >
                     {d.decisionMaker}
                   </div>
                 </td>
-                <td className="tabular px-5 py-4 text-right font-semibold text-ink">
+                <td
+                  className="num"
+                  style={{color: 'var(--ks-ink)', fontWeight: 600}}
+                >
                   {formatINR(d.estValueINR)}
                 </td>
-                <td className="tabular px-5 py-4 text-right text-gray-600">
+                <td className="num" style={{color: 'var(--ks-ink-2)'}}>
                   {formatDate(d.registeredAt)}
                 </td>
-                <td className="px-5 py-4 text-right">
+                <td className="num">
                   <DealStatusPill state={d.state} />
                 </td>
-                <td className="px-2 py-4 text-right">
+                <td className="num" style={{width: 32}}>
                   <Link
                     to={`/partner/dashboard/deals/${d.id}`}
                     aria-label="Open deal"
-                    className="grid h-7 w-7 place-items-center rounded text-gray-400 hover:bg-gray-100 hover:text-ink"
+                    className="inline-grid h-7 w-7 place-items-center rounded-full"
+                    style={{color: 'var(--ks-muted)'}}
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Link>

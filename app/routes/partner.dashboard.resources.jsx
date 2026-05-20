@@ -9,7 +9,6 @@ import {cn} from '~/lib/utils/cn';
 export const meta = () => [{title: 'Resources — Keystonne Partner'}];
 
 const ICONS = {PDF: FileText, DWG: Box, MP4: Film, ZIP: Box};
-
 const TIER_ORDER = ['Bronze', 'Silver', 'Gold', 'Platinum'];
 
 export default function PartnerResources() {
@@ -44,35 +43,63 @@ export default function PartnerResources() {
 
   return (
     <PartnerShell>
-      <header className="mb-6">
-        <span className="eyebrow">Resources</span>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+      <header className="mb-7">
+        <span className="apple-eyebrow">Resources</span>
+        <h1
+          className="mt-3 text-[28px] font-semibold tracking-tight md:text-[34px]"
+          style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+        >
           Spec sheets, CADs, training.
         </h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <p
+          className="mt-2 text-sm md:text-base"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
           Everything you need to spec confidently. Tier-gated items unlock
           as you grow.
         </p>
       </header>
 
-      <div className="mb-6 relative max-w-md">
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+      <div className="relative mb-7 max-w-md">
+        <Search
+          className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2"
+          style={{color: 'var(--ks-muted)'}}
+        />
         <input
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search resources by name or type"
-          className="h-10 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-3 text-sm text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/15"
+          className="h-11 w-full rounded-full pl-10 pr-3 text-sm focus:outline-none"
+          style={{
+            background: 'var(--ks-card-tint)',
+            border: '1px solid var(--ks-line-soft)',
+            color: 'var(--ks-ink)',
+          }}
         />
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {Object.entries(grouped).map(([tag, items]) => (
           <section key={tag}>
             <div className="mb-3 flex items-center gap-2">
-              <Folder className="h-4 w-4 text-gray-400" />
-              <h2 className="text-base font-semibold text-ink">{tag}</h2>
-              <span className="text-[11px] text-gray-500">{items.length}</span>
+              <Folder
+                className="h-4 w-4"
+                style={{color: 'var(--ks-muted)'}}
+                strokeWidth={1.6}
+              />
+              <h2
+                className="text-base font-semibold"
+                style={{color: 'var(--ks-ink)'}}
+              >
+                {tag}
+              </h2>
+              <span
+                className="text-[11px]"
+                style={{color: 'var(--ks-muted)'}}
+              >
+                {items.length}
+              </span>
             </div>
             <ul className="grid gap-3 md:grid-cols-2">
               {items.map((r) => {
@@ -80,38 +107,66 @@ export default function PartnerResources() {
                 const requiredIdx = r.tierMin ? TIER_ORDER.indexOf(r.tierMin) : 0;
                 const locked = requiredIdx > partnerTierIdx;
                 return (
-                  <li key={r.id} className="card flex items-center gap-4 p-4">
+                  <li
+                    key={r.id}
+                    className="premium-card flex items-center gap-4 p-4"
+                  >
                     <div
-                      className={cn(
-                        'grid h-11 w-11 shrink-0 place-items-center rounded-xl',
-                        locked ? 'bg-gray-100 text-gray-400' : 'text-white',
-                      )}
+                      className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl"
                       style={
                         locked
-                          ? undefined
+                          ? {
+                              background: 'var(--ks-card-tint)',
+                              color: 'var(--ks-muted)',
+                              border: '1px solid var(--ks-line-soft)',
+                            }
                           : {
-                              background:
-                                'linear-gradient(135deg, var(--color-brand-primary-600), var(--color-brand-primary))',
+                              background: 'var(--ks-card-tint)',
+                              color: 'var(--ks-ink)',
+                              border: '1px solid var(--ks-line-soft)',
                             }
                       }
                     >
-                      {locked ? <Lock className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
+                      {locked ? (
+                        <Lock className="h-5 w-5" strokeWidth={1.6} />
+                      ) : (
+                        <Icon className="h-5 w-5" strokeWidth={1.6} />
+                      )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-ink">{r.title}</div>
-                      <div className="text-[11px] text-gray-500">
-                        {r.type} · {r.sizeMB} MB{r.tierMin ? ` · ${r.tierMin}+ only` : ''}
+                    <div className="min-w-0 flex-1">
+                      <div
+                        className="text-sm font-semibold"
+                        style={{color: 'var(--ks-ink)'}}
+                      >
+                        {r.title}
+                      </div>
+                      <div
+                        className="text-[11px]"
+                        style={{color: 'var(--ks-muted)'}}
+                      >
+                        {r.type} · {r.sizeMB} MB
+                        {r.tierMin ? ` · ${r.tierMin}+ only` : ''}
                       </div>
                     </div>
                     <button
                       type="button"
                       onClick={() => tryDownload(r)}
                       className={cn(
-                        'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-semibold',
-                        locked
-                          ? 'bg-gray-100 text-gray-500'
-                          : 'border border-gray-300 bg-white text-ink hover:border-ink/40',
+                        'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-medium',
                       )}
+                      style={
+                        locked
+                          ? {
+                              background: 'var(--ks-card-tint)',
+                              color: 'var(--ks-muted)',
+                              border: '1px solid var(--ks-line-soft)',
+                            }
+                          : {
+                              background: 'var(--ks-card-solid)',
+                              color: 'var(--ks-ink)',
+                              border: '1px solid var(--ks-line)',
+                            }
+                      }
                     >
                       <Download className="h-3.5 w-3.5" />
                       {locked ? 'Locked' : 'Download'}
@@ -127,7 +182,12 @@ export default function PartnerResources() {
       {toast && (
         <div
           role="status"
-          className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-ink/90 px-4 py-2 text-[12px] font-semibold text-white shadow-xl backdrop-blur"
+          className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full px-4 py-2 text-[12px] font-medium"
+          style={{
+            background: 'var(--ks-ink)',
+            color: '#ffffff',
+            boxShadow: 'var(--ks-shadow-float)',
+          }}
         >
           {toast}
         </div>

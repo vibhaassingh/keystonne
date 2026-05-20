@@ -12,33 +12,58 @@ export default function PartnerProfile() {
 
   return (
     <PartnerShell>
-      <header className="mb-6">
-        <span className="eyebrow">Profile</span>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+      <header className="mb-7">
+        <span className="apple-eyebrow">Profile</span>
+        <h1
+          className="mt-3 text-[28px] font-semibold tracking-tight md:text-[34px]"
+          style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+        >
           Your partner profile.
         </h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <p
+          className="mt-2 text-sm md:text-base"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
           Approved {formatDate(demoPartner.approvedAt)} · Partner ID{' '}
-          <span className="tabular font-medium text-ink">{demoPartner.id}</span>
+          <span
+            style={{
+              color: 'var(--ks-ink)',
+              fontWeight: 500,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {demoPartner.id}
+          </span>
         </p>
       </header>
 
       <div className="grid gap-4 lg:grid-cols-12">
         {/* Identity */}
-        <div className="card p-5 lg:col-span-7">
+        <div className="premium-panel p-6 lg:col-span-7">
           <div className="flex items-center gap-4">
-            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-brand-primary-600 to-brand-primary text-lg font-bold text-white">
+            <div
+              className="grid h-14 w-14 place-items-center rounded-2xl text-lg font-semibold text-white"
+              style={{background: 'var(--ks-ink)'}}
+            >
               {demoPartner.initials}
             </div>
             <div>
-              <div className="text-base font-semibold text-ink">{demoPartner.name}</div>
-              <div className="text-[12px] text-gray-500">
+              <div
+                className="text-base font-semibold"
+                style={{color: 'var(--ks-ink)'}}
+              >
+                {demoPartner.name}
+              </div>
+              <div
+                className="text-[12px]"
+                style={{color: 'var(--ks-muted)'}}
+              >
                 {demoPartner.persona} · {demoPartner.tier} tier
               </div>
             </div>
           </div>
 
-          <ul className="mt-5 space-y-3 text-sm">
+          <ul className="mt-6 space-y-3 text-sm">
             <KV k="Email" v={demoPartner.email} icon={Mail} />
             <KV k="Mobile" v={demoPartner.mobile} icon={Phone} />
             <KV k="City" v={demoPartner.city} icon={MapPin} />
@@ -47,8 +72,11 @@ export default function PartnerProfile() {
         </div>
 
         {/* Payout */}
-        <div className="card p-5 lg:col-span-5">
-          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-500">
+        <div className="premium-panel p-6 lg:col-span-5">
+          <div
+            className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.10em]"
+            style={{color: 'var(--ks-emerald-dark)'}}
+          >
             <Wallet className="h-3.5 w-3.5" />
             Payout details
           </div>
@@ -59,15 +87,19 @@ export default function PartnerProfile() {
           </ul>
           <button
             type="button"
-            className="mt-5 inline-flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-[12px] font-semibold text-ink hover:border-ink/40"
+            className="apple-button-ghost mt-5"
+            style={{padding: '0.5rem 1rem', fontSize: '12px'}}
           >
             Update payout method
           </button>
         </div>
 
         {/* Tax */}
-        <div className="card p-5 lg:col-span-5">
-          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-500">
+        <div className="premium-panel p-6 lg:col-span-5">
+          <div
+            className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.10em]"
+            style={{color: 'var(--ks-muted)'}}
+          >
             <FileText className="h-3.5 w-3.5" />
             Tax
           </div>
@@ -80,8 +112,11 @@ export default function PartnerProfile() {
         </div>
 
         {/* Programme */}
-        <div className="card p-5 lg:col-span-7">
-          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-500">
+        <div className="premium-panel p-6 lg:col-span-7">
+          <div
+            className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.10em]"
+            style={{color: 'var(--ks-muted)'}}
+          >
             <Shield className="h-3.5 w-3.5" />
             Programme settings
           </div>
@@ -100,11 +135,19 @@ export default function PartnerProfile() {
 function KV({k, v, icon: Icon}) {
   return (
     <li className="flex items-start justify-between gap-3">
-      <span className="flex items-center gap-1.5 text-gray-500">
+      <span
+        className="flex items-center gap-1.5"
+        style={{color: 'var(--ks-muted)'}}
+      >
         {Icon && <Icon className="h-3.5 w-3.5" />}
         {k}
       </span>
-      <span className="tabular text-right font-medium text-ink">{v}</span>
+      <span
+        className="text-right font-medium"
+        style={{color: 'var(--ks-ink)', fontVariantNumeric: 'tabular-nums'}}
+      >
+        {v}
+      </span>
     </li>
   );
 }

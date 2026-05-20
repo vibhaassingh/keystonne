@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import {Link, NavLink} from 'react-router';
 import {
-  LayoutDashboard, Briefcase, FileText, Wallet, Folder, User,
-  LogOut, Menu, X, ChevronRight, Sparkles, ArrowLeft,
+  LayoutDashboard, Briefcase, FileText, Wallet, BanknoteArrowUp,
+  Folder, User, LogOut, Menu, X, ArrowLeft,
 } from 'lucide-react';
 import {KeystonneLogo} from '~/components/KeystonneLogo';
 import {usePartnerSession} from '~/lib/usePartnerSession';
@@ -10,23 +10,22 @@ import {demoPartner} from '~/lib/mock/partner';
 import {cn} from '~/lib/utils/cn';
 
 /**
- * Wraps every /partner/dashboard/* route. Provides:
- *   - Partner topbar (independent of the storefront header — uses the
- *     emerald partner-accent so partners always know which surface
- *     they're in)
- *   - Left sidebar with section navigation; collapses to mobile drawer
- *   - Main content area
- *
- * Renders nothing until `hydrated` to avoid SSR flash; the
- * useRequirePartnerLogin redirect happens on the route component itself.
+ * Wraps every /partner/dashboard/* route. Apple-inspired finance shell:
+ *   - Translucent apple-nav topbar matching the storefront chrome, with
+ *     a small emerald "Partner workspace" chip so context stays clear
+ *     without dyeing the whole header in colour.
+ *   - Left sidebar in premium-panel form, ink labels, emerald icon
+ *     accent + emerald rail when active.
+ *   - Body sits on the graphite-white wash with the same max-width as
+ *     the storefront for visual continuity.
  */
 
 const NAV = [
-  {to: '/partner/dashboard',           label: 'Overview',  icon: LayoutDashboard, end: true},
+  {to: '/partner/dashboard',           label: 'Overview',  icon: LayoutDashboard,  end: true},
   {to: '/partner/dashboard/deals',     label: 'Deals',     icon: Briefcase},
   {to: '/partner/dashboard/quotes',    label: 'Quotes',    icon: FileText},
   {to: '/partner/dashboard/earnings',  label: 'Earnings',  icon: Wallet},
-  {to: '/partner/dashboard/payouts',   label: 'Payouts',   icon: Wallet},
+  {to: '/partner/dashboard/payouts',   label: 'Payouts',   icon: BanknoteArrowUp},
   {to: '/partner/dashboard/resources', label: 'Resources', icon: Folder},
   {to: '/partner/dashboard/profile',   label: 'Profile',   icon: User},
 ];
@@ -36,45 +35,73 @@ export function PartnerShell({children}) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-surface">
-      {/* Partner topbar — replaces the storefront announcement+header on
-          dashboard routes for clearer context-switch. */}
-      <div className="sticky top-0 z-40 border-b border-white/[0.06] bg-emerald-950/85 text-white backdrop-blur-xl supports-[backdrop-filter]:bg-emerald-950/75">
-        <div className="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-3 md:gap-5 md:py-3.5">
+    <div style={{minHeight: '100vh', background: 'var(--ks-page)'}}>
+      {/* Apple-nav topbar — calm graphite-white with a small workspace chip */}
+      <div className="apple-nav sticky top-0 z-40">
+        <div className="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-3 md:gap-5 md:px-6">
           <button
             type="button"
             aria-label="Open sidebar"
             onClick={() => setMobileOpen(true)}
-            className="grid h-10 w-10 place-items-center rounded-lg text-white/85 hover:bg-white/10 md:hidden"
+            className="grid h-10 w-10 place-items-center rounded-lg md:hidden"
+            style={{color: 'var(--ks-ink-2)'}}
           >
             <Menu className="h-5 w-5" />
           </button>
 
-          <KeystonneLogo className="hidden md:block" />
-          <KeystonneLogo variant="monogram" className="md:hidden" />
+          <Link to="/partner/dashboard" className="flex items-center gap-2">
+            <KeystonneLogo tone="dark" className="hidden md:block" />
+            <KeystonneLogo tone="dark" variant="monogram" className="md:hidden" />
+          </Link>
 
-          <span className="hidden items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/85 sm:inline-flex">
-            <Sparkles className="h-3 w-3" />
+          <span
+            className="hidden items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.10em] sm:inline-flex"
+            style={{
+              background: 'var(--ks-emerald-soft)',
+              color: 'var(--ks-emerald-dark)',
+              border: '1px solid rgba(10,127,86,0.20)',
+            }}
+          >
+            <span
+              className="h-1.5 w-1.5 rounded-full"
+              style={{background: 'var(--ks-emerald)'}}
+            />
             Partner workspace
           </span>
 
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2 md:gap-3">
             <Link
               to="/"
-              className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-[12px] font-medium text-white/75 hover:bg-white/10 hover:text-white md:inline-flex"
+              className="hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-medium md:inline-flex"
+              style={{color: 'var(--ks-ink-2)'}}
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               Storefront
             </Link>
-            <div className="flex items-center gap-2 rounded-lg bg-white/10 px-2.5 py-1.5">
-              <div className="grid h-7 w-7 place-items-center rounded-full bg-white/20 text-[11px] font-bold text-white">
+            <div
+              className="flex items-center gap-2 rounded-full px-2.5 py-1.5"
+              style={{
+                background: 'var(--ks-card-tint)',
+                border: '1px solid var(--ks-line-soft)',
+              }}
+            >
+              <div
+                className="grid h-7 w-7 place-items-center rounded-full text-[11px] font-semibold text-white"
+                style={{background: 'var(--ks-ink)'}}
+              >
                 {demoPartner.initials}
               </div>
               <div className="hidden text-left leading-tight sm:block">
-                <div className="text-[11px] text-white/65">
+                <div
+                  className="text-[10px] uppercase tracking-[0.08em]"
+                  style={{color: 'var(--ks-muted)'}}
+                >
                   {demoPartner.tier} · {demoPartner.city}
                 </div>
-                <div className="text-[12px] font-semibold text-white">
+                <div
+                  className="text-[12px] font-semibold"
+                  style={{color: 'var(--ks-ink)'}}
+                >
                   {demoPartner.name}
                 </div>
               </div>
@@ -82,7 +109,8 @@ export function PartnerShell({children}) {
             <button
               type="button"
               onClick={logout}
-              className="grid h-9 w-9 place-items-center rounded-lg text-white/65 hover:bg-white/10 hover:text-white"
+              className="grid h-9 w-9 place-items-center rounded-full transition-colors"
+              style={{color: 'var(--ks-muted)'}}
               aria-label="Log out"
               title="Log out of demo partner"
             >
@@ -93,7 +121,7 @@ export function PartnerShell({children}) {
       </div>
 
       {/* Body */}
-      <div className="mx-auto flex max-w-[1400px] gap-6 px-0 py-0 md:px-6 md:py-6">
+      <div className="mx-auto flex max-w-[1400px] gap-6 px-0 py-0 md:px-6 md:py-7">
         {/* Desktop sidebar */}
         <aside className="hidden w-60 shrink-0 md:block">
           <Sidebar onNavigate={() => setMobileOpen(false)} />
@@ -110,17 +138,25 @@ export function PartnerShell({children}) {
               type="button"
               onClick={() => setMobileOpen(false)}
               aria-label="Close sidebar"
-              className="absolute inset-0 bg-ink/40 backdrop-blur-sm"
+              className="absolute inset-0"
+              style={{background: 'rgba(0,0,0,0.32)', backdropFilter: 'blur(8px)'}}
             />
-            <div className="absolute left-0 top-0 h-full w-72 bg-white p-4 shadow-2xl">
+            <div
+              className="absolute left-0 top-0 h-full w-72 p-4"
+              style={{background: 'var(--ks-card-solid)', boxShadow: 'var(--ks-shadow-float)'}}
+            >
               <div className="mb-4 flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-gray-500">
+                <span
+                  className="text-[11px] font-semibold uppercase tracking-[0.12em]"
+                  style={{color: 'var(--ks-muted)'}}
+                >
                   Navigate
                 </span>
                 <button
                   type="button"
                   onClick={() => setMobileOpen(false)}
-                  className="grid h-8 w-8 place-items-center rounded-lg text-gray-500 hover:bg-gray-100"
+                  className="grid h-8 w-8 place-items-center rounded-full"
+                  style={{color: 'var(--ks-ink-2)'}}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -131,7 +167,7 @@ export function PartnerShell({children}) {
         )}
 
         {/* Main column */}
-        <main className="min-w-0 flex-1 px-4 pb-12 md:px-0">
+        <main className="min-w-0 flex-1 px-4 pb-16 md:px-0">
           {children}
         </main>
       </div>
@@ -141,7 +177,11 @@ export function PartnerShell({children}) {
 
 function Sidebar({onNavigate}) {
   return (
-    <nav aria-label="Partner sections" className="rounded-2xl border border-gray-200 bg-white/85 p-2 backdrop-blur">
+    <nav
+      aria-label="Partner sections"
+      className="premium-panel p-2"
+      style={{borderRadius: 'var(--ks-radius-lg)'}}
+    >
       <ul className="space-y-0.5">
         {NAV.map(({to, label, icon: Icon, end}) => (
           <li key={to}>
@@ -153,23 +193,51 @@ function Sidebar({onNavigate}) {
               className={({isActive}) =>
                 cn(
                   'group flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-colors',
-                  isActive
-                    ? 'bg-partner-accent/10 text-partner-accent font-semibold'
-                    : 'text-ink/80 hover:bg-gray-100 hover:text-ink',
                 )
+              }
+              style={({isActive}) =>
+                isActive
+                  ? {
+                      background: 'var(--ks-emerald-soft)',
+                      color: 'var(--ks-emerald-dark)',
+                      fontWeight: 600,
+                    }
+                  : {color: 'var(--ks-ink-2)'}
               }
             >
               {({isActive}) => (
                 <>
-                  <Icon className={cn('h-4 w-4', isActive ? 'text-partner-accent' : 'text-gray-500')} />
+                  <Icon
+                    className="h-4 w-4"
+                    style={{color: isActive ? 'var(--ks-emerald)' : 'var(--ks-muted)'}}
+                    strokeWidth={1.6}
+                  />
                   {label}
-                  {isActive && <ChevronRight className="ml-auto h-3.5 w-3.5 opacity-70" />}
+                  {isActive && (
+                    <span
+                      className="ml-auto h-1.5 w-1.5 rounded-full"
+                      style={{background: 'var(--ks-emerald)'}}
+                    />
+                  )}
                 </>
               )}
             </NavLink>
           </li>
         ))}
       </ul>
+
+      <div
+        className="mx-2 my-2"
+        style={{height: 1, background: 'var(--ks-line-soft)'}}
+      />
+
+      <Link
+        to="/partner"
+        className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[12px]"
+        style={{color: 'var(--ks-muted)'}}
+      >
+        Partner programme overview
+      </Link>
     </nav>
   );
 }

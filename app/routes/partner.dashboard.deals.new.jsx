@@ -54,31 +54,55 @@ export default function NewDeal() {
   if (submitted) {
     return (
       <PartnerShell>
-        <section className="mx-auto max-w-xl py-20 text-center">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-100 text-emerald-700">
-            <Check className="h-8 w-8" />
+        <section className="mx-auto max-w-xl py-16 text-center md:py-24">
+          <div
+            className="mx-auto grid h-16 w-16 place-items-center rounded-full"
+            style={{
+              background: 'var(--ks-emerald-soft)',
+              color: 'var(--ks-emerald-dark)',
+            }}
+          >
+            <Check className="h-8 w-8" strokeWidth={1.6} />
           </div>
-          <h1 className="mt-5 text-3xl font-semibold tracking-tight text-ink">
+          <h1
+            className="mt-6 text-[32px] font-semibold tracking-tight md:text-[40px]"
+            style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+          >
             Deal registered.
           </h1>
-          <p className="mt-3 text-sm text-gray-600">
+          <p
+            className="mt-3 text-sm md:text-base"
+            style={{color: 'var(--ks-ink-2)'}}
+          >
             Attribution locked. Our partner-ops team will review within one
             working day. You can register additional deals or jump back to
             your dashboard.
           </p>
-          <div className="mt-6 inline-flex flex-col items-center rounded-xl border border-gray-200 bg-white px-5 py-3">
-            <span className="text-[11px] uppercase tracking-wider text-gray-500">
+          <div
+            className="mt-7 inline-flex flex-col items-center rounded-2xl px-5 py-3"
+            style={{
+              background: 'var(--ks-card-tint)',
+              border: '1px solid var(--ks-line-soft)',
+            }}
+          >
+            <span
+              className="text-[10px] font-medium uppercase tracking-[0.10em]"
+              style={{color: 'var(--ks-muted)'}}
+            >
               Deal ID
             </span>
-            <span className="tabular mt-0.5 text-lg font-semibold text-ink">
+            <span
+              className="mt-0.5 text-lg font-semibold"
+              style={{color: 'var(--ks-ink)', fontVariantNumeric: 'tabular-nums'}}
+            >
               {refId}
             </span>
           </div>
-          <div className="mt-8 flex justify-center gap-3">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             <button
               type="button"
               onClick={() => navigate('/partner/dashboard/deals')}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-ink hover:border-ink/40"
+              className="apple-button-ghost"
             >
               View all deals
             </button>
@@ -89,7 +113,7 @@ export default function NewDeal() {
                 setRefId(null);
                 setItems([{sku: products[0].slug, qty: 1}]);
               }}
-              className="inline-flex items-center gap-1.5 rounded-xl btn-primary px-4 py-2.5 text-sm font-semibold"
+              className="apple-button-primary"
             >
               Register another
             </button>
@@ -108,17 +132,24 @@ export default function NewDeal() {
     <PartnerShell>
       <Link
         to="/partner/dashboard/deals"
-        className="mb-4 inline-flex items-center gap-1 text-[12px] font-semibold text-gray-500 hover:text-brand-primary"
+        className="mb-5 inline-flex items-center gap-1 text-[12px] font-medium"
+        style={{color: 'var(--ks-muted)'}}
       >
         <ChevronLeft className="h-3.5 w-3.5" /> Back to deals
       </Link>
 
-      <header className="mb-6">
-        <span className="eyebrow">New deal</span>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+      <header className="mb-7">
+        <span className="apple-eyebrow">New deal</span>
+        <h1
+          className="mt-3 text-[28px] font-semibold tracking-tight md:text-[34px]"
+          style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+        >
           Register a project.
         </h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <p
+          className="mt-2 text-sm md:text-base"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
           Lock attribution the moment you spec — first-to-register wins
           (with a 30-day protection window).
         </p>
@@ -135,6 +166,7 @@ export default function NewDeal() {
                 <select
                   {...register('venture')}
                   className={inputCls}
+                  style={inputStyle}
                 >
                   {businessTypes.map((b) => (
                     <option key={b.slug} value={b.slug}>{b.name}</option>
@@ -167,22 +199,42 @@ export default function NewDeal() {
             </div>
           </Section>
 
-          <Section title={`Line items (${items.length})`} actions={
-            <button type="button" onClick={addItem} className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[12px] font-semibold text-ink hover:border-ink/40">
-              <Plus className="h-3.5 w-3.5" /> Add line
-            </button>
-          }>
+          <Section
+            title={`Line items (${items.length})`}
+            actions={
+              <button
+                type="button"
+                onClick={addItem}
+                className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium"
+                style={{
+                  background: 'var(--ks-card-solid)',
+                  border: '1px solid var(--ks-line)',
+                  color: 'var(--ks-ink)',
+                }}
+              >
+                <Plus className="h-3.5 w-3.5" /> Add line
+              </button>
+            }
+          >
             <ul className="space-y-3">
               {items.map((line, i) => {
                 const p = products.find((p) => p.slug === line.sku);
                 const lineTotal = (p?.priceINR ?? 0) * line.qty;
                 return (
-                  <li key={i} className="grid gap-3 rounded-xl border border-gray-200 bg-white p-3 md:grid-cols-12 md:items-center">
+                  <li
+                    key={i}
+                    className="grid gap-3 rounded-xl p-3 md:grid-cols-12 md:items-center"
+                    style={{
+                      background: 'var(--ks-card-tint)',
+                      border: '1px solid var(--ks-line-soft)',
+                    }}
+                  >
                     <div className="md:col-span-7">
                       <select
                         value={line.sku}
                         onChange={(e) => updateItem(i, {sku: e.target.value})}
                         className={cn(inputCls, 'text-[13px]')}
+                        style={inputStyle}
                       >
                         {products.map((p) => (
                           <option key={p.slug} value={p.slug}>{p.name}</option>
@@ -196,9 +248,16 @@ export default function NewDeal() {
                         value={line.qty}
                         onChange={(e) => updateItem(i, {qty: Math.max(1, parseInt(e.target.value || '1', 10))})}
                         className={cn(inputCls, 'text-center')}
+                        style={inputStyle}
                       />
                     </div>
-                    <div className="tabular text-right text-sm font-semibold text-ink md:col-span-2">
+                    <div
+                      className="text-right text-sm font-semibold md:col-span-2"
+                      style={{
+                        color: 'var(--ks-ink)',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
                       {p?.priceINR ? formatINR(lineTotal) : 'Quote'}
                     </div>
                     <div className="md:col-span-1 md:text-right">
@@ -207,7 +266,8 @@ export default function NewDeal() {
                         onClick={() => removeItem(i)}
                         disabled={items.length === 1}
                         aria-label="Remove line"
-                        className="inline-grid h-8 w-8 place-items-center rounded text-gray-400 hover:bg-gray-100 hover:text-red-600 disabled:opacity-40"
+                        className="inline-grid h-8 w-8 place-items-center rounded-full disabled:opacity-40"
+                        style={{color: 'var(--ks-muted)'}}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -223,6 +283,7 @@ export default function NewDeal() {
               rows={4}
               {...register('notes')}
               className={cn(inputCls, 'resize-none')}
+              style={inputStyle}
               placeholder="Site context, electrical / gas availability, timing constraints…"
             />
           </Section>
@@ -230,41 +291,62 @@ export default function NewDeal() {
 
         {/* Summary */}
         <aside className="lg:col-span-4">
-          <div className="sticky top-2 space-y-4">
-            <div className="card p-5">
-              <span className="eyebrow">Summary</span>
-              <dl className="mt-4 space-y-2 text-sm">
+          <div className="sticky top-24 space-y-4">
+            <div className="partner-finance-card">
+              <span className="apple-eyebrow">Summary</span>
+              <dl className="mt-4 space-y-3 text-sm">
                 <Row k="Line items" v={items.length} />
                 <Row k="Est. priced total" v={formatINR(total)} />
-                <Row k="Est. commission" v={formatINR(Math.round(total * 0.066 * 1.1))} note="6.6% blended × Silver 1.10×" />
+                <Row
+                  k="Est. commission"
+                  v={formatINR(Math.round(total * 0.066 * 1.1))}
+                  note="6.6% blended × Silver 1.10×"
+                  accent="emerald"
+                />
               </dl>
 
-              <div className="my-4 glass-divider" />
+              <div className="apple-divider my-5" />
 
               <button
                 type="submit"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl btn-primary px-4 py-2.5 text-sm font-semibold"
+                className="partner-action w-full justify-center"
               >
                 <Save className="h-4 w-4" />
                 Register deal
               </button>
-              <p className="mt-2 text-[11px] text-gray-500">
+              <p
+                className="mt-3 text-[11px]"
+                style={{color: 'var(--ks-muted)'}}
+              >
                 Attribution locks the moment you submit.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-dashed border-brand-accent/30 bg-brand-accent/5 p-4">
-              <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-brand-accent">
+            <div
+              className="rounded-2xl p-5"
+              style={{
+                background: 'var(--ks-blue-soft)',
+                border: '1px solid rgba(0,113,227,0.18)',
+              }}
+            >
+              <div
+                className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.10em]"
+                style={{color: 'var(--ks-blue-dark)'}}
+              >
                 <Sparkles className="h-3.5 w-3.5" />
                 Try the planner instead
               </div>
-              <p className="mt-1.5 text-[12px] text-gray-700">
+              <p
+                className="mt-2 text-[12px]"
+                style={{color: 'var(--ks-blue-dark)'}}
+              >
                 Describe the kitchen in plain language and we&apos;ll
                 pre-fill this form with suggested line items.
               </p>
               <Link
                 to="/kitchen-planner"
-                className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-brand-accent hover:underline"
+                className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold"
+                style={{color: 'var(--ks-blue-dark)'}}
               >
                 Launch AI planner →
               </Link>
@@ -277,13 +359,22 @@ export default function NewDeal() {
 }
 
 const inputCls =
-  'w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-sm text-ink placeholder:text-gray-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/15';
+  'w-full rounded-xl px-3.5 py-2.5 text-sm focus:outline-none';
+
+const inputStyle = {
+  background: '#fafafa',
+  border: '1px solid var(--ks-line-soft)',
+  color: 'var(--ks-ink)',
+};
 
 function Section({title, actions, children}) {
   return (
-    <fieldset className="mb-5 card p-5">
+    <fieldset className="premium-panel mb-5 p-6">
       <div className="mb-4 flex items-center justify-between">
-        <legend className="text-[11px] font-bold uppercase tracking-[0.14em] text-gray-500">
+        <legend
+          className="text-[11px] font-medium uppercase tracking-[0.10em]"
+          style={{color: 'var(--ks-muted)'}}
+        >
           {title}
         </legend>
         {actions}
@@ -296,25 +387,59 @@ function Section({title, actions, children}) {
 function Field({label, error, children}) {
   return (
     <label className="block">
-      <div className="mb-1.5 text-[12px] font-semibold text-gray-700">{label}</div>
+      <div
+        className="mb-1.5 text-[12px] font-medium"
+        style={{color: 'var(--ks-ink-2)'}}
+      >
+        {label}
+      </div>
       {children}
-      {error && <div className="mt-1 text-[11px] text-red-600">{error}</div>}
+      {error && (
+        <div
+          className="mt-1 text-[11px]"
+          style={{color: '#c2410c'}}
+        >
+          {error}
+        </div>
+      )}
     </label>
   );
 }
 
 function Input(props) {
-  return <input {...props} className={cn(inputCls, props.className)} />;
+  return (
+    <input
+      {...props}
+      className={cn(inputCls, props.className)}
+      style={inputStyle}
+    />
+  );
 }
 
-function Row({k, v, note}) {
+function Row({k, v, note, accent}) {
   return (
-    <div className="flex items-baseline justify-between">
+    <div className="flex items-baseline justify-between gap-3">
       <div>
-        <dt className="text-gray-600">{k}</dt>
-        {note && <div className="text-[11px] text-gray-400">{note}</div>}
+        <dt style={{color: 'var(--ks-ink-2)'}}>{k}</dt>
+        {note && (
+          <div
+            className="text-[11px]"
+            style={{color: 'var(--ks-muted)'}}
+          >
+            {note}
+          </div>
+        )}
       </div>
-      <dd className="tabular font-semibold text-ink">{v}</dd>
+      <dd
+        className="font-semibold"
+        style={{
+          color: accent === 'emerald' ? 'var(--ks-emerald)' : 'var(--ks-ink)',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {v}
+      </dd>
     </div>
   );
 }
+

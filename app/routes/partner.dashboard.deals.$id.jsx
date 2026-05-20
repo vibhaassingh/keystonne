@@ -23,14 +23,22 @@ export default function DealDetail() {
   if (!deal) {
     return (
       <PartnerShell>
-        <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center">
-          <h1 className="text-xl font-semibold text-ink">Deal not found</h1>
-          <p className="mt-2 text-sm text-gray-600">
+        <div className="premium-panel p-10 text-center">
+          <h1
+            className="text-xl font-semibold"
+            style={{color: 'var(--ks-ink)'}}
+          >
+            Deal not found
+          </h1>
+          <p
+            className="mt-2 text-sm"
+            style={{color: 'var(--ks-ink-2)'}}
+          >
             The deal {params.id} doesn&apos;t exist in your account.
           </p>
           <Link
             to="/partner/dashboard/deals"
-            className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-primary hover:underline"
+            className="apple-link mt-4 inline-flex items-center gap-1 text-sm"
           >
             Back to deals
           </Link>
@@ -46,28 +54,44 @@ export default function DealDetail() {
     <PartnerShell>
       <Link
         to="/partner/dashboard/deals"
-        className="mb-4 inline-flex items-center gap-1 text-[12px] font-semibold text-gray-500 hover:text-brand-primary"
+        className="mb-5 inline-flex items-center gap-1 text-[12px] font-medium"
+        style={{color: 'var(--ks-muted)'}}
       >
         <ChevronLeft className="h-3.5 w-3.5" /> Back to deals
       </Link>
 
-      <header className="mb-6 flex flex-wrap items-start justify-between gap-3">
+      <header className="mb-7 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-gray-500">
+          <div
+            className="flex items-center gap-2 text-[11px] uppercase tracking-[0.10em]"
+            style={{color: 'var(--ks-muted)'}}
+          >
             <span>{deal.id}</span>
             <span>·</span>
             <span className="inline-flex items-center gap-1">
               <MapPin className="h-3 w-3" /> {deal.city}
             </span>
           </div>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+          <h1
+            className="mt-2 text-[28px] font-semibold tracking-tight md:text-[34px]"
+            style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+          >
             {deal.project}
           </h1>
-          <p className="mt-1 text-sm text-gray-600">
-            <Building2 className="mr-1 inline h-3.5 w-3.5 text-gray-400" />
+          <p
+            className="mt-2 text-sm"
+            style={{color: 'var(--ks-ink-2)'}}
+          >
+            <Building2
+              className="mr-1 inline h-3.5 w-3.5"
+              style={{color: 'var(--ks-muted)'}}
+            />
             {deal.client}{' '}
-            <span className="text-gray-400">·</span>{' '}
-            <User className="mr-1 inline h-3.5 w-3.5 text-gray-400" />
+            <span style={{color: 'var(--ks-muted)'}}>·</span>{' '}
+            <User
+              className="mr-1 inline h-3.5 w-3.5"
+              style={{color: 'var(--ks-muted)'}}
+            />
             {deal.decisionMaker}
           </p>
         </div>
@@ -79,25 +103,47 @@ export default function DealDetail() {
         <div className="space-y-6 lg:col-span-8">
           <KPIRow deal={deal} />
 
-          <div className="card p-5">
-            <h2 className="text-base font-semibold text-ink">Timeline</h2>
-            <ol className="mt-4 space-y-4 border-l border-gray-200 pl-4">
+          <div className="premium-panel p-6">
+            <h2
+              className="text-base font-semibold"
+              style={{color: 'var(--ks-ink)'}}
+            >
+              Timeline
+            </h2>
+            <ol
+              className="mt-5 space-y-5 pl-4"
+              style={{borderLeft: '1px solid var(--ks-line-soft)'}}
+            >
               {deal.timeline.map((t, i) => (
                 <li key={i} className="relative">
                   <div
                     className="absolute -left-[22px] top-1 grid h-3 w-3 place-items-center rounded-full"
-                    style={{background: `var(--color-status-${DEAL_STATE_META[t.state]?.color ?? 'draft'})`}}
+                    style={{
+                      background: `var(--color-status-${DEAL_STATE_META[t.state]?.color ?? 'draft'})`,
+                      boxShadow: '0 0 0 3px var(--ks-card-solid)',
+                    }}
                   />
                   <div className="flex items-center justify-between gap-3">
-                    <div className="text-sm font-semibold text-ink">
+                    <div
+                      className="text-sm font-semibold"
+                      style={{color: 'var(--ks-ink)'}}
+                    >
                       {DEAL_STATE_META[t.state]?.label}
                     </div>
-                    <div className="tabular text-[12px] text-gray-500">
+                    <div
+                      className="text-[12px]"
+                      style={{color: 'var(--ks-muted)', fontVariantNumeric: 'tabular-nums'}}
+                    >
                       {formatDate(t.at)}
                     </div>
                   </div>
                   {t.note && (
-                    <p className="mt-1 text-[13px] text-gray-600">{t.note}</p>
+                    <p
+                      className="mt-1 text-[13px]"
+                      style={{color: 'var(--ks-ink-2)'}}
+                    >
+                      {t.note}
+                    </p>
                   )}
                 </li>
               ))}
@@ -105,69 +151,105 @@ export default function DealDetail() {
           </div>
 
           {quote && (
-            <div className="card overflow-hidden">
-              <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+            <div className="premium-panel overflow-hidden">
+              <div
+                className="flex items-center justify-between px-6 py-5"
+                style={{borderBottom: '1px solid var(--ks-line-soft)'}}
+              >
                 <div>
-                  <h2 className="text-base font-semibold text-ink">
+                  <h2
+                    className="text-base font-semibold"
+                    style={{color: 'var(--ks-ink)'}}
+                  >
                     Quote {quote.id}
                   </h2>
-                  <p className="text-[12px] text-gray-500">
+                  <p
+                    className="text-[12px]"
+                    style={{color: 'var(--ks-muted)'}}
+                  >
                     {quote.lineItems.length} line items · sent{' '}
                     {formatDate(quote.sentAt ?? quote.createdAt)}
                   </p>
                 </div>
                 <Link
                   to="/partner/dashboard/quotes"
-                  className="inline-flex items-center gap-1 text-sm font-semibold text-brand-primary hover:underline"
+                  className="apple-link inline-flex items-center gap-1 text-sm"
                 >
                   View quote <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">
+              <table className="spec-hairline-table">
+                <thead>
                   <tr>
-                    <th className="px-5 py-3">Item</th>
-                    <th className="tabular px-5 py-3 text-right">Qty</th>
-                    <th className="tabular px-5 py-3 text-right">Unit</th>
-                    <th className="tabular px-5 py-3 text-right">Total</th>
+                    <th>Item</th>
+                    <th className="num">Qty</th>
+                    <th className="num">Unit</th>
+                    <th className="num">Total</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody>
                   {quote.lineItems.map((l, i) => (
                     <tr key={i}>
-                      <td className="px-5 py-3 text-ink">{l.name}</td>
-                      <td className="tabular px-5 py-3 text-right">{l.qty}</td>
-                      <td className="tabular px-5 py-3 text-right text-gray-600">{formatINR(l.unitINR)}</td>
-                      <td className="tabular px-5 py-3 text-right font-semibold text-ink">{formatINR(l.unitINR * l.qty)}</td>
+                      <td style={{color: 'var(--ks-ink)'}}>{l.name}</td>
+                      <td className="num">{l.qty}</td>
+                      <td className="num" style={{color: 'var(--ks-ink-2)'}}>
+                        {formatINR(l.unitINR)}
+                      </td>
+                      <td className="num" style={{color: 'var(--ks-ink)', fontWeight: 600}}>
+                        {formatINR(l.unitINR * l.qty)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
-                <tfoot className="bg-gray-50 text-sm">
+                <tfoot>
                   <tr>
-                    <td colSpan={3} className="px-5 py-2 text-right text-gray-600">Subtotal</td>
-                    <td className="tabular px-5 py-2 text-right font-semibold text-ink">
+                    <td colSpan={3} className="num" style={{color: 'var(--ks-ink-2)'}}>
+                      Subtotal
+                    </td>
+                    <td className="num" style={{color: 'var(--ks-ink)', fontWeight: 600}}>
                       {formatINR(quoteSubtotal(quote))}
                     </td>
                   </tr>
                   <tr>
-                    <td colSpan={3} className="px-5 py-2 text-right text-gray-600">GST · 18%</td>
-                    <td className="tabular px-5 py-2 text-right text-gray-700">{formatINR(gst)}</td>
+                    <td colSpan={3} className="num" style={{color: 'var(--ks-ink-2)'}}>
+                      GST · 18%
+                    </td>
+                    <td className="num" style={{color: 'var(--ks-ink-2)'}}>
+                      {formatINR(gst)}
+                    </td>
                   </tr>
                   <tr>
-                    <td colSpan={3} className="px-5 py-2 text-right text-gray-600">Estimated total</td>
-                    <td className="tabular px-5 py-2 text-right text-base font-semibold text-ink">{formatINR(total)}</td>
+                    <td colSpan={3} className="num" style={{color: 'var(--ks-ink-2)'}}>
+                      Estimated total
+                    </td>
+                    <td
+                      className="num"
+                      style={{
+                        color: 'var(--ks-ink)',
+                        fontWeight: 600,
+                        fontSize: 15,
+                      }}
+                    >
+                      {formatINR(total)}
+                    </td>
                   </tr>
                 </tfoot>
               </table>
             </div>
           )}
 
-          <div className="card p-5">
-            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-500">
+          <div className="premium-panel p-6">
+            <div
+              className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.10em]"
+              style={{color: 'var(--ks-muted)'}}
+            >
               <MessageCircle className="h-3.5 w-3.5" />
               Messages with Keystonne ops
             </div>
-            <p className="mt-3 text-sm text-gray-600">
+            <p
+              className="mt-3 text-sm"
+              style={{color: 'var(--ks-ink-2)'}}
+            >
               Demo mode — message thread ships in Phase 2 once the
               partner-ops backend is wired up.
             </p>
@@ -176,28 +258,52 @@ export default function DealDetail() {
 
         {/* Side */}
         <aside className="space-y-4 lg:col-span-4">
-          <div className="card p-5">
-            <span className="eyebrow">Commission</span>
-            <div className="tabular mt-3 text-3xl font-semibold text-ink">
+          <div className="partner-finance-card">
+            <span className="apple-eyebrow">Commission</span>
+            <div
+              className="mt-3 text-[32px] font-semibold leading-none"
+              style={{
+                color: deal.accruedCommissionINR
+                  ? 'var(--ks-emerald)'
+                  : 'var(--ks-ink)',
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.02em',
+              }}
+            >
               {deal.accruedCommissionINR
                 ? formatINR(deal.accruedCommissionINR)
                 : '—'}
             </div>
-            <p className="mt-1 text-[12px] text-gray-500">
+            <p
+              className="mt-2 text-[12px]"
+              style={{color: 'var(--ks-muted)'}}
+            >
               {deal.accruedCommissionINR
                 ? 'Accrued; releases on installation sign-off.'
                 : 'Pending deal close.'}
             </p>
             {deal.paidCommissionINR && (
-              <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-[12px] text-emerald-800">
-                Net paid: <span className="tabular font-semibold">{formatINR(deal.paidCommissionINR)}</span>
+              <div
+                className="mt-3 rounded-xl px-3 py-2 text-[12px]"
+                style={{
+                  background: 'var(--ks-emerald-soft)',
+                  color: 'var(--ks-emerald-dark)',
+                }}
+              >
+                Net paid:{' '}
+                <span style={{fontWeight: 600, fontVariantNumeric: 'tabular-nums'}}>
+                  {formatINR(deal.paidCommissionINR)}
+                </span>
               </div>
             )}
           </div>
 
-          <div className="card p-5">
-            <span className="eyebrow">Project</span>
-            <ul className="mt-3 space-y-2 text-[13px] text-gray-700">
+          <div className="premium-panel p-6">
+            <span className="apple-eyebrow">Project</span>
+            <ul
+              className="mt-4 space-y-3 text-[13px]"
+              style={{color: 'var(--ks-ink-2)'}}
+            >
               <KV k="Estimated value" v={formatINR(deal.estValueINR)} />
               <KV k="Expected close" v={formatDate(deal.expectedCloseAt)} icon={Calendar} />
               <KV k="Registered" v={formatDate(deal.registeredAt)} />
@@ -207,13 +313,13 @@ export default function DealDetail() {
             </ul>
           </div>
 
-          <div className="card p-5">
-            <span className="eyebrow">Actions</span>
+          <div className="premium-panel p-6">
+            <span className="apple-eyebrow">Actions</span>
             <div className="mt-3 flex flex-col gap-2">
               {!quote && (
                 <Link
                   to="/partner/dashboard/quotes/new"
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl btn-primary px-4 py-2 text-sm font-semibold"
+                  className="partner-action justify-center"
                 >
                   <FileText className="h-4 w-4" />
                   Build a quote
@@ -221,7 +327,7 @@ export default function DealDetail() {
               )}
               <Link
                 to="/partner/dashboard/deals"
-                className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-ink hover:border-ink/40"
+                className="apple-button-ghost justify-center"
               >
                 All deals
               </Link>
@@ -236,32 +342,55 @@ export default function DealDetail() {
 function KPIRow({deal}) {
   return (
     <ul className="grid grid-cols-3 gap-3">
-      <li className="card p-4">
-        <div className="text-[11px] uppercase tracking-wider text-gray-500">Value</div>
-        <div className="tabular mt-1 text-xl font-semibold text-ink">{formatINR(deal.estValueINR)}</div>
-      </li>
-      <li className="card p-4">
-        <div className="text-[11px] uppercase tracking-wider text-gray-500">Commission</div>
-        <div className="tabular mt-1 text-xl font-semibold text-ink">
-          {deal.accruedCommissionINR ? formatINR(deal.accruedCommissionINR) : '—'}
-        </div>
-      </li>
-      <li className="card p-4">
-        <div className="text-[11px] uppercase tracking-wider text-gray-500">Expected close</div>
-        <div className="tabular mt-1 text-xl font-semibold text-ink">{formatDate(deal.expectedCloseAt)}</div>
-      </li>
+      <KPI label="Value" value={formatINR(deal.estValueINR)} />
+      <KPI
+        label="Commission"
+        value={
+          deal.accruedCommissionINR ? formatINR(deal.accruedCommissionINR) : '—'
+        }
+        accent={deal.accruedCommissionINR ? 'emerald' : 'ink'}
+      />
+      <KPI label="Expected close" value={formatDate(deal.expectedCloseAt)} />
     </ul>
+  );
+}
+
+function KPI({label, value, accent = 'ink'}) {
+  const color = accent === 'emerald' ? 'var(--ks-emerald)' : 'var(--ks-ink)';
+  return (
+    <li className="premium-card p-4">
+      <div
+        className="text-[10px] font-medium uppercase tracking-[0.10em]"
+        style={{color: 'var(--ks-muted)'}}
+      >
+        {label}
+      </div>
+      <div
+        className="mt-1 text-xl font-semibold"
+        style={{color, fontVariantNumeric: 'tabular-nums'}}
+      >
+        {value}
+      </div>
+    </li>
   );
 }
 
 function KV({k, v, icon: Icon}) {
   return (
     <li className="flex items-start justify-between gap-3">
-      <span className="flex items-center gap-1.5 text-gray-500">
+      <span
+        className="flex items-center gap-1.5"
+        style={{color: 'var(--ks-muted)'}}
+      >
         {Icon && <Icon className="h-3.5 w-3.5" />}
         {k}
       </span>
-      <span className="tabular text-right font-medium text-ink">{v}</span>
+      <span
+        className="text-right font-medium"
+        style={{color: 'var(--ks-ink)', fontVariantNumeric: 'tabular-nums'}}
+      >
+        {v}
+      </span>
     </li>
   );
 }

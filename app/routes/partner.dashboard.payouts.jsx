@@ -16,37 +16,60 @@ export default function PartnerPayouts() {
 
   return (
     <PartnerShell>
-      <header className="mb-6">
-        <span className="eyebrow">Payouts</span>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+      <header className="mb-7">
+        <span className="apple-eyebrow">Payouts</span>
+        <h1
+          className="mt-3 text-[28px] font-semibold tracking-tight md:text-[34px]"
+          style={{color: 'var(--ks-ink)', letterSpacing: '-0.022em'}}
+        >
           Money out.
         </h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <p
+          className="mt-2 text-sm md:text-base"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
           Weekly payout cycle. Median 11 days from installation sign-off
           to UPI / bank transfer.
         </p>
       </header>
 
-      {/* Requestable */}
-      <div className="card mb-6 relative overflow-hidden p-6">
-        <div
-          className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full opacity-30 blur-3xl"
-          style={{background: 'var(--color-partner-accent)'}}
-        />
-        <div className="relative grid gap-4 md:grid-cols-12 md:items-center">
+      {/* Requestable — hero card */}
+      <div className="premium-panel mb-7 p-7">
+        <div className="grid gap-4 md:grid-cols-12 md:items-center">
           <div className="md:col-span-7">
-            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-partner-accent">
+            <div
+              className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.10em]"
+              style={{color: 'var(--ks-emerald-dark)'}}
+            >
               <Wallet className="h-3.5 w-3.5" />
               Available to request
             </div>
-            <div className="tabular mt-2 text-4xl font-semibold text-ink">
+            <div
+              className="mt-3 text-[44px] font-semibold leading-none md:text-[56px]"
+              style={{
+                color: 'var(--ks-emerald)',
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.022em',
+              }}
+            >
               {formatINR(requestablePayout.amountINR)}
             </div>
-            <p className="mt-1 text-sm text-gray-600">
+            <p
+              className="mt-3 text-sm"
+              style={{color: 'var(--ks-ink-2)'}}
+            >
               {requestablePayout.itemsReady} ledger items moved to{' '}
-              <span className="font-semibold text-ink">Approved</span>{' '}
+              <span style={{color: 'var(--ks-ink)', fontWeight: 600}}>
+                Approved
+              </span>{' '}
               and are eligible for the next payout. Earliest payout date:{' '}
-              <span className="tabular font-semibold text-ink">
+              <span
+                style={{
+                  color: 'var(--ks-ink)',
+                  fontWeight: 600,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
                 {formatDate(requestablePayout.earliestAt)}
               </span>
               .
@@ -57,21 +80,27 @@ export default function PartnerPayouts() {
               type="button"
               onClick={() => setRequested(true)}
               disabled={requested}
-              className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold ${
+              className={requested ? 'partner-action' : 'partner-action'}
+              style={
                 requested
-                  ? 'bg-emerald-600 text-white'
-                  : 'btn-primary'
-              }`}
+                  ? {opacity: 0.65, cursor: 'default'}
+                  : undefined
+              }
             >
               {requested ? (
-                <><Check className="h-4 w-4" /> Payout requested</>
+                <>
+                  <Check className="h-4 w-4" /> Payout requested
+                </>
               ) : (
                 <>Request payout</>
               )}
             </button>
-            <p className="mt-2 text-[11px] text-gray-500">
+            <p
+              className="mt-3 text-[11px]"
+              style={{color: 'var(--ks-muted)'}}
+            >
               {requested
-                ? 'We\'ll batch this with Friday\'s payout run.'
+                ? "We'll batch this with Friday's payout run."
                 : 'TDS @ 10% applied at source. Form 16A in your statements.'}
             </p>
           </div>
@@ -79,43 +108,89 @@ export default function PartnerPayouts() {
       </div>
 
       {/* History */}
-      <div className="card overflow-hidden">
-        <div className="border-b border-gray-100 px-5 py-4">
-          <h2 className="text-base font-semibold text-ink">Past payouts</h2>
-          <p className="text-[12px] text-gray-500">
+      <div className="premium-panel overflow-hidden">
+        <div
+          className="px-6 py-5"
+          style={{borderBottom: '1px solid var(--ks-line-soft)'}}
+        >
+          <h2
+            className="text-base font-semibold"
+            style={{color: 'var(--ks-ink)'}}
+          >
+            Past payouts
+          </h2>
+          <p
+            className="text-[12px]"
+            style={{color: 'var(--ks-muted)'}}
+          >
             {payouts.length} payouts · downloadable Form 16A statements
           </p>
         </div>
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">
+        <table className="spec-hairline-table">
+          <thead>
             <tr>
-              <th className="px-5 py-3">Payout</th>
-              <th className="tabular px-5 py-3 text-right">Gross</th>
-              <th className="tabular px-5 py-3 text-right">TDS</th>
-              <th className="tabular px-5 py-3 text-right">Net</th>
-              <th className="px-5 py-3">Method</th>
-              <th className="px-5 py-3 text-right">Statement</th>
+              <th>Payout</th>
+              <th className="num">Gross</th>
+              <th className="num">TDS</th>
+              <th className="num">Net</th>
+              <th>Method</th>
+              <th className="num">Statement</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody>
             {payouts.map((p) => (
               <tr key={p.id}>
-                <td className="px-5 py-3">
-                  <div className="font-medium text-ink">{p.id}</div>
-                  <div className="text-[11px] text-gray-500">{formatDate(p.date)}</div>
+                <td>
+                  <div
+                    className="font-medium"
+                    style={{color: 'var(--ks-ink)'}}
+                  >
+                    {p.id}
+                  </div>
+                  <div
+                    className="text-[11px]"
+                    style={{color: 'var(--ks-muted)'}}
+                  >
+                    {formatDate(p.date)}
+                  </div>
                 </td>
-                <td className="tabular px-5 py-3 text-right text-gray-700">{formatINR(p.grossINR)}</td>
-                <td className="tabular px-5 py-3 text-right text-gray-500">−{formatINR(p.tdsINR)}</td>
-                <td className="tabular px-5 py-3 text-right font-semibold text-ink">{formatINR(p.netINR)}</td>
-                <td className="px-5 py-3">
-                  <div className="text-ink">{p.method}</div>
-                  <div className="tabular text-[11px] text-gray-500">{p.upiOrAcct}</div>
+                <td className="num" style={{color: 'var(--ks-ink-2)'}}>
+                  {formatINR(p.grossINR)}
                 </td>
-                <td className="px-5 py-3 text-right">
+                <td className="num" style={{color: 'var(--ks-muted)'}}>
+                  −{formatINR(p.tdsINR)}
+                </td>
+                <td
+                  className="num"
+                  style={{
+                    color: 'var(--ks-emerald)',
+                    fontWeight: 600,
+                  }}
+                >
+                  {formatINR(p.netINR)}
+                </td>
+                <td>
+                  <div style={{color: 'var(--ks-ink)'}}>{p.method}</div>
+                  <div
+                    className="text-[11px]"
+                    style={{
+                      color: 'var(--ks-muted)',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {p.upiOrAcct}
+                  </div>
+                </td>
+                <td className="num">
                   <button
                     type="button"
                     aria-label="Download Form 16A"
-                    className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-ink hover:border-ink/40"
+                    className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium"
+                    style={{
+                      background: 'var(--ks-card-solid)',
+                      border: '1px solid var(--ks-line-soft)',
+                      color: 'var(--ks-ink)',
+                    }}
                   >
                     <Download className="h-3 w-3" />
                     16A

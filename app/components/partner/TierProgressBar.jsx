@@ -2,11 +2,11 @@ import {formatINRCompact, formatINR} from '~/lib/utils/formatINR';
 import {tiers} from '~/lib/mock/partnerProgram';
 
 /**
- * Progress bar from current tier toward the next tier, with explicit ₹
- * thresholds either side. Used in the partner dashboard overview.
+ * Apple-style tier-progress bar. Calm grey track with an emerald fill,
+ * ink-tabular ₹ values left, emerald "remaining to next tier" right.
+ * Used on the partner dashboard overview.
  */
 export function TierProgressBar({tier, currentSales, nextTier, nextTierThreshold}) {
-  // Find current tier's threshold so the bar starts from there
   const currentTierMeta = tiers.find((t) => t.name === tier);
   const start = currentTierMeta?.threshold ?? 0;
   const span = (nextTierThreshold ?? start) - start;
@@ -18,31 +18,61 @@ export function TierProgressBar({tier, currentSales, nextTier, nextTierThreshold
     <div>
       <div className="flex items-baseline justify-between">
         <div className="flex items-baseline gap-2">
-          <span className="text-base font-semibold text-ink">{tier}</span>
-          <span className="text-[12px] text-gray-500">tier</span>
+          <span
+            className="text-base font-semibold"
+            style={{color: 'var(--ks-ink)'}}
+          >
+            {tier}
+          </span>
+          <span
+            className="text-[12px]"
+            style={{color: 'var(--ks-muted)'}}
+          >
+            tier
+          </span>
         </div>
-        <div className="text-[12px] text-gray-500">
-          → <span className="font-semibold text-ink">{nextTier}</span> at{' '}
-          <span className="tabular">{formatINRCompact(nextTierThreshold)}</span>
+        <div
+          className="text-[12px]"
+          style={{color: 'var(--ks-muted)'}}
+        >
+          → <span style={{color: 'var(--ks-ink)', fontWeight: 600}}>{nextTier}</span>{' '}
+          at{' '}
+          <span
+            style={{
+              color: 'var(--ks-ink)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {formatINRCompact(nextTierThreshold)}
+          </span>
         </div>
       </div>
 
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-100">
+      <div
+        className="mt-3 h-2 overflow-hidden rounded-full"
+        style={{background: 'var(--ks-line-soft)'}}
+      >
         <div
-          className="h-full rounded-full"
+          className="h-full rounded-full transition-[width] duration-700"
           style={{
             width: `${pct}%`,
             background:
-              'linear-gradient(90deg, var(--color-partner-accent), #10b981)',
+              'linear-gradient(90deg, var(--ks-emerald), #10b981)',
           }}
         />
       </div>
 
       <div className="mt-2 flex items-baseline justify-between text-[12px]">
-        <span className="tabular text-gray-600">
+        <span style={{color: 'var(--ks-ink-2)', fontVariantNumeric: 'tabular-nums'}}>
           {formatINR(currentSales)} closed YTD
         </span>
-        <span className="tabular font-semibold text-partner-accent">
+        <span
+          style={{
+            color: 'var(--ks-emerald)',
+            fontWeight: 600,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {formatINRCompact(remaining)} to {nextTier}
         </span>
       </div>
