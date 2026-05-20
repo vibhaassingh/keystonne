@@ -1,10 +1,9 @@
 import {flatRoutes} from '@react-router/fs-routes';
-import {hydrogenRoutes} from '@shopify/hydrogen';
 
-export default hydrogenRoutes([
-  ...(await flatRoutes()),
-  // Manual route definitions can be added to this array, in addition to or instead of using the `flatRoutes` file-based routing convention.
-  // See https://reactrouter.com/api/framework-conventions/routes.ts#routests
-]);
-
-/** @typedef {import('@react-router/dev/routes').RouteConfig} RouteConfig */
+/**
+ * File-based routing — picks up every *.jsx file in app/routes/.
+ * The original Hydrogen scaffold wrapped this in `hydrogenRoutes(...)` for
+ * Oxygen-specific framework routes; we don't need that since the Vercel
+ * SPA build runs against plain React Router 7.
+ */
+export default await flatRoutes();

@@ -1,423 +1,177 @@
-import {useLoaderData} from 'react-router';
-import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
-import {SearchForm} from '~/components/SearchForm';
-import {SearchResults} from '~/components/SearchResults';
-import {getEmptyPredictiveSearchResult} from '~/lib/search';
+import {useMemo} from 'react';
+import {Link, useSearchParams} from 'react-router';
+import {Search, ChevronRight} from 'lucide-react';
+import {products} from '~/lib/mock/products';
+import {categories} from '~/lib/mock/categories';
+import {businessTypes} from '~/lib/mock/businessTypes';
+import {ProductCard} from '~/components/ProductCard';
 
-/**
- * @type {Route.MetaFunction}
- */
-export const meta = () => {
-  return [{title: `Hydrogen | Search`}];
+export const meta = ({location}) => {
+  const q = new URLSearchParams(location?.search ?? '').get('q') || '';
+  return [{title: q ? `"${q}" — Search Keystonne` : 'Search Keystonne'}];
 };
 
-/**
- * @param {Route.LoaderArgs}
- */
-export async function loader({request, context}) {
-  const url = new URL(request.url);
-  const isPredictive = url.searchParams.has('predictive');
-  const searchPromise = isPredictive
-    ? predictiveSearch({request, context})
-    : regularSearch({request, context});
-
-  searchPromise.catch((error) => {
-    console.error(error);
-    return {term: '', result: null, error: error.message};
-  });
-
-  return await searchPromise;
-}
-
-/**
- * Renders the /search route
- */
 export default function SearchPage() {
-  /** @type {LoaderReturnData} */
-  const {type, term, result, error} = useLoaderData();
-  if (type === 'predictive') return null;
+  const [params] = useSearchParams();
+  const q = (params.get('q') || '').trim();
+  const needle = q.toLowerCase();
+
+  const {productHits, categoryHits, ventureHits} = useMemo(() => {
+    if (!q) return {productHits: [], categoryHits: [], ventureHits: []};
+    return {
+      productHits: products.filter((p) =>
+        (p.name + ' ' + p.blurb + ' ' + (p.category || '')).toLowerCase().includes(needle),
+      ),
+      categoryHits: categories.filter((c) =>
+        (c.name + ' ' + c.blurb).toLowerCase().includes(needle),
+      ),
+      ventureHits: businessTypes.filter((b) =>
+        (b.name + ' ' + b.tagline).toLowerCase().includes(needle),
+      ),
+    };
+  }, [q, needle]);
+
+  const total = productHits.length + categoryHits.length + ventureHits.length;
 
   return (
-    <div className="search">
-      <h1>Search</h1>
-      <SearchForm>
-        {({inputRef}) => (
-          <>
-            <input
-              defaultValue={term}
-              name="q"
-              placeholder="Search…"
-              ref={inputRef}
-              type="search"
-            />
-            &nbsp;
-            <button type="submit">Search</button>
-          </>
+    <section className="mx-auto max-w-[1400px] px-4 py-10 md:px-6 md:py-12">
+      <header className="mb-8">
+        <span className="eyebrow">Search</span>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+          {q ? <>Results for &ldquo;{q}&rdquo;</> : 'Search the Keystonne catalog'}
+        </h1>
+        {q && (
+          <p className="mt-1 text-sm text-gray-600">
+            {total} match{total === 1 ? '' : 'es'} across catalog, categories, and venture types.
+          </p>
         )}
-      </SearchForm>
-      {error && <p style={{color: 'red'}}>{error}</p>}
-      {!term || !result?.total ? (
-        <SearchResults.Empty />
+      </header>
+
+      <form method="get" action="/search" role="search" className="mb-10">
+        <div className="relative max-w-2xl">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            type="search"
+            name="q"
+            defaultValue={q}
+            placeholder="Try: refrigerator, espresso, work table, hotel kitchen…"
+            className="h-11 w-full rounded-xl border border-gray-300 bg-white pl-10 pr-3 text-sm text-ink placeholder:text-gray-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/15"
+          />
+        </div>
+      </form>
+
+      {!q ? (
+        <EmptyPrompt />
+      ) : total === 0 ? (
+        <EmptyResults q={q} />
       ) : (
-        <SearchResults result={result} term={term}>
-          {({articles, pages, products, term}) => (
-            <div>
-              <SearchResults.Products products={products} term={term} />
-              <SearchResults.Pages pages={pages} term={term} />
-              <SearchResults.Articles articles={articles} term={term} />
-            </div>
+        <div className="space-y-10">
+          {productHits.length > 0 && (
+            <section>
+              <h2 className="mb-4 text-lg font-semibold text-ink">
+                Products ({productHits.length})
+              </h2>
+              <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {productHits.map((p) => (
+                  <li key={p.slug}><ProductCard product={p} /></li>
+                ))}
+              </ul>
+            </section>
           )}
-        </SearchResults>
+
+          {categoryHits.length > 0 && (
+            <ResultsList
+              title={`Categories (${categoryHits.length})`}
+              items={categoryHits.map((c) => ({
+                key: c.slug,
+                to: `/collections/${c.slug}`,
+                label: c.name,
+                sub: c.blurb,
+              }))}
+            />
+          )}
+
+          {ventureHits.length > 0 && (
+            <ResultsList
+              title={`Venture types (${ventureHits.length})`}
+              items={ventureHits.map((b) => ({
+                key: b.slug,
+                to: `/business-type/${b.slug}`,
+                label: b.name,
+                sub: b.tagline,
+              }))}
+            />
+          )}
+        </div>
       )}
-      <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />
+    </section>
+  );
+}
+
+function ResultsList({title, items}) {
+  return (
+    <section>
+      <h2 className="mb-4 text-lg font-semibold text-ink">{title}</h2>
+      <ul className="grid gap-2 md:grid-cols-2">
+        {items.map((it) => (
+          <li key={it.key}>
+            <Link
+              to={it.to}
+              prefetch="intent"
+              className="card card-hover flex items-center gap-3 p-4"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold text-ink">{it.label}</div>
+                <div className="line-clamp-1 text-[12px] text-gray-500">{it.sub}</div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-gray-400" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function EmptyPrompt() {
+  return (
+    <div className="card p-10 text-center">
+      <Search className="mx-auto h-8 w-8 text-gray-400" />
+      <h2 className="mt-4 text-base font-semibold text-ink">
+        Search the catalog, categories, and venture types.
+      </h2>
+      <p className="mt-2 text-sm text-gray-600">
+        Try a product name (&ldquo;reach-in fridge&rdquo;), a category
+        (&ldquo;refrigeration&rdquo;), or a venture (&ldquo;cloud kitchen&rdquo;).
+      </p>
     </div>
   );
 }
 
-/**
- * Regular search query and fragments
- * (adjust as needed)
- */
-const SEARCH_PRODUCT_FRAGMENT = `#graphql
-  fragment SearchProduct on Product {
-    __typename
-    handle
-    id
-    publishedAt
-    title
-    trackingParameters
-    vendor
-    selectedOrFirstAvailableVariant(
-      selectedOptions: []
-      ignoreUnknownOptions: true
-      caseInsensitiveMatch: true
-    ) {
-      id
-      image {
-        url
-        altText
-        width
-        height
-      }
-      price {
-        amount
-        currencyCode
-      }
-      compareAtPrice {
-        amount
-        currencyCode
-      }
-      selectedOptions {
-        name
-        value
-      }
-      product {
-        handle
-        title
-      }
-    }
-  }
-`;
-
-const SEARCH_PAGE_FRAGMENT = `#graphql
-  fragment SearchPage on Page {
-     __typename
-     handle
-    id
-    title
-    trackingParameters
-  }
-`;
-
-const SEARCH_ARTICLE_FRAGMENT = `#graphql
-  fragment SearchArticle on Article {
-    __typename
-    handle
-    id
-    title
-    trackingParameters
-  }
-`;
-
-const PAGE_INFO_FRAGMENT = `#graphql
-  fragment PageInfoFragment on PageInfo {
-    hasNextPage
-    hasPreviousPage
-    startCursor
-    endCursor
-  }
-`;
-
-// NOTE: https://shopify.dev/docs/api/storefront/latest/queries/search
-export const SEARCH_QUERY = `#graphql
-  query RegularSearch(
-    $country: CountryCode
-    $endCursor: String
-    $first: Int
-    $language: LanguageCode
-    $last: Int
-    $term: String!
-    $startCursor: String
-  ) @inContext(country: $country, language: $language) {
-    articles: search(
-      query: $term,
-      types: [ARTICLE],
-      first: $first,
-    ) {
-      nodes {
-        ...on Article {
-          ...SearchArticle
-        }
-      }
-    }
-    pages: search(
-      query: $term,
-      types: [PAGE],
-      first: $first,
-    ) {
-      nodes {
-        ...on Page {
-          ...SearchPage
-        }
-      }
-    }
-    products: search(
-      after: $endCursor,
-      before: $startCursor,
-      first: $first,
-      last: $last,
-      query: $term,
-      sortKey: RELEVANCE,
-      types: [PRODUCT],
-      unavailableProducts: HIDE,
-    ) {
-      nodes {
-        ...on Product {
-          ...SearchProduct
-        }
-      }
-      pageInfo {
-        ...PageInfoFragment
-      }
-    }
-  }
-  ${SEARCH_PRODUCT_FRAGMENT}
-  ${SEARCH_PAGE_FRAGMENT}
-  ${SEARCH_ARTICLE_FRAGMENT}
-  ${PAGE_INFO_FRAGMENT}
-`;
-
-/**
- * Regular search fetcher
- * @param {Pick<
- *   Route.LoaderArgs,
- *   'request' | 'context'
- * >}
- * @return {Promise<RegularSearchReturn>}
- */
-async function regularSearch({request, context}) {
-  const {storefront} = context;
-  const url = new URL(request.url);
-  const variables = getPaginationVariables(request, {pageBy: 8});
-  const term = String(url.searchParams.get('q') || '');
-
-  // Search articles, pages, and products for the `q` term
-  const {errors, ...items} = await storefront.query(SEARCH_QUERY, {
-    variables: {...variables, term},
-  });
-
-  if (!items) {
-    throw new Error('No search data returned from Shopify API');
-  }
-
-  const total = Object.values(items).reduce(
-    (acc, {nodes}) => acc + nodes.length,
-    0,
+function EmptyResults({q}) {
+  return (
+    <div className="card p-10 text-center">
+      <h2 className="text-base font-semibold text-ink">
+        No matches for &ldquo;{q}&rdquo;.
+      </h2>
+      <p className="mt-2 text-sm text-gray-600">
+        Try a broader term, or describe your kitchen to the AI planner —
+        we&apos;ll suggest the right equipment.
+      </p>
+      <div className="mt-4 flex justify-center gap-3">
+        <Link
+          to="/collections/all"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-ink hover:border-ink/40"
+        >
+          Browse all categories
+        </Link>
+        <Link
+          to="/kitchen-planner"
+          className="inline-flex items-center gap-1.5 rounded-xl btn-primary px-4 py-2.5 text-sm font-semibold"
+        >
+          Use the AI planner
+        </Link>
+      </div>
+    </div>
   );
-
-  const error = errors
-    ? errors.map(({message}) => message).join(', ')
-    : undefined;
-
-  return {type: 'regular', term, error, result: {total, items}};
 }
-
-/**
- * Predictive search query and fragments
- * (adjust as needed)
- */
-const PREDICTIVE_SEARCH_ARTICLE_FRAGMENT = `#graphql
-  fragment PredictiveArticle on Article {
-    __typename
-    id
-    title
-    handle
-    blog {
-      handle
-    }
-    image {
-      url
-      altText
-      width
-      height
-    }
-    trackingParameters
-  }
-`;
-
-const PREDICTIVE_SEARCH_COLLECTION_FRAGMENT = `#graphql
-  fragment PredictiveCollection on Collection {
-    __typename
-    id
-    title
-    handle
-    image {
-      url
-      altText
-      width
-      height
-    }
-    trackingParameters
-  }
-`;
-
-const PREDICTIVE_SEARCH_PAGE_FRAGMENT = `#graphql
-  fragment PredictivePage on Page {
-    __typename
-    id
-    title
-    handle
-    trackingParameters
-  }
-`;
-
-const PREDICTIVE_SEARCH_PRODUCT_FRAGMENT = `#graphql
-  fragment PredictiveProduct on Product {
-    __typename
-    id
-    title
-    handle
-    trackingParameters
-    selectedOrFirstAvailableVariant(
-      selectedOptions: []
-      ignoreUnknownOptions: true
-      caseInsensitiveMatch: true
-    ) {
-      id
-      image {
-        url
-        altText
-        width
-        height
-      }
-      price {
-        amount
-        currencyCode
-      }
-    }
-  }
-`;
-
-const PREDICTIVE_SEARCH_QUERY_FRAGMENT = `#graphql
-  fragment PredictiveQuery on SearchQuerySuggestion {
-    __typename
-    text
-    styledText
-    trackingParameters
-  }
-`;
-
-// NOTE: https://shopify.dev/docs/api/storefront/latest/queries/predictiveSearch
-const PREDICTIVE_SEARCH_QUERY = `#graphql
-  query PredictiveSearch(
-    $country: CountryCode
-    $language: LanguageCode
-    $limit: Int!
-    $limitScope: PredictiveSearchLimitScope!
-    $term: String!
-    $types: [PredictiveSearchType!]
-  ) @inContext(country: $country, language: $language) {
-    predictiveSearch(
-      limit: $limit,
-      limitScope: $limitScope,
-      query: $term,
-      types: $types,
-    ) {
-      articles {
-        ...PredictiveArticle
-      }
-      collections {
-        ...PredictiveCollection
-      }
-      pages {
-        ...PredictivePage
-      }
-      products {
-        ...PredictiveProduct
-      }
-      queries {
-        ...PredictiveQuery
-      }
-    }
-  }
-  ${PREDICTIVE_SEARCH_ARTICLE_FRAGMENT}
-  ${PREDICTIVE_SEARCH_COLLECTION_FRAGMENT}
-  ${PREDICTIVE_SEARCH_PAGE_FRAGMENT}
-  ${PREDICTIVE_SEARCH_PRODUCT_FRAGMENT}
-  ${PREDICTIVE_SEARCH_QUERY_FRAGMENT}
-`;
-
-/**
- * Predictive search fetcher
- * @param {Pick<
- *   Route.ActionArgs,
- *   'request' | 'context'
- * >}
- * @return {Promise<PredictiveSearchReturn>}
- */
-async function predictiveSearch({request, context}) {
-  const {storefront} = context;
-  const url = new URL(request.url);
-  const term = String(url.searchParams.get('q') || '').trim();
-  const limit = Number(url.searchParams.get('limit') || 10);
-  const type = 'predictive';
-
-  if (!term) return {type, term, result: getEmptyPredictiveSearchResult()};
-
-  // Predictively search articles, collections, pages, products, and queries (suggestions)
-  const {predictiveSearch: items, errors} = await storefront.query(
-    PREDICTIVE_SEARCH_QUERY,
-    {
-      variables: {
-        // customize search options as needed
-        limit,
-        limitScope: 'EACH',
-        term,
-      },
-    },
-  );
-
-  if (errors) {
-    throw new Error(
-      `Shopify API errors: ${errors.map(({message}) => message).join(', ')}`,
-    );
-  }
-
-  if (!items) {
-    throw new Error('No predictive search data returned from Shopify API');
-  }
-
-  const total = Object.values(items).reduce(
-    (acc, item) => acc + item.length,
-    0,
-  );
-
-  return {type, term, result: {items, total}};
-}
-
-/** @typedef {import('./+types/search').Route} Route */
-/** @typedef {import('~/lib/search').RegularSearchReturn} RegularSearchReturn */
-/** @typedef {import('~/lib/search').PredictiveSearchReturn} PredictiveSearchReturn */
-/** @typedef {import('storefrontapi.generated').RegularSearchQuery} RegularSearchQuery */
-/** @typedef {import('storefrontapi.generated').PredictiveSearchQuery} PredictiveSearchQuery */
-/** @typedef {ReturnType<typeof useLoaderData<typeof loader>>} LoaderReturnData */
