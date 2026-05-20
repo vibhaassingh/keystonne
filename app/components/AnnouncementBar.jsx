@@ -1,18 +1,15 @@
 import {useState, useEffect} from 'react';
 import {Link} from 'react-router';
-import {BadgeCheck, Truck, FileCheck2, X} from 'lucide-react';
+import {Sparkles, X} from 'lucide-react';
 
 /**
- * Thin top bar above the header. Three trust pills on the left, partner CTA
- * on the right. Dismissible — preference persists in localStorage so it stays
- * out of the way once a buyer has acknowledged it.
+ * Thin top strip. Minimal, almost iridescent — a single line of compact
+ * trust copy and a partner CTA, on a near-black bar with subtle gradient
+ * stripe. Dismissible — preference persists in localStorage.
  */
 export function AnnouncementBar() {
   const [hidden, setHidden] = useState(false);
 
-  // Hydrate dismissed state on mount. SSR renders the bar by default; this
-  // prevents a flash where the bar disappears after JS loads if the user
-  // had dismissed it previously.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (window.localStorage.getItem('keystonne:announcement-dismissed') === '1') {
@@ -23,34 +20,30 @@ export function AnnouncementBar() {
   if (hidden) return null;
 
   return (
-    <div className="bg-ink text-white text-[12px] md:text-[13px] font-medium tabular">
-      <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-4 py-1.5">
-        <ul className="hidden md:flex items-center gap-5 text-white/85">
-          <li className="flex items-center gap-1.5">
-            <BadgeCheck className="h-3.5 w-3.5 text-brand-accent" />
-            Trade pricing for verified businesses
-          </li>
-          <li className="flex items-center gap-1.5">
-            <Truck className="h-3.5 w-3.5 text-brand-accent" />
-            Pan-India freight included
-          </li>
-          <li className="flex items-center gap-1.5">
-            <FileCheck2 className="h-3.5 w-3.5 text-brand-accent" />
-            GST invoice on every order
-          </li>
-        </ul>
-
-        {/* Mobile: one compact line that summarises the trust strip. */}
-        <span className="md:hidden text-white/85">
-          Pan-India freight · GST invoice · Trade pricing
+    <div className="relative overflow-hidden bg-ink text-white">
+      {/* Subtle gradient stripe along the bottom for "liquid" feel */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px opacity-60"
+        style={{
+          background:
+            'linear-gradient(90deg, transparent, rgba(99,102,241,0.6), rgba(245,158,11,0.5), transparent)',
+        }}
+      />
+      <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-4 py-1.5 text-[12px]">
+        <span className="text-white/85">
+          <span className="text-white/55">Trade pricing</span> for verified
+          businesses ·{' '}
+          <span className="text-white/55">Pan-India freight</span> included ·{' '}
+          <span className="text-white/55">GST invoice</span> on every order
         </span>
 
         <div className="flex items-center gap-3">
           <Link
             to="/partner"
             prefetch="intent"
-            className="text-brand-accent hover:text-brand-accent-hover transition-colors"
+            className="inline-flex items-center gap-1.5 font-semibold text-brand-accent transition-colors hover:text-amber-300"
           >
+            <Sparkles className="h-3 w-3" />
             Earn commission — become a partner →
           </Link>
           <button
@@ -65,7 +58,7 @@ export function AnnouncementBar() {
                 );
               }
             }}
-            className="text-white/60 hover:text-white"
+            className="text-white/40 hover:text-white"
           >
             <X className="h-3.5 w-3.5" />
           </button>

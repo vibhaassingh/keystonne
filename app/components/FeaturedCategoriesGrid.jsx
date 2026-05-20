@@ -1,78 +1,108 @@
 import {Link} from 'react-router';
-import {ArrowRight} from 'lucide-react';
+import {ArrowRight, ArrowUpRight} from 'lucide-react';
 import {categories} from '~/lib/mock/categories';
 
 /**
- * 14-tile grid showing every catalog category. Each tile is a soft
- * brand-coloured panel with the Lucide icon, the category name, and
- * a "Shop now" affordance. No stock photography (CLAUDE.md §4).
- *
- * Tiles cycle through a small palette of brand-aligned accents so the
- * grid reads as a varied catalog without resorting to product photos.
+ * Bento-style grid of all 14 categories. Two featured tiles span wide
+ * (first + ninth) and break up the rhythm; the rest are uniform. Glass
+ * surfaces over coloured gradients give depth without using real photos.
  */
 
 const PALETTE = [
-  '#0E3B6A', // brand-primary
-  '#0F766E', // teal-700
-  '#9A3412', // orange-800
-  '#1E40AF', // blue-800
-  '#854D0E', // amber-800
-  '#0E7490', // cyan-700
-  '#5B21B6', // purple-800
-  '#0F172A', // slate-900
-  '#7C2D12', // orange-900
-  '#155E75', // cyan-800
-  '#1F2937', // gray-800
-  '#0B2E55', // brand-primary-700
-  '#047857', // emerald-700
-  '#1D4ED8', // blue-700
+  ['#4338CA', '#1E1B4B'], // indigo
+  ['#0F766E', '#022C22'], // teal
+  ['#B45309', '#451A03'], // amber
+  ['#1D4ED8', '#0B2E55'], // blue
+  ['#9333EA', '#3B0764'], // purple
+  ['#0E7490', '#083344'], // cyan
+  ['#DC2626', '#450A0A'], // red
+  ['#475569', '#0F172A'], // slate
+  ['#C2410C', '#431407'], // orange-700
+  ['#0D9488', '#042F2E'], // teal-600
+  ['#374151', '#0A0D14'], // gray-700
+  ['#3730A3', '#1E1B4B'], // indigo-700
+  ['#047857', '#022C22'], // emerald
+  ['#1E40AF', '#1E1B4B'], // blue-800
 ];
 
 export function FeaturedCategoriesGrid() {
   return (
-    <section className="mx-auto max-w-[1400px] px-4 py-10 md:py-14">
-      <header className="mb-6 flex items-end justify-between">
+    <section className="mx-auto max-w-[1400px] px-4 py-12 md:px-6 md:py-16">
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-brand-primary">
-            Shop the catalog
-          </span>
-          <h2 className="mt-1 text-2xl font-semibold text-ink md:text-3xl">
-            Featured categories
+          <span className="eyebrow">Shop the catalog</span>
+          <h2 className="mt-2 text-3xl font-semibold text-ink md:text-4xl">
+            14 categories. One quote.
           </h2>
+          <p className="mt-2 max-w-xl text-sm text-gray-600 md:text-base">
+            Browse the catalog, or describe the kitchen you’re building and
+            we’ll pull a spec across every category for you.
+          </p>
         </div>
         <Link
           to="/collections/all"
           prefetch="intent"
           className="hidden items-center gap-1 text-sm font-semibold text-brand-primary hover:underline md:inline-flex"
         >
-          Browse all 14 categories <ArrowRight className="h-4 w-4" />
+          Browse all categories <ArrowRight className="h-4 w-4" />
         </Link>
       </header>
 
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+      {/* Bento grid: featured tiles span wider; rest are 1×1 */}
+      <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {categories.map((c, i) => {
+          const isFeatured = i === 0 || i === 7; // bento accents
+          const [c1, c2] = PALETTE[i % PALETTE.length];
           const Icon = c.icon;
-          const bg = PALETTE[i % PALETTE.length];
           return (
-            <li key={c.slug}>
+            <li
+              key={c.slug}
+              className={isFeatured ? 'sm:col-span-2 lg:col-span-2' : ''}
+            >
               <Link
                 to={`/collections/${c.slug}`}
                 prefetch="intent"
-                className="group flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow hover:shadow-md"
+                className="group relative block h-full overflow-hidden rounded-2xl"
+                style={{
+                  boxShadow:
+                    '0 1px 2px rgba(10,13,20,0.06), 0 8px 24px -16px rgba(10,13,20,0.18)',
+                }}
               >
+                {/* Gradient backdrop */}
                 <div
-                  className="grid aspect-[5/3] place-items-center"
-                  style={{background: `linear-gradient(135deg, ${bg}, ${shade(bg, -18)})`}}
-                >
-                  <Icon className="h-9 w-9 text-white/95 transition-transform group-hover:scale-110" />
-                </div>
-                <div className="flex flex-1 flex-col gap-1 p-3">
-                  <span className="text-[13px] font-semibold leading-snug text-ink">
-                    {c.name}
-                  </span>
-                  <span className="line-clamp-2 text-[11px] text-gray-500">
-                    {c.blurb}
-                  </span>
+                  className="absolute inset-0"
+                  style={{background: `linear-gradient(135deg, ${c1}, ${c2})`}}
+                />
+                {/* Floating orb */}
+                <div
+                  className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full opacity-50 blur-3xl"
+                  style={{background: c1}}
+                />
+                {/* Inner glass card */}
+                <div className="relative flex h-full flex-col justify-between p-4 text-white md:p-5">
+                  <div className="flex items-start justify-between">
+                    <div
+                      className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 backdrop-blur"
+                      style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25)'}}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <ArrowUpRight className="h-4 w-4 opacity-50 transition-all group-hover:opacity-100 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </div>
+                  <div className={isFeatured ? 'mt-12' : 'mt-8'}>
+                    <h3
+                      className={`font-semibold leading-tight tracking-tight ${
+                        isFeatured ? 'text-xl md:text-2xl' : 'text-base'
+                      }`}
+                    >
+                      {c.name}
+                    </h3>
+                    {isFeatured && (
+                      <p className="mt-2 line-clamp-2 text-[13px] text-white/75">
+                        {c.blurb}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </Link>
             </li>
@@ -81,13 +111,4 @@ export function FeaturedCategoriesGrid() {
       </ul>
     </section>
   );
-}
-
-/** Lighten / darken a hex color by amount (positive = lighter, negative = darker). */
-function shade(hex, amount) {
-  const n = parseInt(hex.slice(1), 16);
-  const r = Math.max(0, Math.min(255, ((n >> 16) & 0xff) + amount));
-  const g = Math.max(0, Math.min(255, ((n >> 8) & 0xff) + amount));
-  const b = Math.max(0, Math.min(255, (n & 0xff) + amount));
-  return `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`;
 }

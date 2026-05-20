@@ -1,24 +1,14 @@
 /**
- * Mock product catalog for the storefront. Generic names, generic specs,
- * invented but plausible Indian-market pricing — NEVER reference any real
- * brand, manufacturer, or SKU code (CLAUDE.md §5).
+ * Mock product catalog. Generic descriptive names, generic specs, invented
+ * but plausible Indian-market pricing — NEVER reference any real brand,
+ * manufacturer, or SKU code (CLAUDE.md §5).
  *
  * Items priced < ₹50,000 show "Add to Cart"; everything else (and a fallback
  * on every product) shows "Request Quote".
- *
- * Each product:
- *   {
- *     slug, name, category, blurb,
- *     priceINR (number or null for "quote only"),
- *     specs: {dimensions, capacity, power, ...},
- *     warrantyMonths, leadDays,
- *     accent: hex color used for the placeholder card background,
- *     rating: 1-5 (decimal, mock review average),
- *     reviewCount, badge: optional "Best seller" / "New" pill
- *   }
  */
 
 export const products = [
+  // ── Refrigeration ────────────────────────────────────────────────────────
   {
     slug: 'reach-in-fridge-two-door',
     name: 'Heavy-Duty Two-Door Reach-In Refrigerator',
@@ -40,6 +30,25 @@ export const products = [
     badge: 'Best seller',
   },
   {
+    slug: 'reach-in-fridge-single-door',
+    name: 'Single-Door Reach-In Refrigerator',
+    category: 'refrigeration',
+    blurb: 'Compact upright for prep stations and beverage holding. Energy-efficient inverter compressor.',
+    priceINR: 78_000,
+    specs: {
+      Dimensions: '680 × 770 × 2090 mm',
+      Capacity: '620 L',
+      'Power draw': '220 V, 340 W',
+      'Temp range': '+2°C to +8°C',
+      Material: '304 stainless steel',
+    },
+    warrantyMonths: 12,
+    leadDays: 7,
+    accent: '#1E40AF',
+    rating: 4.6,
+    reviewCount: 24,
+  },
+  {
     slug: 'undercounter-prep-chiller',
     name: 'Undercounter Refrigerated Prep Table 4ft',
     category: 'refrigeration',
@@ -58,6 +67,66 @@ export const products = [
     rating: 4.6,
     reviewCount: 21,
   },
+  {
+    slug: 'blast-chiller-20-tray',
+    name: 'Blast Chiller / Shock Freezer — 20 trays',
+    category: 'refrigeration',
+    blurb: 'Brings food from +90°C to +3°C in 90 minutes; HACCP-compliant cycle logging.',
+    priceINR: 4_85_000,
+    specs: {
+      Dimensions: '900 × 870 × 1900 mm',
+      'Tray capacity': '20 × GN 1/1',
+      'Blast cycle': '+90°C → +3°C in 90 min',
+      'Power draw': '380 V, 3.6 kW',
+      Material: '304 SS, CFC-free',
+    },
+    warrantyMonths: 18,
+    leadDays: 21,
+    accent: '#0F172A',
+    rating: 4.9,
+    reviewCount: 9,
+    badge: 'New',
+  },
+  {
+    slug: 'walk-in-cold-room-12sqm',
+    name: 'Pre-Fabricated Walk-In Cold Room — 12 sqm',
+    category: 'refrigeration',
+    blurb: 'Modular PUF panels with 80 mm insulation; complete with door, ramp, and condensing unit.',
+    priceINR: null, // quote-only
+    specs: {
+      'Floor area': '12 sqm (4 × 3 m)',
+      Insulation: '80 mm PUF, 40 kg/m³',
+      'Temp range': '+2°C to +8°C',
+      'Condensing unit': '3 HP, R404a',
+      Door: 'Hinged, with safety release',
+    },
+    warrantyMonths: 18,
+    leadDays: 28,
+    accent: '#1F2937',
+    rating: 4.7,
+    reviewCount: 6,
+  },
+  {
+    slug: 'ice-cube-machine-150kg',
+    name: 'Air-Cooled Ice Cube Machine — 150 kg/day',
+    category: 'refrigeration',
+    blurb: 'Half-dice cubes, integrated 60 kg bin; food-grade water inlet.',
+    priceINR: 1_85_000,
+    specs: {
+      'Production': '150 kg per 24h',
+      'Cube type': 'Half-dice, 22 g',
+      'Bin capacity': '60 kg',
+      'Power draw': '220 V, 1.1 kW',
+      'Water inlet': '15 mm food-grade',
+    },
+    warrantyMonths: 12,
+    leadDays: 14,
+    accent: '#0369A1',
+    rating: 4.5,
+    reviewCount: 18,
+  },
+
+  // ── Cooking ranges ───────────────────────────────────────────────────────
   {
     slug: 'two-burner-chinese-range',
     name: 'Two-Burner Chinese Range with Side Tank',
@@ -79,6 +148,65 @@ export const products = [
     badge: 'Best seller',
   },
   {
+    slug: 'three-tank-chinese-range',
+    name: 'Three-Tank Chinese Range with Hot-Water Reservoir',
+    category: 'cooking-ranges',
+    blurb: 'For high-volume kitchens — three burners, two prep tanks, integrated water heater.',
+    priceINR: 2_85_000,
+    specs: {
+      Dimensions: '2400 × 1100 × 850 mm',
+      'Burner output': '3 × 60,000 kcal/hr',
+      Fuel: 'LPG / PNG',
+      Tanks: '2 × 25 L + integrated water heater',
+      'Frame': '14 SWG SS 304',
+    },
+    warrantyMonths: 12,
+    leadDays: 21,
+    accent: '#7C2D12',
+    rating: 4.7,
+    reviewCount: 23,
+  },
+  {
+    slug: 'four-burner-gas-stove',
+    name: 'Four-Burner Commercial Gas Stove with Cabinet Base',
+    category: 'cooking-ranges',
+    blurb: 'Cast iron burner heads, drip tray, enclosed cabinet base for utensil storage.',
+    priceINR: 48_500,
+    specs: {
+      Dimensions: '900 × 900 × 850 mm',
+      Burners: '4 × 8,000 kcal/hr',
+      Fuel: 'LPG',
+      'Base storage': 'Enclosed cabinet, twin doors',
+      Material: '304 SS top, GI cabinet',
+    },
+    warrantyMonths: 12,
+    leadDays: 7,
+    accent: '#B45309',
+    rating: 4.4,
+    reviewCount: 41,
+  },
+  {
+    slug: 'induction-range-twin-zone',
+    name: 'Twin-Zone Commercial Induction Range — 5 kW × 2',
+    category: 'cooking-ranges',
+    blurb: 'Tropicalised induction heads for high-ambient kitchens. Glass-ceramic top.',
+    priceINR: 1_15_000,
+    specs: {
+      Dimensions: '800 × 700 × 200 mm',
+      Zones: '2 × 5 kW',
+      Control: 'Digital, 9 power levels per zone',
+      'Power draw': '380 V, 10 kW total',
+      Cooling: 'Twin axial fans',
+    },
+    warrantyMonths: 12,
+    leadDays: 14,
+    accent: '#1F2937',
+    rating: 4.6,
+    reviewCount: 17,
+  },
+
+  // ── Indian cooking ───────────────────────────────────────────────────────
+  {
     slug: 'four-burner-indian-bhatti',
     name: 'Four-Burner Indian Bhatti with Tawa Plate',
     category: 'indian-cooking',
@@ -97,6 +225,91 @@ export const products = [
     rating: 4.5,
     reviewCount: 17,
   },
+  {
+    slug: 'gas-tandoor-medium',
+    name: 'Medium Gas Tandoor with Insulated Inner Pot',
+    category: 'indian-cooking',
+    blurb: 'Clay-lined inner pot with 4-burner gas ring; suitable for 60-cover restaurants.',
+    priceINR: 38_500,
+    specs: {
+      Dimensions: '750 × 750 × 1100 mm',
+      'Inner pot': 'Clay-lined, 600 mm dia',
+      Burners: '4-ring gas, 24,000 kcal/hr',
+      Fuel: 'LPG',
+      Insulation: '50 mm rockwool',
+    },
+    warrantyMonths: 12,
+    leadDays: 14,
+    accent: '#991B1B',
+    rating: 4.6,
+    reviewCount: 28,
+  },
+
+  // ── Ovens ────────────────────────────────────────────────────────────────
+  {
+    slug: 'combi-oven-10-gn',
+    name: 'Combi Oven — 10 × GN 1/1, Boiler-Based Steam',
+    category: 'ovens',
+    blurb: 'Programmable combi with boiler-based steam, HACCP logging, USB recipe transfer.',
+    priceINR: 5_85_000,
+    specs: {
+      Dimensions: '900 × 800 × 1100 mm',
+      'Tray capacity': '10 × GN 1/1',
+      Modes: 'Convection · Steam · Combi',
+      'Power draw': '380 V, 18 kW',
+      Programs: '99 user, 200 factory',
+    },
+    warrantyMonths: 18,
+    leadDays: 21,
+    accent: '#374151',
+    rating: 4.8,
+    reviewCount: 14,
+    badge: 'Best seller',
+  },
+
+  // ── Deep fryers ──────────────────────────────────────────────────────────
+  {
+    slug: 'twin-tank-fryer',
+    name: 'Twin-Tank Floor-Standing Deep Fryer — 28 L × 2',
+    category: 'deep-fryers',
+    blurb: 'Cold-zone tank design extends oil life; thermostat protection with manual reset.',
+    priceINR: 92_500,
+    specs: {
+      Dimensions: '800 × 750 × 850 mm',
+      'Tank capacity': '2 × 28 L',
+      'Burner output': '2 × 22,000 kcal/hr',
+      Fuel: 'LPG',
+      'Basket': '2 × full + 2 × half',
+    },
+    warrantyMonths: 12,
+    leadDays: 10,
+    accent: '#A16207',
+    rating: 4.5,
+    reviewCount: 19,
+  },
+
+  // ── Food prep ────────────────────────────────────────────────────────────
+  {
+    slug: 'planetary-mixer-30l',
+    name: 'Planetary Mixer — 30 L Bowl, Three-Speed',
+    category: 'food-prep',
+    blurb: 'Bowl-lift design, included flat beater, dough hook, and wire whip.',
+    priceINR: 1_18_000,
+    specs: {
+      Dimensions: '700 × 820 × 1320 mm',
+      'Bowl capacity': '30 L',
+      Speeds: '3, with timer',
+      'Power draw': '220 V, 1.5 kW',
+      Attachments: 'Flat beater, dough hook, whip',
+    },
+    warrantyMonths: 12,
+    leadDays: 14,
+    accent: '#5B21B6',
+    rating: 4.7,
+    reviewCount: 22,
+  },
+
+  // ── Work tables ──────────────────────────────────────────────────────────
   {
     slug: 'ss-work-table-6ft',
     name: 'Heavy-Duty SS Work Table 6ft × 2.5ft with Undershelf',
@@ -117,6 +330,107 @@ export const products = [
     reviewCount: 92,
   },
   {
+    slug: 'ss-work-table-4ft',
+    name: 'SS Work Table 4ft × 2ft with Undershelf',
+    category: 'work-tables',
+    blurb: 'Compact stainless work surface for small kitchens. Same heavy-duty 14-SWG top.',
+    priceINR: 12_500,
+    specs: {
+      Dimensions: '1220 × 610 × 850 mm',
+      'Top thickness': '1.5 mm / 14 SWG',
+      Material: '304 stainless steel',
+      Undershelf: 'Solid',
+      Load: '120 kg distributed',
+    },
+    warrantyMonths: 12,
+    leadDays: 5,
+    accent: '#475569',
+    rating: 4.5,
+    reviewCount: 64,
+  },
+  {
+    slug: 'ss-work-table-8ft-drawers',
+    name: 'SS Work Table 8ft × 2.5ft with Two Drawers',
+    category: 'work-tables',
+    blurb: 'Long-format prep table with two integrated drawers — perfect for cutlery and small tools.',
+    priceINR: 32_500,
+    specs: {
+      Dimensions: '2440 × 760 × 850 mm',
+      'Top thickness': '1.5 mm / 14 SWG',
+      Drawers: '2 × ball-bearing slides',
+      Material: '304 stainless steel',
+      Load: '220 kg distributed',
+    },
+    warrantyMonths: 12,
+    leadDays: 7,
+    accent: '#1F2937',
+    rating: 4.6,
+    reviewCount: 38,
+  },
+  {
+    slug: 'mobile-prep-table-with-castors',
+    name: 'Mobile Prep Table with Locking Castors — 4ft',
+    category: 'work-tables',
+    blurb: 'Wheeled work table with two heavy-duty locking castors and two free-rolling.',
+    priceINR: 16_200,
+    specs: {
+      Dimensions: '1220 × 610 × 880 mm',
+      Castors: '4 × 125 mm, 2 with brake',
+      Material: '304 stainless steel',
+      Undershelf: 'Perforated',
+      Load: '110 kg distributed',
+    },
+    warrantyMonths: 12,
+    leadDays: 7,
+    accent: '#1E293B',
+    rating: 4.4,
+    reviewCount: 27,
+  },
+
+  // ── Storage ─────────────────────────────────────────────────────────────
+  {
+    slug: 'ss-storage-rack-4tier',
+    name: 'Four-Tier Stainless Steel Storage Rack — 6ft',
+    category: 'storage',
+    blurb: 'Adjustable shelves; food-safe SS 304 finish. Bolt-together construction for easy assembly.',
+    priceINR: 22_500,
+    specs: {
+      Dimensions: '1830 × 600 × 1800 mm',
+      Tiers: '4 (adjustable in 50 mm increments)',
+      Material: '304 stainless steel',
+      Load: '120 kg per shelf',
+      Assembly: 'Bolt-together',
+    },
+    warrantyMonths: 12,
+    leadDays: 7,
+    accent: '#475569',
+    rating: 4.5,
+    reviewCount: 71,
+  },
+
+  // ── Sinks & plumbing ────────────────────────────────────────────────────
+  {
+    slug: 'three-bowl-pot-sink',
+    name: 'Three-Bowl Pot Wash Sink with Drainboards',
+    category: 'sinks-plumbing',
+    blurb: 'Heavy-gauge SS bowls with integral drainboards; designed for high-volume scullery.',
+    priceINR: 28_500,
+    specs: {
+      Dimensions: '2400 × 700 × 900 mm',
+      Bowls: '3 × 600 × 600 × 400 mm',
+      Drainboards: '2 × 600 mm flanking',
+      Material: '304 SS, 16 SWG',
+      Outlet: '50 mm waste outlets',
+    },
+    warrantyMonths: 12,
+    leadDays: 10,
+    accent: '#0E7490',
+    rating: 4.6,
+    reviewCount: 33,
+  },
+
+  // ── Dishwashing ─────────────────────────────────────────────────────────
+  {
     slug: 'undercounter-dishwasher',
     name: 'Undercounter Commercial Dishwasher — 60 racks/hr',
     category: 'dishwashing',
@@ -136,6 +450,27 @@ export const products = [
     reviewCount: 14,
   },
   {
+    slug: 'hood-type-dishwasher',
+    name: 'Hood-Type Pass-Through Dishwasher — 90 racks/hr',
+    category: 'dishwashing',
+    blurb: 'Pass-through design with rinse boost, breakdown protection, and energy-recovery option.',
+    priceINR: 5_85_000,
+    specs: {
+      Dimensions: '740 × 800 × 2080 mm',
+      Throughput: '90 racks/hr',
+      'Power draw': '380 V, 12 kW',
+      'Cycle time': '60 / 90 / 120 sec',
+      Material: '304 SS construction',
+    },
+    warrantyMonths: 18,
+    leadDays: 21,
+    accent: '#115E59',
+    rating: 4.7,
+    reviewCount: 11,
+  },
+
+  // ── Ventilation ──────────────────────────────────────────────────────────
+  {
     slug: 'wall-canopy-hood-6ft',
     name: 'Wall-Canopy Exhaust Hood 6ft with ESP Filter',
     category: 'ventilation-exhaust',
@@ -145,7 +480,7 @@ export const products = [
       Dimensions: '1830 × 1200 × 600 mm',
       Material: '20 SWG SS 304',
       Filters: '3-stage baffle, 304 grade',
-      'Airflow': '2400 m³/hr',
+      Airflow: '2400 m³/hr',
       'ESP option': 'Add-on inline module',
     },
     warrantyMonths: 12,
@@ -155,6 +490,29 @@ export const products = [
     reviewCount: 11,
     badge: 'New',
   },
+
+  // ── Service & display ───────────────────────────────────────────────────
+  {
+    slug: 'bain-marie-4-pan',
+    name: 'Four-Pan Electric Bain Marie with Lid',
+    category: 'service-display',
+    blurb: 'Thermostat-controlled hot holding for service counters. Includes 4 × GN 1/2 pans.',
+    priceINR: 32_500,
+    specs: {
+      Dimensions: '1400 × 600 × 850 mm',
+      Pans: '4 × GN 1/2 × 150 mm',
+      'Temp range': '+30°C to +90°C',
+      'Power draw': '220 V, 2.0 kW',
+      Material: '304 SS, hinged glass lid',
+    },
+    warrantyMonths: 12,
+    leadDays: 10,
+    accent: '#854D0E',
+    rating: 4.5,
+    reviewCount: 19,
+  },
+
+  // ── Coffee & espresso ────────────────────────────────────────────────────
   {
     slug: 'two-group-espresso-machine',
     name: 'Two-Group Semi-Automatic Espresso Machine',
@@ -174,6 +532,27 @@ export const products = [
     rating: 4.8,
     reviewCount: 42,
     badge: 'Best seller',
+  },
+
+  // ── Bar equipment ───────────────────────────────────────────────────────
+  {
+    slug: 'back-bar-cooler-2-door',
+    name: 'Two-Door Back-Bar Cooler with Glass Doors',
+    category: 'bar-equipment',
+    blurb: 'Front-breathing back-bar cooler with LED-lit glass doors; bottle-storage layout inside.',
+    priceINR: 1_42_000,
+    specs: {
+      Dimensions: '1200 × 540 × 920 mm',
+      Capacity: '320 L',
+      'Power draw': '220 V, 380 W',
+      Doors: '2 × tempered glass with LED',
+      'Temp range': '+2°C to +10°C',
+    },
+    warrantyMonths: 12,
+    leadDays: 10,
+    accent: '#1E40AF',
+    rating: 4.6,
+    reviewCount: 16,
   },
 ];
 

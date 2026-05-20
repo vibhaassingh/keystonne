@@ -1,11 +1,10 @@
-import {Await, Link} from 'react-router';
-import {Suspense} from 'react';
+import {Link} from 'react-router';
 import {Aside} from '~/components/Aside';
 import {AnnouncementBar} from '~/components/AnnouncementBar';
 import {Header} from '~/components/Header';
 import {MegaNav} from '~/components/MegaNav';
 import {Footer} from '~/components/Footer';
-import {CartMain} from '~/components/CartMain';
+import {QuoteCartDrawer} from '~/components/QuoteCartDrawer';
 import {categories} from '~/lib/mock/categories';
 
 /**
@@ -21,29 +20,19 @@ import {categories} from '~/lib/mock/categories';
  * SearchAside from the scaffold is dropped — Keystonne's search is inline
  * in the header (a B2B catalog needs always-visible search).
  */
-export function PageLayout({cart, children = null, isLoggedIn}) {
+export function PageLayout({children = null, isLoggedIn}) {
   return (
     <Aside.Provider>
-      <CartAside cart={cart} />
+      <Aside type="cart" heading="Your cart">
+        <QuoteCartDrawer />
+      </Aside>
       <MobileCategoryAside />
       <AnnouncementBar />
-      <Header cart={cart} isLoggedIn={isLoggedIn} />
+      <Header isLoggedIn={isLoggedIn} />
       <MegaNav />
       <main className="min-h-[60vh]">{children}</main>
       <Footer />
     </Aside.Provider>
-  );
-}
-
-function CartAside({cart}) {
-  return (
-    <Aside type="cart" heading="Your cart">
-      <Suspense fallback={<p className="p-4 text-sm">Loading cart…</p>}>
-        <Await resolve={cart}>
-          {(resolved) => <CartMain cart={resolved} layout="aside" />}
-        </Await>
-      </Suspense>
-    </Aside>
   );
 }
 

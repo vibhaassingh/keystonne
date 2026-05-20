@@ -10,6 +10,7 @@ import {
   useRouteLoaderData,
 } from 'react-router';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
+import {QuoteCartProvider} from '~/lib/quoteCart';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
@@ -55,7 +56,7 @@ export function links() {
     },
     {
       rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+      href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap',
     },
     {rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg'},
   ];
@@ -182,9 +183,11 @@ export default function App() {
       shop={data.shop}
       consent={data.consent}
     >
-      <PageLayout {...data}>
-        <Outlet />
-      </PageLayout>
+      <QuoteCartProvider>
+        <PageLayout {...data}>
+          <Outlet />
+        </PageLayout>
+      </QuoteCartProvider>
     </Analytics.Provider>
   );
 }

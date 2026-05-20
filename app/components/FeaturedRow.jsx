@@ -18,14 +18,10 @@ export function FeaturedRow({
   if (!products?.length) return null;
   return (
     <section className="mx-auto max-w-[1400px] px-4 py-8 md:py-12">
-      <header className="mb-5 flex items-end justify-between">
+      <header className="mb-6 flex items-end justify-between">
         <div>
-          {eyebrow && (
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-brand-primary">
-              {eyebrow}
-            </span>
-          )}
-          <h2 className="mt-1 text-2xl font-semibold text-ink md:text-3xl">
+          {eyebrow && <span className="eyebrow">{eyebrow}</span>}
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
             {title}
           </h2>
         </div>
