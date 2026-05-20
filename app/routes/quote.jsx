@@ -9,9 +9,10 @@ import {formatDate} from '~/lib/utils/formatDate';
 import {cn} from '~/lib/utils/cn';
 
 /**
- * Quote-request form. Lists the items being quoted on (cart + optional
- * prefilled SKU from a product page), then collects buyer details. Submit
- * is console.log + success screen — no backend in Phase 1.
+ * Apple-style quote request form. Three fieldset sections on the left,
+ * sticky bundle + direct-reach panel on the right. RHF handles
+ * validation; submit is console.log + success screen with a
+ * reference number — no real backend.
  */
 
 export const meta = () => [{title: 'Request a quote — Keystonne'}];
@@ -35,115 +36,139 @@ export default function QuotePage() {
   const prefillProduct = prefillSlug ? productBySlug[prefillSlug] : null;
 
   const {items, subtotal, gst, total, clear} = useQuoteCart();
-
-  // The quote bundle is: cart items + (optional) prefilled product the user
-  // landed on directly. We display them merged, deduplicating by slug.
   const bundle = buildBundle(items, prefillProduct);
 
   const [submitted, setSubmitted] = useState(false);
   const {register, handleSubmit, formState: {errors, isSubmitting}, reset} = useForm({
-    defaultValues: {
-      businessType: '',
-      city: '',
-      timeline: 'within-a-month',
-    },
+    defaultValues: {businessType: '', city: '', timeline: 'within-a-month'},
   });
 
   function onSubmit(values) {
     const payload = {
       id: `quote_${Date.now()}`,
       submittedAt: new Date().toISOString(),
-      bundle: bundle.map((b) => ({slug: b.slug, qty: b.qty, name: b.name, priceINR: b.priceINR})),
+      bundle: bundle.map((b) => ({
+        slug: b.slug,
+        qty: b.qty,
+        name: b.name,
+        priceINR: b.priceINR,
+      })),
       subtotal,
       gst,
       total,
       buyer: values,
     };
-    // Phase 2 will POST to /api/quotes; today we capture in the console
-    // so demo viewers can inspect what's being collected.
     // eslint-disable-next-line no-console
     console.log('[demo] Quote submitted:', payload);
     setSubmitted(true);
     reset();
   }
 
-  if (submitted) return <SuccessScreen onReset={() => { setSubmitted(false); clear(); }} />;
+  if (submitted) {
+    return (
+      <SuccessScreen
+        onReset={() => {
+          setSubmitted(false);
+          clear();
+        }}
+      />
+    );
+  }
 
   return (
-    <section className="mx-auto max-w-[1100px] px-4 py-10 md:px-6 md:py-12">
-      <h1 className="text-2xl font-semibold text-ink md:text-3xl">
-        Request a quote
-      </h1>
-      <p className="mt-1 max-w-2xl text-sm text-gray-600">
-        Tell us a little about the project — we&apos;ll return a single
-        all-in quote, including freight and installation, within 24 hours.
-      </p>
+    <section className="mx-auto max-w-[1200px] px-4 py-12 md:px-6 md:py-16">
+      <header className="mb-10">
+        <span className="apple-eyebrow">Request a quote</span>
+        <h1
+          className="mt-3 text-[32px] font-semibold tracking-tight md:text-[40px]"
+          style={{color: 'var(--ks-ink)'}}
+        >
+          Tell us about the project.
+        </h1>
+        <p
+          className="mt-3 max-w-2xl text-[15px] leading-relaxed"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
+          We&apos;ll return a single all-in quote — including freight,
+          installation, and the GST invoice you can use for ITC — within
+          24 hours.
+        </p>
+      </header>
 
-      <div className="mt-8 grid gap-8 md:grid-cols-12">
-        <form onSubmit={handleSubmit(onSubmit)} className="md:col-span-7">
+      <div className="grid gap-8 md:grid-cols-12">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="md:col-span-7 space-y-5"
+        >
           <FormSection title="Your details">
             <Field label="Full name" error={errors.name?.message}>
-              <input
+              <Input
                 type="text"
                 {...register('name', {required: 'Tell us your name'})}
-                className={inputCls(errors.name)}
                 placeholder="Arjun Mehta"
               />
             </Field>
             <Field label="Work email" error={errors.email?.message}>
-              <input
+              <Input
                 type="email"
                 {...register('email', {
                   required: 'Work email needed',
-                  pattern: {value: /^[^@\s]+@[^@\s]+\.[^@\s]+$/, message: 'Invalid email'},
+                  pattern: {
+                    value: /^[^@\s]+@[^@\s]+\.[^@\s]+$/,
+                    message: 'Invalid email',
+                  },
                 })}
-                className={inputCls(errors.email)}
                 placeholder="arjun@lakesidecafe.in"
               />
             </Field>
-            <Field label="Mobile (with country code)" error={errors.phone?.message}>
-              <input
+            <Field
+              label="Mobile (with country code)"
+              error={errors.phone?.message}
+            >
+              <Input
                 type="tel"
-                {...register('phone', {required: 'Mobile needed for delivery coordination'})}
-                className={inputCls(errors.phone)}
+                {...register('phone', {
+                  required: 'Mobile needed for delivery coordination',
+                })}
                 placeholder="+91 98XXX XXXXX"
               />
             </Field>
           </FormSection>
 
           <FormSection title="Business details">
-            <Field label="Business name" error={errors.businessName?.message}>
-              <input
+            <Field
+              label="Business name"
+              error={errors.businessName?.message}
+            >
+              <Input
                 type="text"
-                {...register('businessName', {required: 'Business name (or "Personal venture")'})}
-                className={inputCls(errors.businessName)}
+                {...register('businessName', {
+                  required: 'Business name (or "Personal venture")',
+                })}
                 placeholder="Lakeside Café"
               />
             </Field>
             <Field label="Business type">
-              <select
-                {...register('businessType')}
-                className={inputCls()}
-              >
+              <select {...register('businessType')} className={inputCls()}>
                 <option value="">Select…</option>
                 {BUSINESS_TYPES.map((b) => (
-                  <option key={b.value} value={b.value}>{b.label}</option>
+                  <option key={b.value} value={b.value}>
+                    {b.label}
+                  </option>
                 ))}
               </select>
             </Field>
             <Field label="City">
-              <input
+              <Input
                 type="text"
                 {...register('city')}
-                className={inputCls()}
                 placeholder="Bengaluru"
               />
             </Field>
             <Field label="GSTIN (optional)">
-              <input
+              <Input
                 type="text"
                 {...register('gstin')}
-                className={inputCls()}
                 placeholder="29ABCDE1234F1Z5"
               />
             </Field>
@@ -171,47 +196,87 @@ export default function QuotePage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md bg-brand-primary px-5 py-3 text-sm font-semibold text-white hover:bg-brand-primary-700 disabled:opacity-60 md:w-auto md:px-8"
+            className="apple-button-amber w-full justify-center md:w-auto"
           >
             <FileText className="h-4 w-4" />
             Send my quote request
-            <ArrowRight className="h-4 w-4 opacity-80" />
+            <ArrowRight className="h-4 w-4 opacity-70" />
           </button>
-          <p className="mt-2 text-[12px] text-gray-500">
-            By submitting you accept our standard 71% advance + 29% pre-dispatch terms.
+          <p
+            className="text-[12px]"
+            style={{color: 'var(--ks-muted)'}}
+          >
+            By submitting you accept our standard 71% advance + 29%
+            pre-dispatch terms.
           </p>
         </form>
 
         <aside className="md:col-span-5">
           <div className="sticky top-2 space-y-4">
-            <div className="rounded-lg border border-gray-200 bg-white p-4">
-              <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-gray-500">
+            <div
+              className="rounded-[var(--ks-radius-md)] p-5"
+              style={{
+                background: 'var(--ks-card-solid)',
+                border: '1px solid var(--ks-line-soft)',
+              }}
+            >
+              <span className="apple-eyebrow">
                 Items in this quote ({bundle.length})
-              </h2>
+              </span>
               {bundle.length === 0 ? (
-                <p className="text-sm text-gray-600">
+                <p
+                  className="mt-3 text-sm"
+                  style={{color: 'var(--ks-ink-2)'}}
+                >
                   No specific items — we&apos;ll build the spec from your
                   notes. You can also{' '}
-                  <Link to="/collections/all" className="text-brand-primary hover:underline">
+                  <Link
+                    to="/collections/all"
+                    className="font-medium hover:underline"
+                    style={{color: 'var(--ks-blue)'}}
+                  >
                     add products to your cart
                   </Link>{' '}
                   first.
                 </p>
               ) : (
-                <ul className="divide-y divide-gray-100">
+                <ul
+                  className="mt-3 divide-y"
+                  style={{borderColor: 'var(--ks-line-soft)'}}
+                >
                   {bundle.map((b) => (
-                    <li key={b.slug} className="flex items-start gap-3 py-2">
+                    <li
+                      key={b.slug}
+                      className="flex items-start gap-3 py-2.5"
+                      style={{
+                        borderTop:
+                          bundle.indexOf(b) === 0
+                            ? 'none'
+                            : '1px solid var(--ks-line-soft)',
+                      }}
+                    >
                       <div
-                        className="h-10 w-10 shrink-0 rounded"
-                        style={{background: b.accent}}
+                        className="h-10 w-10 shrink-0 rounded-md"
+                        style={{
+                          background: `linear-gradient(180deg, ${tint(b.accent, 0.10)}, ${tint(b.accent, 0.04)})`,
+                          border: '1px solid var(--ks-line-soft)',
+                        }}
                       />
                       <div className="min-w-0 flex-1">
-                        <div className="line-clamp-2 text-[13px] font-semibold text-ink">
+                        <div
+                          className="line-clamp-2 text-[13px] font-semibold"
+                          style={{color: 'var(--ks-ink)'}}
+                        >
                           {b.name}
                         </div>
-                        <div className="text-[11px] text-gray-500">
+                        <div
+                          className="text-[11px]"
+                          style={{color: 'var(--ks-muted)'}}
+                        >
                           Qty {b.qty}{' '}
-                          {b.priceINR ? `· ${formatINR(b.priceINR)} each` : '· Project priced'}
+                          {b.priceINR
+                            ? `· ${formatINR(b.priceINR)} each`
+                            : '· Project priced'}
                         </div>
                       </div>
                     </li>
@@ -220,23 +285,38 @@ export default function QuotePage() {
               )}
 
               {bundle.length > 0 && subtotal > 0 && (
-                <div className="mt-3 border-t border-gray-100 pt-3 text-[13px]">
-                  <Row label="Subtotal" value={formatINR(subtotal)} />
-                  <Row label="GST · 18%" value={formatINR(gst)} muted />
-                  <Row label="Estimate" value={formatINR(total)} strong />
+                <div
+                  className="mt-3 space-y-1.5 border-t pt-3 text-[13px]"
+                  style={{borderColor: 'var(--ks-line-soft)'}}
+                >
+                  <Row k="Subtotal" v={formatINR(subtotal)} />
+                  <Row k="GST · 18%" v={formatINR(gst)} muted />
+                  <Row k="Estimate" v={formatINR(total)} strong />
                 </div>
               )}
             </div>
 
-            <div className="rounded-lg bg-brand-primary-50 p-4 text-[13px] text-brand-primary">
-              <div className="font-semibold">Talk to a specialist now</div>
-              <ul className="mt-2 space-y-1.5 text-gray-700">
+            <div
+              className="rounded-[var(--ks-radius-md)] p-5 text-[13px]"
+              style={{
+                background: 'var(--ks-blue-soft)',
+                color: 'var(--ks-blue-dark)',
+                border: '1px solid rgba(0,113,227,0.18)',
+              }}
+            >
+              <div
+                className="font-semibold"
+                style={{color: 'var(--ks-blue-dark)'}}
+              >
+                Talk to a specialist now
+              </div>
+              <ul className="mt-2 space-y-1.5">
                 <li className="flex items-center gap-1.5">
-                  <Phone className="h-3.5 w-3.5 text-brand-primary" />
+                  <Phone className="h-3.5 w-3.5" strokeWidth={1.6} />
                   Sales line: +91 80 0000 0000
                 </li>
                 <li className="flex items-center gap-1.5">
-                  <Mail className="h-3.5 w-3.5 text-brand-primary" />
+                  <Mail className="h-3.5 w-3.5" strokeWidth={1.6} />
                   hello@keystonne.in
                 </li>
               </ul>
@@ -248,7 +328,6 @@ export default function QuotePage() {
   );
 }
 
-/** Merge cart items + optional pre-filled product (deduped by slug). */
 function buildBundle(items, prefillProduct) {
   const seen = new Set();
   const out = [];
@@ -276,8 +355,17 @@ function buildBundle(items, prefillProduct) {
 
 function FormSection({title, children}) {
   return (
-    <fieldset className="mb-6 rounded-lg border border-gray-200 bg-white p-5">
-      <legend className="px-2 text-xs font-bold uppercase tracking-wider text-gray-500">
+    <fieldset
+      className="rounded-[var(--ks-radius-md)] p-5"
+      style={{
+        background: 'var(--ks-card-solid)',
+        border: '1px solid var(--ks-line-soft)',
+      }}
+    >
+      <legend
+        className="px-2 text-[11px] font-semibold uppercase tracking-[0.10em]"
+        style={{color: 'var(--ks-muted)'}}
+      >
         {title}
       </legend>
       <div className="grid gap-4 md:grid-cols-2">{children}</div>
@@ -288,28 +376,58 @@ function FormSection({title, children}) {
 function Field({label, error, children}) {
   return (
     <label className="block">
-      <div className="mb-1 text-[12px] font-semibold text-gray-700">{label}</div>
+      <div
+        className="mb-1.5 text-[12px] font-medium"
+        style={{color: 'var(--ks-ink-2)'}}
+      >
+        {label}
+      </div>
       {children}
-      {error && <div className="mt-1 text-[11px] text-red-600">{error}</div>}
+      {error && (
+        <div
+          className="mt-1 text-[11px]"
+          style={{color: '#c2410c'}}
+        >
+          {error}
+        </div>
+      )}
     </label>
   );
 }
 
 function inputCls(error) {
   return cn(
-    'w-full rounded-md border bg-white px-3 py-2 text-sm text-ink placeholder:text-gray-400 focus:outline-none focus:ring-2',
+    'w-full rounded-md px-3 py-2 text-sm focus:outline-none',
     error
-      ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
-      : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/20',
+      ? 'focus:ring-2'
+      : '',
   );
 }
 
-function Row({label, value, strong, muted}) {
+function Input(props) {
+  return (
+    <input
+      {...props}
+      className={cn(inputCls(), props.className)}
+      style={{
+        background: '#fafafa',
+        border: '1px solid var(--ks-line)',
+        color: 'var(--ks-ink)',
+        ...(props.style || {}),
+      }}
+    />
+  );
+}
+
+function Row({k, v, muted, strong}) {
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <span className={muted ? 'text-gray-500' : 'text-gray-700'}>{label}</span>
-      <span className={`tabular ${strong ? 'text-base font-semibold text-ink' : 'font-medium text-ink'}`}>
-        {value}
+      <span style={{color: muted ? 'var(--ks-muted)' : 'var(--ks-ink-2)'}}>{k}</span>
+      <span
+        className={`tabular ${strong ? 'text-[15px] font-semibold' : 'font-medium'}`}
+        style={{color: 'var(--ks-ink)'}}
+      >
+        {v}
       </span>
     </div>
   );
@@ -317,35 +435,63 @@ function Row({label, value, strong, muted}) {
 
 function SuccessScreen({onReset}) {
   return (
-    <section className="mx-auto max-w-xl px-4 py-20 text-center">
-      <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-100 text-emerald-700">
-        <Check className="h-8 w-8" />
+    <section className="mx-auto max-w-xl px-4 py-24 text-center">
+      <div
+        className="mx-auto grid h-14 w-14 place-items-center rounded-full"
+        style={{
+          background: 'var(--ks-emerald-soft)',
+          color: 'var(--ks-emerald-dark)',
+        }}
+      >
+        <Check className="h-7 w-7" strokeWidth={1.6} />
       </div>
-      <h1 className="mt-5 text-2xl font-semibold text-ink">Quote request sent.</h1>
-      <p className="mt-3 text-sm text-gray-600">
+      <h1
+        className="mt-5 text-[28px] font-semibold"
+        style={{color: 'var(--ks-ink)'}}
+      >
+        Quote request sent.
+      </h1>
+      <p
+        className="mt-3 text-sm"
+        style={{color: 'var(--ks-ink-2)'}}
+      >
         Our team will reach out within 24 hours with an itemised quote —
         including freight, installation, and the GST invoice you can use
         for ITC. We&apos;ve cleared your cart.
       </p>
-      <p className="mt-1 text-[12px] text-gray-500">
-        Reference: <span className="tabular">QT-{Date.now().toString().slice(-6)}</span> ·{' '}
-        Filed on {formatDate(new Date())}
-      </p>
-      <div className="mt-6 flex justify-center gap-3">
-        <Link
-          to="/collections/all"
-          className="inline-flex items-center gap-1.5 rounded-md bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-brand-primary-700"
+      <p
+        className="mt-1 text-[12px]"
+        style={{color: 'var(--ks-muted)'}}
+      >
+        Reference:{' '}
+        <span
+          className="tabular"
+          style={{color: 'var(--ks-ink)'}}
         >
+          QT-{Date.now().toString().slice(-6)}
+        </span>{' '}
+        · Filed on {formatDate(new Date())}
+      </p>
+      <div className="mt-7 flex justify-center gap-3">
+        <Link to="/collections/all" className="apple-button-primary">
           Continue browsing
         </Link>
         <button
           type="button"
           onClick={onReset}
-          className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-ink hover:border-ink/40"
+          className="apple-button-ghost"
         >
           Submit another
         </button>
       </div>
     </section>
   );
+}
+
+function tint(hex, opacity) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 0xff;
+  const g = (n >> 8) & 0xff;
+  const b = n & 0xff;
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }

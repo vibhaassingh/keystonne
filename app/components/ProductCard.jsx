@@ -1,6 +1,6 @@
 import {Link} from 'react-router';
-import {Star, ShoppingCart, FileText, Check} from 'lucide-react';
 import {useState} from 'react';
+import {Star, FileText, Check, ArrowRight} from 'lucide-react';
 import {formatINR} from '~/lib/utils/formatINR';
 import {categoryBySlug} from '~/lib/mock/categories';
 import {useQuoteCart} from '~/lib/quoteCart';
@@ -8,14 +8,28 @@ import {useAside} from '~/components/Aside';
 import {cn} from '~/lib/utils/cn';
 
 /**
- * Modern, dense product card. Rounded-2xl glass surface with hover-lift,
- * tinted gradient image panel, inner highlight, soft shadow stack. WSS
- * density preserved: rating, brand-prefixed title, two-line spec line,
- * price-with-unit, dual CTA (Add to cart / Request quote).
+ * Apple-style dense product card.
  *
- * "Add to Cart" only renders for items priced under ₹50,000 (CLAUDE.md §7).
+ * Layout:
+ *   ┌──────────────────────────────┐
+ *   │ [neutral image panel · icon] │  + optional badge top-right
+ *   ├──────────────────────────────┤
+ *   │  CATEGORY eyebrow            │
+ *   │  Product name (≤ 2 lines)    │
+ *   │  Short commercial use case   │
+ *   │  · Dimensions: 1340 × 770 …  │
+ *   │  · Capacity: 1,240 L         │
+ *   │  · Lead time: 7 days         │
+ *   ├──────────────────────────────┤
+ *   │  ₹1,29,000 / each   +18% GST │
+ *   │  [Add to quote] [Details →]  │
+ *   └──────────────────────────────┘
+ *
+ * CTA discipline (brief §3): amber for procurement-intent actions
+ * only ("Add to quote" / "Request quote"); secondary "Details" stays
+ * neutral as a blue link.
  */
-export function ProductCard({product, compact = false}) {
+export function ProductCard({product}) {
   const cat = categoryBySlug[product.category];
   const Icon = cat?.icon ?? Star;
   const canAddToCart =
@@ -28,30 +42,56 @@ export function ProductCard({product, compact = false}) {
     add(product.slug, 1);
     setJustAdded(true);
     setTimeout(() => setJustAdded(false), 1400);
-    setTimeout(() => open('cart'), 200);
+    setTimeout(() => open('cart'), 220);
+  }
+
+  const specs = product.specs || {};
+  const specLines = [
+    pickSpec(specs, /dimension|size/i, ['Dimensions']),
+    pickSpec(specs, /capacity|throughput|tray/i, ['Capacity']),
+    pickSpec(specs, /power|burner|fuel|airflow/i, ['Power draw']),
+  ].filter(Boolean).slice(0, 3);
+
+  // Fallback to lead/warranty if specs don't surface enough technical rows.
+  if (specLines.length < 3) {
+    specLines.push({label: 'Lead time', value: `${product.leadDays} days`});
   }
 
   return (
-    <article className="card card-hover group flex h-full flex-col overflow-hidden">
+    <article
+      className="group flex h-full flex-col overflow-hidden transition-colors"
+      style={{
+        background: 'var(--ks-card-solid)',
+        border: '1px solid var(--ks-line-soft)',
+        borderRadius: 'var(--ks-radius-md)',
+      }}
+    >
+      {/* Image panel — neutral surface, soft tint hint from accent */}
       <Link
         to={`/products/${product.slug}`}
         prefetch="intent"
-        className="relative block overflow-hidden rounded-t-[15px]"
+        className="relative block"
       >
         <div
-          className="relative grid aspect-[4/3] w-full place-items-center"
+          className="relative grid aspect-[5/4] w-full place-items-center"
           style={{
-            background: `linear-gradient(135deg, ${product.accent}, ${shade(product.accent, -25)})`,
+            background: `linear-gradient(180deg, ${tint(product.accent, 0.06)} 0%, ${tint(product.accent, 0.02)} 100%)`,
           }}
         >
-          {/* Floating orb for depth */}
-          <div
-            className="absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-40 blur-3xl"
-            style={{background: product.accent}}
+          <Icon
+            className="h-14 w-14"
+            strokeWidth={1.4}
+            style={{color: 'var(--ks-ink-2)'}}
           />
-          <Icon className="relative h-14 w-14 text-white/95 drop-shadow-[0_4px_8px_rgba(0,0,0,0.25)] transition-transform duration-300 group-hover:scale-110" />
           {product.badge && (
-            <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink shadow-sm backdrop-blur">
+            <span
+              className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em]"
+              style={{
+                background: 'var(--ks-card-solid)',
+                color: 'var(--ks-ink)',
+                border: '1px solid var(--ks-line)',
+              }}
+            >
               {product.badge}
             </span>
           )}
@@ -59,93 +99,126 @@ export function ProductCard({product, compact = false}) {
       </Link>
 
       <div className="flex flex-1 flex-col p-4">
-        {/* Rating */}
-        <div className="mb-1.5 flex items-center gap-1.5 text-[11px] text-gray-500">
-          <Stars value={product.rating} />
-          <span className="tabular">
-            {product.rating.toFixed(1)} · {product.reviewCount} reviews
+        {/* Category eyebrow */}
+        {cat && (
+          <span
+            className="text-[10px] font-semibold uppercase tracking-[0.10em]"
+            style={{color: 'var(--ks-muted)'}}
+          >
+            {cat.name}
           </span>
-        </div>
+        )}
 
-        {/* Title */}
+        {/* Title + short use case */}
         <Link to={`/products/${product.slug}`} prefetch="intent">
           <h3
-            className={cn(
-              'line-clamp-2 font-semibold leading-snug text-ink transition-colors group-hover:text-brand-primary',
-              compact ? 'text-[13px]' : 'text-sm',
-            )}
+            className="mt-1 line-clamp-2 text-[14px] font-semibold leading-snug transition-colors group-hover:opacity-90"
+            style={{color: 'var(--ks-ink)'}}
           >
             {product.name}
           </h3>
         </Link>
+        <p
+          className="mt-1 line-clamp-2 text-[12px] leading-snug"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
+          {product.blurb}
+        </p>
 
-        {/* Short spec line */}
-        {!compact && (
-          <p className="mt-1 line-clamp-2 text-[12px] text-gray-600">
-            {firstSpecLine(product)}
-          </p>
-        )}
+        {/* Spec bullets */}
+        <ul
+          className="mt-3 space-y-0.5 text-[11px]"
+          style={{color: 'var(--ks-muted)'}}
+        >
+          {specLines.map((s) => (
+            <li key={s.label} className="flex gap-1.5">
+              <span>{s.label}:</span>
+              <span
+                className="tabular"
+                style={{color: 'var(--ks-ink-2)'}}
+              >
+                {s.value}
+              </span>
+            </li>
+          ))}
+        </ul>
 
-        {/* Price + lead time */}
-        <div className="mt-3 flex items-end justify-between">
+        {/* Price + meta */}
+        <div
+          className="mt-4 flex items-end justify-between border-t pt-3"
+          style={{borderColor: 'var(--ks-line-soft)'}}
+        >
           {canAddToCart ? (
             <div>
-              <div className="text-[10px] uppercase tracking-wider text-gray-500">
-                Starts at
-              </div>
-              <div className="tabular text-base font-semibold text-ink">
+              <div
+                className="tabular text-[16px] font-semibold leading-none"
+                style={{color: 'var(--ks-ink)'}}
+              >
                 {formatINR(product.priceINR)}
-                <span className="ml-1 text-[10px] font-normal text-gray-500">
-                  / each
+                <span
+                  className="ml-1 text-[10px] font-medium"
+                  style={{color: 'var(--ks-muted)'}}
+                >
+                  /each
                 </span>
               </div>
             </div>
           ) : (
             <div>
-              <div className="text-[10px] uppercase tracking-wider text-gray-500">
+              <div
+                className="text-[11px] font-semibold uppercase tracking-[0.08em]"
+                style={{color: 'var(--ks-muted)'}}
+              >
                 Project pricing
               </div>
-              <div className="text-sm font-semibold text-brand-primary">
-                Request a quote
+              <div
+                className="text-[14px] font-semibold"
+                style={{color: 'var(--ks-ink)'}}
+              >
+                Request quote
               </div>
             </div>
           )}
-          <div className="text-right text-[11px] text-gray-500">
+          <div
+            className="text-right text-[10px]"
+            style={{color: 'var(--ks-muted)'}}
+          >
             <div>+18% GST</div>
             <div>Ships in {product.leadDays}d</div>
           </div>
         </div>
 
         {/* Dual CTA */}
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 flex items-center gap-2">
           {canAddToCart ? (
             <button
               type="button"
               onClick={handleAdd}
               className={cn(
-                'flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-white transition-all',
-                justAdded
-                  ? 'bg-emerald-600'
-                  : 'btn-accent hover:-translate-y-0.5',
+                'flex-1 inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[12px] font-semibold transition-colors',
+                justAdded ? '' : 'apple-button-amber',
               )}
+              style={
+                justAdded
+                  ? {
+                      background: 'var(--ks-emerald)',
+                      color: '#ffffff',
+                      border: '1px solid transparent',
+                    }
+                  : undefined
+              }
             >
               {justAdded ? (
-                <>
-                  <Check className="h-3.5 w-3.5" />
-                  Added
-                </>
+                <><Check className="h-3.5 w-3.5" /> Added</>
               ) : (
-                <>
-                  <ShoppingCart className="h-3.5 w-3.5" />
-                  Add to cart
-                </>
+                <>Add to quote</>
               )}
             </button>
           ) : (
             <Link
               to={`/quote?sku=${product.slug}`}
               prefetch="intent"
-              className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg btn-primary px-2.5 py-2 text-[12px] font-semibold transition-all hover:-translate-y-0.5"
+              className="apple-button-amber flex-1 justify-center !py-2 !text-[12px]"
             >
               <FileText className="h-3.5 w-3.5" />
               Request quote
@@ -155,9 +228,11 @@ export function ProductCard({product, compact = false}) {
           <Link
             to={`/products/${product.slug}`}
             prefetch="intent"
-            className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-[12px] font-semibold text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] transition-colors hover:border-ink/30"
+            className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-[12px] font-medium transition-colors"
+            style={{color: 'var(--ks-blue)'}}
           >
             Details
+            <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
       </div>
@@ -165,46 +240,18 @@ export function ProductCard({product, compact = false}) {
   );
 }
 
-function Stars({value}) {
-  return (
-    <span className="flex" aria-label={`Rated ${value.toFixed(1)} out of 5`}>
-      {[0, 1, 2, 3, 4].map((i) => {
-        const fill = Math.max(0, Math.min(1, value - i));
-        return (
-          <span key={i} className="relative inline-block h-3.5 w-3.5">
-            <Star className="h-3.5 w-3.5 text-gray-300" />
-            <span
-              className="absolute inset-0 overflow-hidden"
-              style={{width: `${fill * 100}%`}}
-              aria-hidden="true"
-            >
-              <Star className="h-3.5 w-3.5 text-brand-accent" fill="currentColor" />
-            </span>
-          </span>
-        );
-      })}
-    </span>
-  );
-}
-
-function firstSpecLine(product) {
-  const specs = product.specs || {};
+function pickSpec(specs, pattern, labelOverrides = []) {
   const keys = Object.keys(specs);
-  if (keys.length === 0) return product.blurb;
-  const pri = keys.find((k) => /capacity|dimension/i.test(k)) ?? keys[0];
-  const sec =
-    keys.find((k) => k !== pri && /power|temp|burner|throughput/i.test(k)) ??
-    keys[1];
-  const out = [];
-  if (pri) out.push(`${pri}: ${specs[pri]}`);
-  if (sec) out.push(`${sec}: ${specs[sec]}`);
-  return out.join(' · ');
+  const k = keys.find((key) => pattern.test(key));
+  if (!k) return null;
+  return {label: labelOverrides[0] ?? k, value: specs[k]};
 }
 
-function shade(hex, amount) {
+/** Take a hex colour and blend with white at given opacity to get a tint. */
+function tint(hex, opacity) {
   const n = parseInt(hex.slice(1), 16);
-  const r = Math.max(0, Math.min(255, ((n >> 16) & 0xff) + amount));
-  const g = Math.max(0, Math.min(255, ((n >> 8) & 0xff) + amount));
-  const b = Math.max(0, Math.min(255, (n & 0xff) + amount));
-  return `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+  const r = (n >> 16) & 0xff;
+  const g = (n >> 8) & 0xff;
+  const b = n & 0xff;
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }

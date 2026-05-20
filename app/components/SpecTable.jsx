@@ -1,23 +1,56 @@
+import {cn} from '~/lib/utils/cn';
+
 /**
- * Striped key-value spec table for product detail and quote pages. The
- * "spec table" pattern is what B2B buyers actually skim — dimensions,
- * power, capacity, material — so we render this above marketing copy.
+ * Hairline spec sheet — no zebra stripes, no chunky backgrounds.
+ * Keys read as muted labels, values as graphite tabular figures.
+ * `dense` halves the row padding for sidebar usage.
  */
 export function SpecTable({specs, dense = false}) {
   if (!specs || Object.keys(specs).length === 0) return null;
+
   return (
-    <dl className="grid grid-cols-1 overflow-hidden rounded-md border border-gray-200 bg-white">
-      {Object.entries(specs).map(([k, v], i) => (
-        <div
-          key={k}
-          className={`grid grid-cols-3 gap-3 px-4 ${
-            dense ? 'py-2 text-[12px]' : 'py-3 text-[13px]'
-          } ${i % 2 === 1 ? 'bg-gray-50' : ''}`}
-        >
-          <dt className="col-span-1 font-semibold text-gray-600">{k}</dt>
-          <dd className="col-span-2 tabular text-ink">{v}</dd>
-        </div>
-      ))}
-    </dl>
+    <table
+      className={cn(
+        'spec-hairline-table w-full text-[13px]',
+        dense && 'text-[12px]',
+      )}
+      style={{
+        background: 'var(--ks-card-solid)',
+        border: '1px solid var(--ks-line-soft)',
+        borderRadius: 'var(--ks-radius-md)',
+        overflow: 'hidden',
+      }}
+    >
+      <tbody>
+        {Object.entries(specs).map(([k, v]) => (
+          <tr key={k}>
+            <th
+              scope="row"
+              className={cn(
+                'whitespace-nowrap text-left font-medium',
+                dense ? 'py-2 pl-3 pr-3' : 'py-3 pl-4 pr-3',
+              )}
+              style={{
+                color: 'var(--ks-muted)',
+                fontSize: dense ? 11 : 12,
+                letterSpacing: '0.02em',
+                width: '40%',
+              }}
+            >
+              {k}
+            </th>
+            <td
+              className={cn(
+                'num text-right',
+                dense ? 'py-2 pr-3 pl-3' : 'py-3 pr-4 pl-3',
+              )}
+              style={{color: 'var(--ks-ink)'}}
+            >
+              {v}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
