@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import {Link} from 'react-router';
 import {
-  ArrowRight, ArrowUpRight, ChevronDown, Handshake, Check,
-  Sparkles, Wallet, Calendar, TrendingUp, ShieldCheck,
+  ArrowRight, ArrowUpRight, ChevronDown, Handshake, ShieldCheck,
+  Wallet, TrendingUp, Calendar, FileText, Check,
 } from 'lucide-react';
 import {
   personas, tiers, commissionRates, howItWorks, faqs,
@@ -11,8 +11,13 @@ import {formatINRCompact} from '~/lib/utils/formatINR';
 import {cn} from '~/lib/utils/cn';
 
 /**
- * Partner-programme marketing page. The conversion page for the partner
- * portal — every partner-portal route ultimately hangs off here.
+ * Apple-style /partner landing. The previous emerald-mesh hero +
+ * glass-stat panel is retired; the page now reads as premium
+ * financial / procurement infrastructure on the same graphite-white
+ * surface as the storefront. Emerald is reserved for commission
+ * amounts, status pills, and one "Apply" CTA where the partner
+ * commits — every other action stays on the neutral graphite +
+ * blue palette.
  */
 
 export const meta = () => [
@@ -40,80 +45,62 @@ export default function PartnerLanding() {
   );
 }
 
+/* ── Hero ──────────────────────────────────────────────────────── */
+
 function Hero() {
   return (
-    <section className="mx-auto max-w-[1400px] px-4 pt-8 md:px-6">
-      <div
-        className="relative overflow-hidden rounded-3xl text-white mesh-emerald"
-        style={{boxShadow: '0 30px 80px -30px rgba(5,46,30,0.55), inset 0 1px 0 rgba(255,255,255,0.08)'}}
-      >
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-16 -left-10 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-white/[0.05] blur-3xl" />
-        </div>
-
-        <div className="relative grid gap-8 px-6 py-14 md:grid-cols-12 md:items-center md:px-14 md:py-24">
+    <section className="mx-auto max-w-[1400px] px-4 pt-8 md:px-6 md:pt-12">
+      <div className="apple-hero relative overflow-hidden px-6 py-12 md:px-14 md:py-20">
+        <div className="grid gap-10 md:grid-cols-12 md:items-center">
           <div className="md:col-span-7">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/90 backdrop-blur">
-              <Handshake className="h-3.5 w-3.5" />
-              Keystonne Partner Programme
+            <span className="apple-eyebrow">
+              <Handshake className="h-3 w-3" strokeWidth={1.7} />
+              Keystonne Partner Network
             </span>
-            <h1 className="mt-5 max-w-2xl text-[36px] font-semibold leading-[1.04] tracking-tight md:text-[56px]">
-              Spec kitchens. Earn transparently. Get paid on installation.
+
+            <h1 className="apple-display mt-4">
+              Turn kitchen influence into{' '}
+              <span style={{color: 'var(--ks-emerald)'}}>transparent commission</span>.
             </h1>
-            <p className="mt-5 max-w-xl text-base text-white/85 md:text-lg">
-              India’s commercial-kitchen sales already run on a network of
-              consultants, chefs, and F&B leaders. Keystonne formalises it
-              — published commission rates, real-time deal tracking, GST
-              + TDS handled, payouts on installation.
+
+            <p
+              className="apple-subhead mt-5 max-w-xl"
+              style={{color: 'var(--ks-ink-2)'}}
+            >
+              Register deals, build quotes, track status, and see commission
+              from project protection to payout. India&apos;s commercial
+              kitchen sales already run on this network — we&apos;ve made the
+              ledger transparent.
             </p>
+
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
                 to="/partner/apply"
                 prefetch="intent"
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-partner-accent shadow-lg transition-transform hover:-translate-y-0.5"
+                className="apple-button-primary"
               >
-                Apply to join
-                <ArrowRight className="h-4 w-4" />
+                Apply as partner
+                <ArrowRight className="h-4 w-4 opacity-70" />
               </Link>
               <Link
                 to="/partner/login"
                 prefetch="intent"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/5 px-5 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-white/10"
+                className="apple-button-ghost"
               >
-                Existing partner? Sign in
+                Log in as demo partner
               </Link>
             </div>
-            <p className="mt-4 text-[12px] text-white/60">
-              No joining fee. No exclusivity clauses. We earn when you earn.
+
+            <p
+              className="mt-5 text-[12px]"
+              style={{color: 'var(--ks-muted)'}}
+            >
+              No joining fee. No exclusivity. Decision within 3 working days.
             </p>
           </div>
 
           <aside className="md:col-span-5">
-            <div
-              className="rounded-2xl border border-white/25 bg-white/12 p-6 backdrop-blur-2xl"
-              style={{boxShadow: '0 20px 50px -20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.28)'}}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/65">
-                  Programme at a glance
-                </span>
-                <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-200">
-                  Live
-                </span>
-              </div>
-              <div className="mt-6 grid grid-cols-3 gap-4">
-                <Stat label="Avg commission" value="6.5%" sub="On closed orders" />
-                <Stat label="Median payout" value="11d" sub="From install" />
-                <Stat label="Active partners" value="850+" sub="Across India" />
-              </div>
-
-              <div className="mt-6 space-y-3 text-sm text-white/85">
-                <Bullet>Bronze · Silver · Gold tiers with published thresholds</Bullet>
-                <Bullet>GST + TDS handled automatically; Form 16A every quarter</Bullet>
-                <Bullet>UPI / bank payouts weekly · co-branded quote PDFs</Bullet>
-              </div>
-            </div>
+            <SampleCommissionCard />
           </aside>
         </div>
       </div>
@@ -121,51 +108,159 @@ function Hero() {
   );
 }
 
-function Stat({label, value, sub}) {
+function SampleCommissionCard() {
   return (
-    <div>
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-white/55">{label}</div>
-      <div className="tabular mt-1 text-2xl font-semibold text-white">{value}</div>
-      <div className="text-[11px] text-white/65">{sub}</div>
+    <div
+      className="rounded-[var(--ks-radius-lg)] p-6"
+      style={{
+        background: 'var(--ks-card-solid)',
+        border: '1px solid var(--ks-line-soft)',
+        boxShadow: 'var(--ks-shadow-card)',
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <span className="apple-eyebrow">Sample protected project</span>
+        <span
+          className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em]"
+          style={{
+            background: 'var(--ks-emerald-soft)',
+            color: 'var(--ks-emerald-dark)',
+          }}
+        >
+          <ShieldCheck className="h-3 w-3" />
+          Protected
+        </span>
+      </div>
+
+      <div
+        className="mt-4 text-[20px] font-semibold leading-tight md:text-[22px]"
+        style={{color: 'var(--ks-ink)'}}
+      >
+        120-cover restaurant kitchen
+      </div>
+      <div
+        className="text-[12px]"
+        style={{color: 'var(--ks-muted)'}}
+      >
+        Refrigeration + cooking + work tables · 47 line items
+      </div>
+
+      <dl
+        className="mt-5 space-y-2.5 border-t pt-4 text-[13px]"
+        style={{borderColor: 'var(--ks-line-soft)'}}
+      >
+        <Row k="Quote value" v="₹24,80,000" />
+        <Row k="Commission rate" v="5.6% blended" muted />
+        <Row k="TDS withheld" v="10% statutory" muted />
+      </dl>
+
+      <div
+        className="mt-5 flex items-baseline justify-between rounded-xl px-4 py-3"
+        style={{background: 'var(--ks-emerald-soft)'}}
+      >
+        <div
+          className="text-[11px] font-medium uppercase tracking-[0.10em]"
+          style={{color: 'var(--ks-emerald-dark)'}}
+        >
+          Estimated commission
+        </div>
+        <div
+          className="tabular text-[22px] font-semibold"
+          style={{color: 'var(--ks-emerald)'}}
+        >
+          ₹1,38,000
+        </div>
+      </div>
+
+      <div
+        className="mt-4 flex items-center justify-between text-[11px]"
+        style={{color: 'var(--ks-muted)'}}
+      >
+        <span>Payout: after installation + approval · ~11 days</span>
+      </div>
     </div>
   );
 }
 
-function Bullet({children}) {
+function Row({k, v, muted}) {
   return (
-    <div className="flex items-start gap-2">
-      <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
-      <span>{children}</span>
+    <div className="flex items-baseline justify-between">
+      <dt style={{color: muted ? 'var(--ks-muted)' : 'var(--ks-ink-2)'}}>{k}</dt>
+      <dd
+        className="tabular font-medium"
+        style={{color: muted ? 'var(--ks-ink-2)' : 'var(--ks-ink)'}}
+      >
+        {v}
+      </dd>
     </div>
   );
 }
+
+/* ── Promises ──────────────────────────────────────────────────── */
 
 function Promises() {
   const items = [
-    {icon: TrendingUp, title: 'Published rates', body: 'Every partner sees the same per-category rate × tier multiplier. No backroom negotiations.'},
-    {icon: Calendar, title: 'Real-time tracking', body: 'Watch your deal move from registered → quoted → won → installed → paid. No more WhatsApp chasing.'},
-    {icon: Wallet, title: 'Paid on installation', body: 'Commission releases the moment the kitchen is signed off. Median 11 days end-to-end.'},
-    {icon: ShieldCheck, title: 'Compliance handled', body: 'GST, TDS, Form 16A all generated automatically. You stay clean.'},
+    {
+      icon: ShieldCheck,
+      title: 'Deal protection',
+      body:
+        '30-day attribution window opens the day you register a project. Conflicts are adjudicated by partner-ops within 5 working days.',
+    },
+    {
+      icon: TrendingUp,
+      title: 'Published rates',
+      body:
+        'Every partner sees the same per-category rate × tier multiplier. No backroom deals; the table below is the table.',
+    },
+    {
+      icon: FileText,
+      title: 'Quote collaboration',
+      body:
+        'Build co-branded quote PDFs in the dashboard, share to the client, track opens — without leaving the partner workspace.',
+    },
+    {
+      icon: Wallet,
+      title: 'Payout visibility',
+      body:
+        'Accrued → approved → paid in a real-time ledger. GST + TDS handled automatically; Form 16A every quarter.',
+    },
   ];
   return (
     <section className="mx-auto max-w-[1400px] px-4 py-12 md:px-6 md:py-16">
       <header className="mb-8 max-w-2xl">
-        <span className="eyebrow">Why partners switch</span>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
-          Four promises the informal market can’t make.
+        <span className="apple-eyebrow">Why partners switch</span>
+        <h2
+          className="mt-3 text-2xl font-semibold tracking-tight md:text-[32px]"
+          style={{color: 'var(--ks-ink)'}}
+        >
+          Four promises the informal market can&apos;t make.
         </h2>
       </header>
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {items.map(({icon: Icon, title, body}) => (
-          <li key={title} className="card p-5">
+          <li key={title} className="premium-card p-5">
             <div
-              className="grid h-10 w-10 place-items-center rounded-xl text-white"
-              style={{background: 'linear-gradient(135deg, var(--color-partner-accent), #047857)', boxShadow: '0 6px 16px -8px rgba(5,150,105,0.55)'}}
+              className="grid h-9 w-9 place-items-center rounded-lg"
+              style={{background: '#f0f0f3'}}
             >
-              <Icon className="h-5 w-5" />
+              <Icon
+                className="h-4 w-4"
+                strokeWidth={1.6}
+                style={{color: 'var(--ks-ink)'}}
+              />
             </div>
-            <h3 className="mt-3 text-base font-semibold text-ink">{title}</h3>
-            <p className="mt-1 text-[13px] leading-relaxed text-gray-600">{body}</p>
+            <h3
+              className="mt-3 text-[14px] font-semibold"
+              style={{color: 'var(--ks-ink)'}}
+            >
+              {title}
+            </h3>
+            <p
+              className="mt-1 text-[12px] leading-relaxed"
+              style={{color: 'var(--ks-ink-2)'}}
+            >
+              {body}
+            </p>
           </li>
         ))}
       </ul>
@@ -173,26 +268,41 @@ function Promises() {
   );
 }
 
+/* ── How it works ──────────────────────────────────────────────── */
+
 function HowItWorks() {
   return (
     <section className="mx-auto max-w-[1400px] px-4 py-12 md:px-6 md:py-16">
       <header className="mb-8 max-w-2xl">
-        <span className="eyebrow">How it works</span>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+        <span className="apple-eyebrow">How it works</span>
+        <h2
+          className="mt-3 text-2xl font-semibold tracking-tight md:text-[32px]"
+          style={{color: 'var(--ks-ink)'}}
+        >
           Four steps. Apply once. Earn for every deal.
         </h2>
       </header>
-      <ol className="grid gap-4 md:grid-cols-4">
+      <ol className="grid gap-3 md:grid-cols-4">
         {howItWorks.map((s) => (
-          <li key={s.n} className="card relative overflow-hidden p-6">
-            <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-emerald-400/10 blur-2xl" />
-            <div className="relative">
-              <div className="tabular text-[44px] font-semibold leading-none text-partner-accent/30">
-                0{s.n}
-              </div>
-              <h3 className="mt-4 text-base font-semibold text-ink">{s.title}</h3>
-              <p className="mt-1 text-sm text-gray-600">{s.body}</p>
+          <li key={s.n} className="premium-card p-6">
+            <div
+              className="tabular text-[44px] font-semibold leading-none"
+              style={{color: 'var(--ks-line)'}}
+            >
+              0{s.n}
             </div>
+            <h3
+              className="mt-4 text-[15px] font-semibold"
+              style={{color: 'var(--ks-ink)'}}
+            >
+              {s.title}
+            </h3>
+            <p
+              className="mt-1.5 text-[13px] leading-relaxed"
+              style={{color: 'var(--ks-ink-2)'}}
+            >
+              {s.body}
+            </p>
           </li>
         ))}
       </ol>
@@ -200,35 +310,68 @@ function HowItWorks() {
   );
 }
 
+/* ── Personas ──────────────────────────────────────────────────── */
+
 function Personas() {
   return (
     <section className="mx-auto max-w-[1400px] px-4 py-12 md:px-6 md:py-16">
       <header className="mb-8 max-w-2xl">
-        <span className="eyebrow">Who joins</span>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
-          The people the Indian commercial-kitchen market already runs on.
+        <span className="apple-eyebrow">Who joins</span>
+        <h2
+          className="mt-3 text-2xl font-semibold tracking-tight md:text-[32px]"
+          style={{color: 'var(--ks-ink)'}}
+        >
+          The network India&apos;s commercial kitchens already run on.
         </h2>
       </header>
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {personas.map((p) => {
           const Icon = p.icon;
           return (
-            <li key={p.slug} className="card card-hover p-5">
+            <li key={p.slug} className="premium-card p-5">
               <div className="flex items-start gap-3">
                 <div
-                  className="grid h-10 w-10 place-items-center rounded-xl text-white"
-                  style={{background: 'linear-gradient(135deg, var(--color-partner-accent), #047857)'}}
+                  className="grid h-9 w-9 place-items-center rounded-lg"
+                  style={{background: '#f0f0f3'}}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon
+                    className="h-4 w-4"
+                    strokeWidth={1.6}
+                    style={{color: 'var(--ks-ink)'}}
+                  />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-base font-semibold text-ink">{p.name}</h3>
-                  <p className="mt-1 text-[13px] leading-relaxed text-gray-600">
+                  <h3
+                    className="text-[15px] font-semibold"
+                    style={{color: 'var(--ks-ink)'}}
+                  >
+                    {p.name}
+                  </h3>
+                  <p
+                    className="mt-1 text-[12px] leading-relaxed"
+                    style={{color: 'var(--ks-ink-2)'}}
+                  >
                     {p.blurb}
                   </p>
-                  <div className="mt-3 flex items-center gap-4 text-[11px] text-gray-500">
-                    <span><b className="tabular text-ink">{p.avgDealsPerYear}</b> deals/yr</span>
-                    <span><b className="text-ink">{p.typicalDealSize}</b> typical</span>
+                  <div
+                    className="mt-3 flex items-center gap-4 text-[11px]"
+                    style={{color: 'var(--ks-muted)'}}
+                  >
+                    <span>
+                      <b
+                        className="tabular"
+                        style={{color: 'var(--ks-ink)'}}
+                      >
+                        {p.avgDealsPerYear}
+                      </b>{' '}
+                      deals/yr
+                    </span>
+                    <span>
+                      <b style={{color: 'var(--ks-ink)'}}>
+                        {p.typicalDealSize}
+                      </b>{' '}
+                      typical
+                    </span>
                   </div>
                 </div>
               </div>
@@ -240,40 +383,70 @@ function Personas() {
   );
 }
 
+/* ── Commission table ──────────────────────────────────────────── */
+
 function CommissionTable() {
   return (
     <section className="mx-auto max-w-[1400px] px-4 py-12 md:px-6 md:py-16">
       <header className="mb-8 max-w-2xl">
-        <span className="eyebrow">Transparent commissions</span>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+        <span className="apple-eyebrow">Transparent commissions</span>
+        <h2
+          className="mt-3 text-2xl font-semibold tracking-tight md:text-[32px]"
+          style={{color: 'var(--ks-ink)'}}
+        >
           Every rate. Published.
         </h2>
-        <p className="mt-3 text-sm text-gray-600 md:text-base">
+        <p
+          className="mt-3 max-w-2xl text-[14px] leading-relaxed"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
           Base rate × tier multiplier = paid commission. Calculated on
-          catalog price net of GST. We send a line-item breakdown with
-          every payout.
+          catalog price net of GST. Line-item breakdown sent with every
+          payout.
         </p>
       </header>
 
-      <div className="card overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">
+      <div
+        className="overflow-hidden rounded-[var(--ks-radius-md)]"
+        style={{
+          background: 'var(--ks-card-solid)',
+          border: '1px solid var(--ks-line-soft)',
+        }}
+      >
+        <table className="spec-hairline-table w-full text-[13px]">
+          <thead
+            style={{
+              background: 'var(--ks-page-warm)',
+              color: 'var(--ks-muted)',
+            }}
+          >
             <tr>
-              <th className="px-5 py-3">Category</th>
-              <th className="tabular px-5 py-3 text-right">Base rate</th>
-              <th className="tabular px-5 py-3 text-right">Silver (×1.10)</th>
-              <th className="tabular px-5 py-3 text-right">Gold (×1.20)</th>
-              <th className="tabular px-5 py-3 text-right">Platinum (×1.30)</th>
+              <th>Category</th>
+              <th className="num">Base rate</th>
+              <th className="num">Silver (×1.10)</th>
+              <th className="num">Gold (×1.20)</th>
+              <th className="num">Platinum (×1.30)</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody>
             {commissionRates.map((r) => (
               <tr key={r.category}>
-                <td className="px-5 py-3 font-medium text-ink">{r.category}</td>
-                <td className="tabular px-5 py-3 text-right">{r.rate.toFixed(1)}%</td>
-                <td className="tabular px-5 py-3 text-right text-gray-600">{(r.rate * 1.1).toFixed(2)}%</td>
-                <td className="tabular px-5 py-3 text-right font-semibold text-partner-accent">{(r.rate * 1.2).toFixed(2)}%</td>
-                <td className="tabular px-5 py-3 text-right text-gray-600">{(r.rate * 1.3).toFixed(2)}%</td>
+                <td style={{color: 'var(--ks-ink)'}}>{r.category}</td>
+                <td className="num" style={{color: 'var(--ks-ink-2)'}}>
+                  {r.rate.toFixed(1)}%
+                </td>
+                <td className="num" style={{color: 'var(--ks-muted)'}}>
+                  {(r.rate * 1.1).toFixed(2)}%
+                </td>
+                <td
+                  className="num font-semibold"
+                  style={{color: 'var(--ks-emerald)'}}
+                >
+                  {(r.rate * 1.2).toFixed(2)}%
+                </td>
+                <td className="num" style={{color: 'var(--ks-muted)'}}>
+                  {(r.rate * 1.3).toFixed(2)}%
+                </td>
               </tr>
             ))}
           </tbody>
@@ -283,90 +456,148 @@ function CommissionTable() {
   );
 }
 
+/* ── Tiers ─────────────────────────────────────────────────────── */
+
 function Tiers() {
   return (
     <section className="mx-auto max-w-[1400px] px-4 py-12 md:px-6 md:py-16">
       <header className="mb-8 max-w-2xl">
-        <span className="eyebrow">Tiers</span>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
-          Move up by closing deals. Unlock more on every step.
+        <span className="apple-eyebrow">Tiers</span>
+        <h2
+          className="mt-3 text-2xl font-semibold tracking-tight md:text-[32px]"
+          style={{color: 'var(--ks-ink)'}}
+        >
+          Move up by closing. Unlock more on every step.
         </h2>
       </header>
 
       <ul className="grid gap-3 lg:grid-cols-4">
-        {tiers.map((t, i) => (
-          <li
-            key={t.slug}
-            className={cn(
-              'card relative overflow-hidden p-6',
-              i === 2 && 'ring-2 ring-partner-accent',
-            )}
-          >
-            {i === 2 && (
-              <span className="absolute right-4 top-4 rounded-full bg-partner-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                Sweet spot
-              </span>
-            )}
-            <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-gray-500">
-              Tier
-            </div>
-            <div className="mt-1 text-2xl font-semibold text-ink">{t.name}</div>
-            <div className="tabular mt-1 text-sm text-gray-600">
-              {t.threshold === null
-                ? t.thresholdLabel
-                : t.threshold === 0
-                ? 'Approved partner'
-                : `From ${formatINRCompact(t.threshold)} closed sales`}
-            </div>
-            <div className="mt-3 inline-flex items-center rounded-full bg-partner-accent/10 px-2.5 py-0.5 text-[11px] font-bold text-partner-accent">
-              {t.commissionMultiplier.toFixed(2)}× multiplier
-            </div>
-            <ul className="mt-5 space-y-2 text-[13px] text-gray-700">
-              {t.perks.map((perk) => (
-                <li key={perk} className="flex items-start gap-2">
-                  <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-partner-accent" />
-                  {perk}
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
+        {tiers.map((t, i) => {
+          const highlighted = i === 2;
+          return (
+            <li
+              key={t.slug}
+              className="premium-card relative p-6"
+              style={
+                highlighted
+                  ? {
+                      boxShadow: `0 0 0 1px var(--ks-emerald), 0 18px 50px rgba(0,0,0,.07)`,
+                    }
+                  : undefined
+              }
+            >
+              {highlighted && (
+                <span
+                  className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em]"
+                  style={{
+                    background: 'var(--ks-emerald-soft)',
+                    color: 'var(--ks-emerald-dark)',
+                  }}
+                >
+                  Sweet spot
+                </span>
+              )}
+              <div className="apple-eyebrow">Tier</div>
+              <div
+                className="mt-1 text-2xl font-semibold"
+                style={{color: 'var(--ks-ink)'}}
+              >
+                {t.name}
+              </div>
+              <div
+                className="tabular mt-1 text-[13px]"
+                style={{color: 'var(--ks-ink-2)'}}
+              >
+                {t.threshold === null
+                  ? t.thresholdLabel
+                  : t.threshold === 0
+                  ? 'Approved partner'
+                  : `From ${formatINRCompact(t.threshold)} closed sales`}
+              </div>
+              <div
+                className="mt-3 inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold"
+                style={{
+                  background: 'var(--ks-emerald-soft)',
+                  color: 'var(--ks-emerald-dark)',
+                }}
+              >
+                {t.commissionMultiplier.toFixed(2)}× multiplier
+              </div>
+              <ul
+                className="mt-5 space-y-2 text-[13px]"
+                style={{color: 'var(--ks-ink-2)'}}
+              >
+                {t.perks.map((perk) => (
+                  <li key={perk} className="flex items-start gap-2">
+                    <Check
+                      className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                      strokeWidth={2}
+                      style={{color: 'var(--ks-emerald)'}}
+                    />
+                    {perk}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );
 }
 
+/* ── Payout pipeline ───────────────────────────────────────────── */
+
 function Payout() {
+  const stages = [
+    {state: 'Accrued',   body: 'Deal closes → commission booked but not yet payable.'},
+    {state: 'Approved',  body: 'We dispatch the equipment → moves toward payable.'},
+    {state: 'Paid',      body: 'Installation signed off → UPI / bank within a week.'},
+    {state: 'TDS',       body: 'Statutory deduction at source → Form 16A quarterly.'},
+    {state: 'Statement', body: 'Monthly itemised statement for your records.'},
+  ];
+
   return (
     <section className="mx-auto max-w-[1400px] px-4 py-12 md:px-6 md:py-16">
-      <div
-        className="rounded-3xl border border-gray-200 bg-white/85 p-6 backdrop-blur-2xl md:p-10"
-        style={{boxShadow: 'var(--shadow-glass)'}}
-      >
+      <div className="premium-panel p-6 md:p-10">
         <header className="mb-8 max-w-2xl">
-          <span className="eyebrow">Payout</span>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+          <span className="apple-eyebrow">Payout</span>
+          <h2
+            className="mt-3 text-2xl font-semibold tracking-tight md:text-[32px]"
+            style={{color: 'var(--ks-ink)'}}
+          >
             Where the money sits at every stage.
           </h2>
         </header>
 
         <ol className="grid gap-3 md:grid-cols-5">
-          {[
-            {state: 'Accrued',    body: 'When your deal closes — commission booked but not yet payable.', accent: 'bg-amber-100 text-amber-700'},
-            {state: 'Approved',   body: 'When we dispatch the equipment — commission moves toward payable.', accent: 'bg-emerald-100 text-emerald-700'},
-            {state: 'Paid',       body: 'When installation is signed off — UPI / bank payout within a week.', accent: 'bg-green-100 text-green-700'},
-            {state: 'TDS',        body: 'Statutory deduction (typically 10%) — Form 16A every quarter.', accent: 'bg-indigo-100 text-indigo-700'},
-            {state: 'Statement',  body: 'Monthly statement with every line-item breakdown for your records.', accent: 'bg-slate-100 text-slate-700'},
-          ].map((s, i) => (
-            <li key={s.state} className="relative">
-              <div className="card p-4">
-                <div className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider', s.accent)}>
-                  {i + 1}. {s.state}
-                </div>
-                <p className="mt-2 text-[13px] leading-relaxed text-gray-700">
-                  {s.body}
-                </p>
+          {stages.map((s, i) => (
+            <li
+              key={s.state}
+              className="rounded-[var(--ks-radius-md)] p-4"
+              style={{
+                background: 'var(--ks-card-solid)',
+                border: '1px solid var(--ks-line-soft)',
+              }}
+            >
+              <div
+                className="tabular text-[11px] font-semibold uppercase tracking-[0.10em]"
+                style={{color: 'var(--ks-muted)'}}
+              >
+                Stage {i + 1}
               </div>
+              <div
+                className="mt-2 text-[14px] font-semibold"
+                style={{color: 'var(--ks-ink)'}}
+              >
+                {s.state}
+              </div>
+              <p
+                className="mt-1.5 text-[12px] leading-relaxed"
+                style={{color: 'var(--ks-ink-2)'}}
+              >
+                {s.body}
+              </p>
             </li>
           ))}
         </ol>
@@ -375,36 +606,60 @@ function Payout() {
   );
 }
 
+/* ── FAQ ───────────────────────────────────────────────────────── */
+
 function FAQ() {
   const [open, setOpen] = useState(0);
   return (
     <section className="mx-auto max-w-[1100px] px-4 py-12 md:px-6 md:py-16">
       <header className="mb-8 max-w-2xl">
-        <span className="eyebrow">FAQ</span>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+        <span className="apple-eyebrow">FAQ</span>
+        <h2
+          className="mt-3 text-2xl font-semibold tracking-tight md:text-[32px]"
+          style={{color: 'var(--ks-ink)'}}
+        >
           The questions partners always ask.
         </h2>
       </header>
 
       <ul className="space-y-2">
         {faqs.map((item, i) => (
-          <li key={item.q} className="card overflow-hidden">
+          <li
+            key={item.q}
+            className="overflow-hidden rounded-[var(--ks-radius-md)]"
+            style={{
+              background: 'var(--ks-card-solid)',
+              border: '1px solid var(--ks-line-soft)',
+            }}
+          >
             <button
               type="button"
               onClick={() => setOpen(open === i ? -1 : i)}
               aria-expanded={open === i}
               className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
             >
-              <span className="text-[15px] font-semibold text-ink">{item.q}</span>
+              <span
+                className="text-[15px] font-semibold"
+                style={{color: 'var(--ks-ink)'}}
+              >
+                {item.q}
+              </span>
               <ChevronDown
                 className={cn(
-                  'h-4 w-4 shrink-0 text-gray-400 transition-transform',
-                  open === i && 'rotate-180 text-brand-primary',
+                  'h-4 w-4 shrink-0 transition-transform',
+                  open === i && 'rotate-180',
                 )}
+                style={{color: open === i ? 'var(--ks-ink)' : 'var(--ks-muted)'}}
               />
             </button>
             {open === i && (
-              <div className="border-t border-gray-100 px-5 pb-5 pt-4 text-[14px] leading-relaxed text-gray-700">
+              <div
+                className="border-t px-5 pb-5 pt-4 text-[14px] leading-relaxed"
+                style={{
+                  borderColor: 'var(--ks-line-soft)',
+                  color: 'var(--ks-ink-2)',
+                }}
+              >
                 {item.a}
               </div>
             )}
@@ -415,22 +670,25 @@ function FAQ() {
   );
 }
 
+/* ── Final CTA ─────────────────────────────────────────────────── */
+
 function FinalCTA() {
   return (
     <section className="mx-auto max-w-[1400px] px-4 py-12 md:px-6 md:py-16">
-      <div
-        className="relative overflow-hidden rounded-3xl px-6 py-12 text-white md:px-14 md:py-16 mesh-emerald"
-        style={{boxShadow: '0 30px 80px -30px rgba(5,46,30,0.55)'}}
-      >
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-20 right-1/3 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
-        </div>
-        <div className="relative grid gap-6 md:grid-cols-12 md:items-center">
+      <div className="apple-hero relative overflow-hidden px-6 py-12 md:px-14 md:py-16">
+        <div className="grid gap-6 md:grid-cols-12 md:items-center">
           <div className="md:col-span-8">
-            <h3 className="text-2xl font-semibold leading-tight md:text-4xl">
-              Ready to make the next kitchen you spec pay you back?
+            <h3
+              className="text-2xl font-semibold leading-tight tracking-tight md:text-[36px]"
+              style={{color: 'var(--ks-ink)'}}
+            >
+              Ready to make the next kitchen you spec{' '}
+              <span style={{color: 'var(--ks-emerald)'}}>pay you back</span>?
             </h3>
-            <p className="mt-3 max-w-xl text-white/85">
+            <p
+              className="mt-3 max-w-xl text-[15px] leading-relaxed"
+              style={{color: 'var(--ks-ink-2)'}}
+            >
               Nine steps. Three working days to a decision. No joining fee.
               Apply now and join 850+ Keystonne partners across India.
             </p>
@@ -439,9 +697,10 @@ function FinalCTA() {
             <Link
               to="/partner/apply"
               prefetch="intent"
-              className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-partner-accent shadow-lg transition-transform hover:-translate-y-0.5"
+              className="partner-action"
             >
-              Apply to join <ArrowUpRight className="h-4 w-4" />
+              Apply to join
+              <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

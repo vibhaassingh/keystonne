@@ -1,23 +1,26 @@
 import {useState} from 'react';
 import {Link} from 'react-router';
 import {useForm} from 'react-hook-form';
-import {
-  Check, ChevronLeft, ChevronRight, ArrowRight,
-} from 'lucide-react';
+import {Check, ChevronLeft, ChevronRight, ArrowRight} from 'lucide-react';
 import {personas, applySteps} from '~/lib/mock/partnerProgram';
 import {cn} from '~/lib/utils/cn';
 
 /**
- * Partner application — single React Hook Form instance with nine logical
- * steps. We validate per-step via `trigger()` so the user can't advance
- * with missing required fields. Final step (Review) is read-only; submit
- * writes the payload to the console + reaches a success screen with a
- * reference number — no real backend in Phase 1 (CLAUDE.md §2).
+ * Apple-style 9-step partner application.
+ *
+ *   Desktop:   left progress rail   |   centered step card
+ *   Mobile:    top progress dots
+ *
+ * Submit writes the payload to the console + lands a success screen
+ * with a generated reference. No real backend (CLAUDE.md §2).
  */
 
 export const meta = () => [
   {title: 'Apply to join the Keystonne Partner Programme'},
-  {name: 'description', content: '9-step application — KYC, persona, references, payout. Decision within 3 working days.'},
+  {
+    name: 'description',
+    content: '9-step application — KYC, persona, references, payout. Decision within 3 working days.',
+  },
 ];
 
 const FIELDS_PER_STEP = {
@@ -41,33 +44,14 @@ export default function PartnerApply() {
     mode: 'onTouched',
     defaultValues: {
       persona: '',
-      name: '',
-      email: '',
-      mobile: '',
-      city: '',
-      businessKind: 'self',
-      businessName: '',
-      yearsExperience: '',
-      pan: '',
-      gstin: '',
-      address: '',
-      payoutMethod: 'upi',
-      payoutId: '',
-      ifsc: '',
-      accountName: '',
-      p1Name: '',
-      p1Client: '',
-      p1Value: '',
-      p2Name: '',
-      p2Client: '',
-      p2Value: '',
-      source: '',
-      refName: '',
-      refRole: '',
-      refContact: '',
-      agreeProgramme: false,
-      agreeConduct: false,
-      agreeTDS: false,
+      name: '', email: '', mobile: '', city: '',
+      businessKind: 'self', businessName: '', yearsExperience: '',
+      pan: '', gstin: '', address: '',
+      payoutMethod: 'upi', payoutId: '', ifsc: '', accountName: '',
+      p1Name: '', p1Client: '', p1Value: '',
+      p2Name: '', p2Client: '', p2Value: '',
+      source: '', refName: '', refRole: '', refContact: '',
+      agreeProgramme: false, agreeConduct: false, agreeTDS: false,
     },
   });
   const {handleSubmit, trigger, watch, register, formState: {errors}, getValues} = form;
@@ -92,90 +76,128 @@ export default function PartnerApply() {
   if (submitted) return <SuccessScreen refId={refId} />;
 
   return (
-    <section className="mx-auto max-w-[1100px] px-4 py-10 md:px-6 md:py-12">
-      <header className="mb-8 max-w-2xl">
-        <span className="eyebrow">Become a Keystonne partner</span>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink md:text-4xl">
-          Apply in 9 steps. Decision in 3 days.
+    <section className="mx-auto max-w-[1200px] px-4 py-12 md:px-6 md:py-16">
+      <header className="mb-10 max-w-2xl">
+        <span className="apple-eyebrow">Become a Keystonne partner</span>
+        <h1
+          className="mt-3 text-[32px] font-semibold tracking-tight md:text-[40px]"
+          style={{color: 'var(--ks-ink)'}}
+        >
+          Apply in 9 steps.{' '}
+          <span style={{color: 'var(--ks-muted)'}}>
+            Decision in 3 days.
+          </span>
         </h1>
-        <p className="mt-2 text-sm text-gray-600 md:text-base">
-          Everything below is reviewed by our partner-ops team. Take 10
-          minutes; we&apos;ll lock in your status quickly.
+        <p
+          className="mt-3 text-[15px] leading-relaxed"
+          style={{color: 'var(--ks-ink-2)'}}
+        >
+          Everything below is reviewed by partner-ops. Ten minutes.
         </p>
       </header>
 
-      <Stepper current={step} onJump={(n) => n < step && setStep(n)} />
+      {/* Mobile top stepper */}
+      <div className="mb-6 md:hidden">
+        <MobileStepper current={step} />
+      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
-        <div className="card p-6 md:p-8">
-          <div className="mb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-brand-primary">
-            Step {step} of 9
+      <div className="grid gap-8 md:grid-cols-12">
+        {/* Left progress rail (desktop) */}
+        <aside className="hidden md:col-span-3 md:block">
+          <div className="sticky top-2">
+            <DesktopStepper
+              current={step}
+              onJump={(n) => n < step && setStep(n)}
+            />
           </div>
-          <h2 className="text-xl font-semibold text-ink md:text-2xl">
-            {applySteps[step - 1].label}
-          </h2>
-          <p className="mt-1 text-sm text-gray-600">
-            {applySteps[step - 1].hint}
-          </p>
+        </aside>
 
-          <div className="mt-6 grid gap-4">
-            {step === 1 && <PersonaStep register={register} errors={errors} watch={watch} />}
-            {step === 2 && <PersonalStep register={register} errors={errors} />}
-            {step === 3 && <BusinessStep register={register} errors={errors} watch={watch} />}
-            {step === 4 && <TaxStep register={register} errors={errors} />}
-            {step === 5 && <PayoutStep register={register} errors={errors} watch={watch} />}
-            {step === 6 && <PortfolioStep register={register} errors={errors} />}
-            {step === 7 && <ReferenceStep register={register} errors={errors} />}
-            {step === 8 && <AgreementsStep register={register} errors={errors} />}
-            {step === 9 && <ReviewStep values={getValues()} />}
+        {/* Centered step card */}
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="md:col-span-9"
+        >
+          <div className="premium-panel p-6 md:p-10">
+            <div className="flex items-baseline justify-between">
+              <span className="apple-eyebrow">
+                Step {step} of 9
+              </span>
+              <span
+                className="text-[11px]"
+                style={{color: 'var(--ks-muted)'}}
+              >
+                {applySteps[step - 1].label}
+              </span>
+            </div>
+            <h2
+              className="mt-3 text-xl font-semibold tracking-tight md:text-[24px]"
+              style={{color: 'var(--ks-ink)'}}
+            >
+              {applySteps[step - 1].hint}
+            </h2>
+
+            <div className="mt-6 grid gap-5">
+              {step === 1 && <PersonaStep register={register} errors={errors} watch={watch} />}
+              {step === 2 && <PersonalStep register={register} errors={errors} />}
+              {step === 3 && <BusinessStep register={register} errors={errors} watch={watch} />}
+              {step === 4 && <TaxStep register={register} errors={errors} />}
+              {step === 5 && <PayoutStep register={register} errors={errors} watch={watch} />}
+              {step === 6 && <PortfolioStep register={register} errors={errors} />}
+              {step === 7 && <ReferenceStep register={register} errors={errors} />}
+              {step === 8 && <AgreementsStep register={register} errors={errors} />}
+              {step === 9 && <ReviewStep values={getValues()} />}
+            </div>
           </div>
-        </div>
 
-        <div className="mt-6 flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <button
-            type="button"
-            onClick={back}
-            disabled={step === 1}
-            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-ink shadow-sm hover:border-ink/40 disabled:opacity-40"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Back
-          </button>
-
-          {step < 9 ? (
+          <div className="mt-6 flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
             <button
               type="button"
-              onClick={next}
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl btn-primary px-5 py-2.5 text-sm font-semibold"
+              onClick={back}
+              disabled={step === 1}
+              className="apple-button-ghost justify-center disabled:opacity-40"
             >
-              Continue
-              <ChevronRight className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" />
+              Back
             </button>
-          ) : (
-            <button
-              type="submit"
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl btn-accent px-5 py-2.5 text-sm font-semibold"
-            >
-              Submit application
-              <ArrowRight className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-      </form>
 
-      <p className="mt-6 text-center text-[11px] text-gray-500">
-        Demo mode — submissions are captured to the browser console. Real
-        Supabase integration ships in Phase 2.
+            {step < 9 ? (
+              <button
+                type="button"
+                onClick={next}
+                className="apple-button-primary justify-center"
+              >
+                Continue
+                <ChevronRight className="h-4 w-4 opacity-70" />
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="partner-action justify-center"
+              >
+                Submit application
+                <ArrowRight className="h-4 w-4 opacity-80" />
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+
+      <p
+        className="mt-8 text-center text-[11px]"
+        style={{color: 'var(--ks-muted)'}}
+      >
+        Demo mode — submissions are captured to the browser console.
+        Real Supabase integration ships in Phase 2.
       </p>
     </section>
   );
 }
 
-/* ───────────────────────────  Stepper  ─────────────────────────── */
+/* ── Steppers ─────────────────────────────────────────────────── */
 
-function Stepper({current, onJump}) {
+function DesktopStepper({current, onJump}) {
   return (
-    <ol className="grid grid-cols-3 gap-2 sm:grid-cols-9">
+    <ol className="space-y-0.5">
       {applySteps.map((s) => {
         const state =
           s.n < current ? 'done' : s.n === current ? 'now' : 'upcoming';
@@ -185,27 +207,47 @@ function Stepper({current, onJump}) {
               type="button"
               onClick={() => onJump?.(s.n)}
               disabled={state === 'upcoming'}
-              className={cn(
-                'group flex w-full items-start gap-2 rounded-xl border bg-white/70 p-3 text-left transition-colors backdrop-blur',
-                state === 'now'
-                  ? 'border-brand-primary shadow-[0_8px_24px_-12px_rgba(67,56,202,0.35)]'
-                  : state === 'done'
-                  ? 'border-emerald-300 hover:border-emerald-500'
-                  : 'border-gray-200 opacity-60',
-              )}
+              className="flex w-full items-start gap-3 rounded-md px-3 py-2 text-left transition-colors"
+              style={{
+                background: state === 'now' ? '#f0f0f3' : 'transparent',
+                cursor: state === 'upcoming' ? 'default' : 'pointer',
+              }}
             >
               <div
-                className={cn(
-                  'tabular grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-bold',
-                  state === 'done' && 'bg-emerald-600 text-white',
-                  state === 'now' && 'bg-brand-primary text-white',
-                  state === 'upcoming' && 'bg-gray-100 text-gray-500',
-                )}
+                className="tabular grid h-5 w-5 shrink-0 place-items-center rounded-full text-[10px] font-semibold"
+                style={{
+                  background:
+                    state === 'done' ? 'var(--ks-emerald)'
+                    : state === 'now' ? 'var(--ks-ink)'
+                    : 'transparent',
+                  color:
+                    state === 'upcoming' ? 'var(--ks-muted)' : '#ffffff',
+                  border:
+                    state === 'upcoming'
+                      ? '1px solid var(--ks-line)'
+                      : 'none',
+                }}
               >
-                {state === 'done' ? <Check className="h-3.5 w-3.5" /> : s.n}
+                {state === 'done' ? <Check className="h-3 w-3" strokeWidth={2.5} /> : s.n}
               </div>
-              <div className="hidden text-[11px] font-semibold uppercase tracking-wider text-gray-600 sm:block">
-                {s.label}
+              <div className="min-w-0">
+                <div
+                  className="text-[12px] font-semibold uppercase tracking-[0.08em]"
+                  style={{
+                    color:
+                      state === 'now' ? 'var(--ks-ink)'
+                      : state === 'done' ? 'var(--ks-ink-2)'
+                      : 'var(--ks-muted)',
+                  }}
+                >
+                  {s.label}
+                </div>
+                <div
+                  className="text-[11px] leading-snug"
+                  style={{color: 'var(--ks-muted)'}}
+                >
+                  {s.hint}
+                </div>
               </div>
             </button>
           </li>
@@ -215,23 +257,50 @@ function Stepper({current, onJump}) {
   );
 }
 
-/* ───────────────────────────  Steps  ────────────────────────────── */
+function MobileStepper({current}) {
+  return (
+    <div className="flex items-center gap-2">
+      {applySteps.map((s) => {
+        const state =
+          s.n < current ? 'done' : s.n === current ? 'now' : 'upcoming';
+        return (
+          <div
+            key={s.n}
+            className="h-1.5 flex-1 rounded-full"
+            style={{
+              background:
+                state === 'done' ? 'var(--ks-emerald)'
+                : state === 'now' ? 'var(--ks-ink)'
+                : 'var(--ks-line-soft)',
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── Steps ─────────────────────────────────────────────────────── */
 
 function PersonaStep({register, errors, watch}) {
   const selected = watch('persona');
   return (
     <>
-      <ul className="grid gap-3 sm:grid-cols-2">
+      <ul className="grid gap-2.5 sm:grid-cols-2">
         {personas.map((p) => {
           const Icon = p.icon;
           const isSelected = selected === p.slug;
           return (
             <li key={p.slug}>
               <label
-                className={cn(
-                  'card card-hover flex cursor-pointer items-start gap-3 p-4 transition-all',
-                  isSelected && 'ring-2 ring-brand-primary',
-                )}
+                className="flex cursor-pointer items-start gap-3 rounded-[var(--ks-radius-md)] p-4 transition-all"
+                style={{
+                  background: 'var(--ks-card-solid)',
+                  border: '1px solid ' + (isSelected ? 'var(--ks-ink)' : 'var(--ks-line-soft)'),
+                  boxShadow: isSelected
+                    ? '0 0 0 1px var(--ks-ink)'
+                    : 'none',
+                }}
               >
                 <input
                   type="radio"
@@ -240,14 +309,26 @@ function PersonaStep({register, errors, watch}) {
                   className="sr-only"
                 />
                 <div
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white"
-                  style={{background: 'linear-gradient(135deg, var(--color-partner-accent), #047857)'}}
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-lg"
+                  style={{background: '#f0f0f3'}}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon
+                    className="h-4 w-4"
+                    strokeWidth={1.6}
+                    style={{color: 'var(--ks-ink)'}}
+                  />
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-semibold text-ink">{p.name}</div>
-                  <div className="mt-0.5 text-[12px] leading-snug text-gray-600">
+                  <div
+                    className="text-[14px] font-semibold"
+                    style={{color: 'var(--ks-ink)'}}
+                  >
+                    {p.name}
+                  </div>
+                  <div
+                    className="mt-0.5 text-[12px] leading-snug"
+                    style={{color: 'var(--ks-ink-2)'}}
+                  >
                     {p.blurb}
                   </div>
                 </div>
@@ -300,23 +381,29 @@ function BusinessStep({register, errors, watch}) {
           {[
             {value: 'self', label: 'Self-employed / consultant'},
             {value: 'firm', label: 'Firm / agency'},
-          ].map((o) => (
-            <label
-              key={o.value}
-              className={cn(
-                'flex cursor-pointer items-center gap-2 rounded-xl border bg-white px-3 py-2.5 text-sm transition-colors',
-                kind === o.value ? 'border-brand-primary ring-2 ring-brand-primary/20' : 'border-gray-300 hover:border-ink/40',
-              )}
-            >
-              <input
-                type="radio"
-                value={o.value}
-                {...register('businessKind')}
-                className="sr-only"
-              />
-              <span className="font-medium text-ink">{o.label}</span>
-            </label>
-          ))}
+          ].map((o) => {
+            const sel = kind === o.value;
+            return (
+              <label
+                key={o.value}
+                className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2.5 text-sm transition-colors"
+                style={{
+                  background: 'var(--ks-card-solid)',
+                  border: '1px solid ' + (sel ? 'var(--ks-ink)' : 'var(--ks-line)'),
+                  color: 'var(--ks-ink)',
+                  boxShadow: sel ? '0 0 0 1px var(--ks-ink)' : 'none',
+                }}
+              >
+                <input
+                  type="radio"
+                  value={o.value}
+                  {...register('businessKind')}
+                  className="sr-only"
+                />
+                <span className="font-medium">{o.label}</span>
+              </label>
+            );
+          })}
         </div>
       </Field>
       <div className="grid gap-4 md:grid-cols-2">
@@ -334,7 +421,10 @@ function BusinessStep({register, errors, watch}) {
             type="number"
             min={0}
             max={60}
-            {...register('yearsExperience', {required: 'Best estimate is fine', min: {value: 0, message: 'Must be ≥ 0'}})}
+            {...register('yearsExperience', {
+              required: 'Best estimate is fine',
+              min: {value: 0, message: 'Must be ≥ 0'},
+            })}
             placeholder="8"
           />
         </Field>
@@ -351,7 +441,10 @@ function TaxStep({register, errors}) {
           <Input
             {...register('pan', {
               required: 'PAN is required for TDS compliance',
-              pattern: {value: /^[A-Z]{5}[0-9]{4}[A-Z]$/, message: 'Should look like ABCDE1234F'},
+              pattern: {
+                value: /^[A-Z]{5}[0-9]{4}[A-Z]$/,
+                message: 'Should look like ABCDE1234F',
+              },
             })}
             placeholder="ABCDE1234F"
             style={{textTransform: 'uppercase'}}
@@ -390,23 +483,29 @@ function PayoutStep({register, errors, watch}) {
           {[
             {value: 'upi', label: 'UPI'},
             {value: 'bank', label: 'Bank transfer (NEFT)'},
-          ].map((o) => (
-            <label
-              key={o.value}
-              className={cn(
-                'flex cursor-pointer items-center gap-2 rounded-xl border bg-white px-3 py-2.5 text-sm transition-colors',
-                method === o.value ? 'border-brand-primary ring-2 ring-brand-primary/20' : 'border-gray-300 hover:border-ink/40',
-              )}
-            >
-              <input
-                type="radio"
-                value={o.value}
-                {...register('payoutMethod')}
-                className="sr-only"
-              />
-              <span className="font-medium text-ink">{o.label}</span>
-            </label>
-          ))}
+          ].map((o) => {
+            const sel = method === o.value;
+            return (
+              <label
+                key={o.value}
+                className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2.5 text-sm transition-colors"
+                style={{
+                  background: 'var(--ks-card-solid)',
+                  border: '1px solid ' + (sel ? 'var(--ks-ink)' : 'var(--ks-line)'),
+                  color: 'var(--ks-ink)',
+                  boxShadow: sel ? '0 0 0 1px var(--ks-ink)' : 'none',
+                }}
+              >
+                <input
+                  type="radio"
+                  value={o.value}
+                  {...register('payoutMethod')}
+                  className="sr-only"
+                />
+                <span className="font-medium">{o.label}</span>
+              </label>
+            );
+          })}
         </div>
       </Field>
 
@@ -441,7 +540,10 @@ function PortfolioStep({register, errors}) {
   return (
     <div className="grid gap-6">
       <PortfolioProject n={1} register={register} errors={errors} />
-      <div className="text-[11px] uppercase tracking-wider text-gray-400">
+      <div
+        className="text-[11px] uppercase tracking-[0.08em]"
+        style={{color: 'var(--ks-muted)'}}
+      >
         Project 2 (optional but recommended)
       </div>
       <PortfolioProject n={2} register={register} errors={errors} optional />
@@ -484,7 +586,8 @@ function ReferenceStep({register, errors}) {
       <Field label="How did you hear about Keystonne?" error={errors.source?.message}>
         <select
           {...register('source', {required: 'Pick one'})}
-          className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
+          className={inputCls}
+          style={inputStyle}
         >
           <option value="">Select…</option>
           <option value="referral">Existing Keystonne partner</option>
@@ -514,25 +617,34 @@ function ReferenceStep({register, errors}) {
 function AgreementsStep({register, errors}) {
   return (
     <div className="space-y-3">
-      <Check2 label="I accept the Keystonne commission programme terms (published rates × tier multipliers)." error={errors.agreeProgramme?.message}>
+      <Check2
+        label="I accept the Keystonne commission programme terms (published rates × tier multipliers)."
+        error={errors.agreeProgramme?.message}
+      >
         <input
           type="checkbox"
           {...register('agreeProgramme', {required: 'Required to participate'})}
-          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+          className="mt-0.5 h-4 w-4 rounded"
+          style={{accentColor: 'var(--ks-ink)'}}
         />
       </Check2>
-      <Check2 label="I will recommend Keystonne only where it's the right fit for my client and disclose my partner status in the spec sheet." error={errors.agreeConduct?.message}>
+      <Check2
+        label="I will recommend Keystonne only where it's the right fit for my client and disclose my partner status in the spec sheet."
+        error={errors.agreeConduct?.message}
+      >
         <input
           type="checkbox"
           {...register('agreeConduct', {required: 'Required — this is the ethics floor'})}
-          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+          className="mt-0.5 h-4 w-4 rounded"
+          style={{accentColor: 'var(--ks-ink)'}}
         />
       </Check2>
       <Check2 label="I understand TDS (typically 10%) will be deducted at source and Form 16A issued quarterly.">
         <input
           type="checkbox"
           {...register('agreeTDS')}
-          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+          className="mt-0.5 h-4 w-4 rounded"
+          style={{accentColor: 'var(--ks-ink)'}}
         />
       </Check2>
     </div>
@@ -541,9 +653,18 @@ function AgreementsStep({register, errors}) {
 
 function Check2({label, error, children}) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 bg-white p-4 hover:border-ink/40">
+    <label
+      className="flex cursor-pointer items-start gap-3 rounded-[var(--ks-radius-md)] p-4"
+      style={{
+        background: 'var(--ks-card-solid)',
+        border: '1px solid var(--ks-line-soft)',
+      }}
+    >
       {children}
-      <span className="flex-1 text-sm text-ink">
+      <span
+        className="flex-1 text-[13px]"
+        style={{color: 'var(--ks-ink)'}}
+      >
         {label}
         {error && <ErrorText className="mt-1">{error}</ErrorText>}
       </span>
@@ -567,20 +688,41 @@ function ReviewStep({values}) {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-gray-600">
+      <p
+        className="text-sm"
+        style={{color: 'var(--ks-ink-2)'}}
+      >
         Confirm everything looks right. Submitting opens a review with our
         partner-ops team; we&apos;ll be in touch within 3 working days.
       </p>
       {blocks.map(([title, fields]) => (
-        <div key={title} className="rounded-xl border border-gray-200 bg-white/80 p-4 backdrop-blur">
-          <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-gray-500">
+        <div
+          key={title}
+          className="rounded-[var(--ks-radius-md)] p-4"
+          style={{
+            background: 'var(--ks-card-solid)',
+            border: '1px solid var(--ks-line-soft)',
+          }}
+        >
+          <div
+            className="text-[11px] font-semibold uppercase tracking-[0.10em]"
+            style={{color: 'var(--ks-muted)'}}
+          >
             {title}
           </div>
-          <dl className="mt-2 grid grid-cols-1 gap-1 text-sm md:grid-cols-2">
+          <dl className="mt-2 grid grid-cols-1 gap-1 text-[13px] md:grid-cols-2">
             {Object.entries(fields).map(([k, v]) => (
-              <div key={k} className="flex items-baseline justify-between gap-3 py-0.5">
-                <dt className="text-gray-500">{k}</dt>
-                <dd className="tabular text-right font-medium text-ink">{v}</dd>
+              <div
+                key={k}
+                className="flex items-baseline justify-between gap-3 py-0.5"
+              >
+                <dt style={{color: 'var(--ks-muted)'}}>{k}</dt>
+                <dd
+                  className="tabular text-right font-medium"
+                  style={{color: 'var(--ks-ink)'}}
+                >
+                  {v}
+                </dd>
               </div>
             ))}
           </dl>
@@ -590,66 +732,114 @@ function ReviewStep({values}) {
   );
 }
 
-/* ───────────────────────────  Atoms  ────────────────────────────── */
+/* ── Atoms ─────────────────────────────────────────────────────── */
+
+const inputCls = 'w-full rounded-md px-3 py-2 text-sm focus:outline-none';
+const inputStyle = {
+  background: '#fafafa',
+  border: '1px solid var(--ks-line)',
+  color: 'var(--ks-ink)',
+};
 
 function Field({label, error, children}) {
   return (
     <label className="block">
-      <div className="mb-1.5 text-[12px] font-semibold text-gray-700">{label}</div>
+      <div
+        className="mb-1.5 text-[12px] font-medium"
+        style={{color: 'var(--ks-ink-2)'}}
+      >
+        {label}
+      </div>
       {children}
       {error && <ErrorText className="mt-1">{error}</ErrorText>}
     </label>
   );
 }
 
-const inputBase =
-  'w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-gray-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20';
-
 function Input(props) {
-  return <input {...props} className={cn(inputBase, props.className)} />;
-}
-function Textarea(props) {
-  return <textarea {...props} className={cn(inputBase, 'resize-none', props.className)} />;
-}
-function ErrorText({children, className}) {
-  return <span className={cn('block text-[11px] text-red-600', className)}>{children}</span>;
+  return (
+    <input
+      {...props}
+      className={cn(inputCls, props.className)}
+      style={{...inputStyle, ...(props.style || {})}}
+    />
+  );
 }
 
-/* ───────────────────────────  Success  ──────────────────────────── */
+function Textarea(props) {
+  return (
+    <textarea
+      {...props}
+      className={cn(inputCls, 'resize-none', props.className)}
+      style={{...inputStyle, ...(props.style || {})}}
+    />
+  );
+}
+
+function ErrorText({children, className}) {
+  return (
+    <span
+      className={cn('block text-[11px]', className)}
+      style={{color: '#c2410c'}}
+    >
+      {children}
+    </span>
+  );
+}
+
+/* ── Success ──────────────────────────────────────────────────── */
 
 function SuccessScreen({refId}) {
   return (
-    <section className="mx-auto max-w-xl px-4 py-20 text-center">
-      <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-100 text-emerald-700">
-        <Check className="h-8 w-8" />
+    <section className="mx-auto max-w-xl px-4 py-24 text-center">
+      <div
+        className="mx-auto grid h-14 w-14 place-items-center rounded-full"
+        style={{
+          background: 'var(--ks-emerald-soft)',
+          color: 'var(--ks-emerald-dark)',
+        }}
+      >
+        <Check className="h-7 w-7" strokeWidth={1.6} />
       </div>
-      <h1 className="mt-5 text-3xl font-semibold tracking-tight text-ink">
+      <h1
+        className="mt-5 text-3xl font-semibold tracking-tight"
+        style={{color: 'var(--ks-ink)'}}
+      >
         Application received.
       </h1>
-      <p className="mt-3 text-sm text-gray-600 md:text-base">
-        Our partner-ops team reviews every application personally. Expect a
-        decision within 3 working days — we&apos;ll reach out on the mobile
-        and email you provided.
+      <p
+        className="mt-3 text-sm"
+        style={{color: 'var(--ks-ink-2)'}}
+      >
+        Partner-ops reviews every application personally. Expect a decision
+        within 3 working days — we&apos;ll reach out on the mobile and email
+        you provided.
       </p>
-      <div className="mt-6 inline-flex flex-col items-center rounded-xl border border-gray-200 bg-white px-5 py-3">
-        <span className="text-[11px] uppercase tracking-wider text-gray-500">
+      <div
+        className="mt-6 inline-flex flex-col items-center rounded-[var(--ks-radius-md)] px-5 py-3"
+        style={{
+          background: 'var(--ks-card-solid)',
+          border: '1px solid var(--ks-line-soft)',
+        }}
+      >
+        <span
+          className="text-[11px] uppercase tracking-[0.10em]"
+          style={{color: 'var(--ks-muted)'}}
+        >
           Reference
         </span>
-        <span className="tabular mt-0.5 text-lg font-semibold text-ink">
+        <span
+          className="tabular mt-0.5 text-lg font-semibold"
+          style={{color: 'var(--ks-ink)'}}
+        >
           {refId}
         </span>
       </div>
       <div className="mt-8 flex justify-center gap-3">
-        <Link
-          to="/partner"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-ink hover:border-ink/40"
-        >
+        <Link to="/partner" className="apple-button-ghost">
           Back to programme overview
         </Link>
-        <Link
-          to="/partner/login"
-          className="inline-flex items-center gap-1.5 rounded-xl btn-primary px-4 py-2.5 text-sm font-semibold"
-        >
+        <Link to="/partner/login" className="apple-button-primary">
           Preview the dashboard
         </Link>
       </div>
