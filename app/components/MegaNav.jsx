@@ -1,37 +1,114 @@
 import {useState, useRef, useEffect} from 'react';
-import {Link, NavLink} from 'react-router';
-import {ChevronDown, Sparkles} from 'lucide-react';
-import {categories} from '~/lib/mock/categories';
-import {cn} from '~/lib/utils/cn';
+import {Link} from 'react-router';
+import {Sparkles, ArrowRight} from 'lucide-react';
+import {categoryBySlug} from '~/lib/mock/categories';
+import {businessTypes} from '~/lib/mock/businessTypes';
 
 /**
- * Bright Apple-inspired category tray, sitting below the sticky header.
+ * Apple-style pillar mega nav.
  *
- * Top row: all 14 catalog categories (slugs + names locked by CLAUDE.md
- * §6 — do not rename). Hovering / focusing a category reveals a
- * .premium-panel flyout with that category's subgroups in 3 columns,
- * each item paired with a one-line procurement hint that doubles as
- * tertiary search text.
+ * The original 14-cat horizontal scroll was too dense for a premium B2B
+ * surface — every cat earned a hover trigger of equal weight. This
+ * grouping mirrors how a chef or procurement manager thinks about the
+ * kitchen (heat / cold / prep / wash / beverage / service) and adds a
+ * "Solutions" pillar for venture-led browsing. The category slugs and
+ * names underneath stay locked per CLAUDE.md §6.
  *
- * Active / hover state: graphite text + subtle underline marker. The
- * previous indigo block has been retired so the row reads more like an
- * Apple Store tray than a coloured navigation strip.
+ * Structure:
+ *   - 6 pillars in the row, each opening a full-width premium-panel
+ *     flyout with an editorial left rail + a 2 or 3-column category
+ *     card grid on the right
+ *   - 7th right-side sidetrack: blue AI Planner link
+ *   - Hover (or keyboard focus) opens the flyout; a short close-timer
+ *     prevents flicker when moving between trigger and panel
+ *   - Mobile (< md) hides the bar entirely — MobileCategoryAside in
+ *     PageLayout owns that surface
  */
+
+/* Pillar map: every category from CLAUDE.md §6 lives in exactly one
+   pillar. Order within a pillar = visual priority in the flyout. */
+const PILLARS = [
+  {
+    key: 'cooking',
+    label: 'Cooking',
+    headline: 'Heat, fire, and tempering.',
+    blurb:
+      'Indian bhattis, Chinese ranges, ovens, fryers — the equipment that turns ingredients into menu items.',
+    cats: ['cooking-ranges', 'indian-cooking', 'ovens', 'deep-fryers'],
+  },
+  {
+    key: 'cold',
+    label: 'Refrigeration & Storage',
+    headline: 'Cold chain and dry stores.',
+    blurb:
+      'Pull-down to plating temperature, hold prep at the line, store ingredients pristine for a week of service.',
+    cats: ['refrigeration', 'storage'],
+  },
+  {
+    key: 'prep',
+    label: 'Prep & Wash',
+    headline: 'Where the line is built.',
+    blurb:
+      'Mise-en-place tables, mixers and slicers, three-bowl sinks, dishwashers — the prep and wash backbone of every kitchen.',
+    cats: ['food-prep', 'work-tables', 'sinks-plumbing', 'dishwashing'],
+  },
+  {
+    key: 'beverage',
+    label: 'Beverage & Bar',
+    headline: 'Coffee programme, cocktail bar.',
+    blurb:
+      'Espresso machines, brewers, back-bar coolers, ice — beverage-led venues that need every shot and pour to land.',
+    cats: ['coffee-espresso', 'bar-equipment'],
+  },
+  {
+    key: 'service',
+    label: 'Service & Ventilation',
+    headline: 'Front of house, top of house.',
+    blurb:
+      'Hot and cold display, bain marie, salad bars — plus the hoods, ESPs, and make-up air that keep the kitchen breathable.',
+    cats: ['service-display', 'ventilation-exhaust'],
+  },
+  {
+    key: 'solutions',
+    label: 'Solutions',
+    headline: 'Built for the way your kitchen runs.',
+    blurb:
+      'Venture-specific landing pages with suggested kits and chef notes. Pick the one that matches what you are building.',
+    ventures: true,
+  },
+];
+
 export function MegaNav() {
-  const [openSlug, setOpenSlug] = useState(null);
+  const [openKey, setOpenKey] = useState(null);
   const closeTimer = useRef(null);
 
   function scheduleClose() {
-    closeTimer.current = setTimeout(() => setOpenSlug(null), 140);
+    closeTimer.current = setTimeout(() => setOpenKey(null), 140);
   }
   function cancelClose() {
     if (closeTimer.current) clearTimeout(closeTimer.current);
   }
-  useEffect(() => () => closeTimer.current && clearTimeout(closeTimer.current), []);
+
+  // Close on Escape for keyboard users.
+  useEffect(() => {
+    if (!openKey) return;
+    function onKey(e) {
+      if (e.key === 'Escape') setOpenKey(null);
+    }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [openKey]);
+
+  useEffect(
+    () => () => closeTimer.current && clearTimeout(closeTimer.current),
+    [],
+  );
+
+  const openPillar = openKey ? PILLARS.find((p) => p.key === openKey) : null;
 
   return (
     <nav
-      aria-label="Browse categories"
+      aria-label="Browse the catalog"
       className="relative hidden md:block"
       style={{
         background: 'rgba(255, 255, 255, 0.78)',
@@ -41,45 +118,34 @@ export function MegaNav() {
       }}
       onMouseLeave={scheduleClose}
     >
-      <div className="mx-auto flex max-w-[1400px] items-stretch px-2">
-        <ul className="flex flex-1 items-stretch overflow-x-auto">
-          {categories.map((c) => (
+      <div className="mx-auto flex max-w-[1400px] items-stretch px-4 md:px-6">
+        <ul className="flex items-stretch gap-1">
+          {PILLARS.map((p) => (
             <li
-              key={c.slug}
+              key={p.key}
               onMouseEnter={() => {
                 cancelClose();
-                setOpenSlug(c.slug);
+                setOpenKey(p.key);
               }}
-              onFocus={() => setOpenSlug(c.slug)}
+              onFocus={() => setOpenKey(p.key)}
               className="relative"
             >
-              <NavLink
-                to={`/collections/${c.slug}`}
-                prefetch="intent"
-                className={({isActive}) =>
-                  cn(
-                    'flex items-center gap-1 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition-colors',
-                    isActive && 'font-semibold',
-                  )
+              <button
+                type="button"
+                aria-expanded={openKey === p.key}
+                aria-controls={`mega-panel-${p.key}`}
+                onClick={() =>
+                  setOpenKey((k) => (k === p.key ? null : p.key))
                 }
-                style={({isActive}) => ({
-                  color: isActive || openSlug === c.slug
-                    ? 'var(--ks-ink)'
-                    : 'var(--ks-ink-2)',
-                })}
+                className="flex h-12 items-center px-3 text-[13px] font-medium transition-colors"
+                style={{
+                  color:
+                    openKey === p.key ? 'var(--ks-ink)' : 'var(--ks-ink-2)',
+                }}
               >
-                {c.name}
-                {c.subgroups?.length ? (
-                  <ChevronDown
-                    className={cn(
-                      'h-3 w-3 transition-transform',
-                      openSlug === c.slug && 'rotate-180',
-                    )}
-                    style={{opacity: 0.45}}
-                  />
-                ) : null}
-              </NavLink>
-              {openSlug === c.slug && (
+                {p.label}
+              </button>
+              {openKey === p.key && (
                 <span
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-x-3 -bottom-px h-0.5 rounded-full"
@@ -90,41 +156,40 @@ export function MegaNav() {
           ))}
         </ul>
 
-        {/* New-venture sidetrack — blue ink (system / AI guidance link). */}
         <Link
-          to="/business-type/new-venture"
+          to="/kitchen-planner"
           prefetch="intent"
-          className="ml-auto flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium transition-colors"
+          className="ml-auto flex items-center gap-1.5 px-3 text-[13px] font-medium transition-colors"
           style={{
             color: 'var(--ks-blue)',
             borderLeft: '1px solid var(--ks-line-soft)',
           }}
         >
           <Sparkles className="h-3.5 w-3.5" />
-          New venture? Start here
+          AI Planner
         </Link>
       </div>
 
-      {openSlug && (
+      {openPillar && (
         <MegaFlyout
-          slug={openSlug}
+          pillar={openPillar}
           onMouseEnter={cancelClose}
           onMouseLeave={scheduleClose}
+          onClose={() => setOpenKey(null)}
         />
       )}
     </nav>
   );
 }
 
-function MegaFlyout({slug, onMouseEnter, onMouseLeave}) {
-  const cat = categories.find((c) => c.slug === slug);
-  if (!cat) return null;
-  const Icon = cat.icon;
+/* ───────────────  Flyout  ─────────────── */
 
+function MegaFlyout({pillar, onMouseEnter, onMouseLeave, onClose}) {
   return (
     <div
+      id={`mega-panel-${pillar.key}`}
       role="region"
-      aria-label={`${cat.name} subcategories`}
+      aria-label={`${pillar.label} menu`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className="absolute left-0 right-0 top-full z-30"
@@ -135,74 +200,203 @@ function MegaFlyout({slug, onMouseEnter, onMouseLeave}) {
         boxShadow: '0 24px 60px -20px rgba(0,0,0,0.10)',
       }}
     >
-      <div className="mx-auto grid max-w-[1400px] grid-cols-12 gap-6 px-6 py-8">
-        {/* Left — category summary */}
+      <div className="mx-auto grid max-w-[1400px] grid-cols-12 gap-8 px-6 py-9 md:px-8">
+        {/* Editorial rail */}
         <div
           className="col-span-3 pr-6"
           style={{borderRight: '1px solid var(--ks-line-soft)'}}
         >
-          <div className="flex items-center gap-2">
-            <div
-              className="grid h-9 w-9 place-items-center rounded-xl"
-              style={{
-                background: '#f0f0f3',
-                color: 'var(--ks-ink)',
-              }}
-            >
-              <Icon className="h-4 w-4" strokeWidth={1.6} />
-            </div>
-            <span className="apple-eyebrow">Category</span>
-          </div>
+          <span className="apple-eyebrow">{pillar.label}</span>
           <h3
-            className="mt-3 text-lg font-semibold leading-tight"
-            style={{color: 'var(--ks-ink)'}}
+            className="mt-3 text-[22px] font-semibold leading-tight"
+            style={{color: 'var(--ks-ink)', letterSpacing: '-0.012em'}}
           >
-            {cat.name}
+            {pillar.headline}
           </h3>
           <p
-            className="mt-2 text-sm"
+            className="mt-3 text-sm leading-relaxed"
             style={{color: 'var(--ks-ink-2)'}}
           >
-            {cat.blurb}
+            {pillar.blurb}
           </p>
-          <Link
-            to={`/collections/${cat.slug}`}
-            prefetch="intent"
-            className="mt-4 inline-flex items-center gap-1 text-sm font-medium"
-            style={{color: 'var(--ks-ink)'}}
-          >
-            Shop all {cat.name} →
-          </Link>
+
+          {pillar.ventures ? (
+            <Link
+              to="/business-type/new-venture"
+              prefetch="intent"
+              onClick={onClose}
+              className="mt-5 inline-flex items-center gap-1 text-sm font-medium"
+              style={{color: 'var(--ks-blue)'}}
+            >
+              I&apos;m building something new
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          ) : (
+            <Link
+              to={`/collections/${pillar.cats[0]}`}
+              prefetch="intent"
+              onClick={onClose}
+              className="mt-5 inline-flex items-center gap-1 text-sm font-medium"
+              style={{color: 'var(--ks-ink)'}}
+            >
+              Browse all {pillar.label.toLowerCase()}
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          )}
         </div>
 
-        {/* Right — subgroup columns with procurement hints */}
-        <div className="col-span-9 grid grid-cols-2 gap-x-8 gap-y-6 lg:grid-cols-3">
-          {(cat.subgroups || []).map((sg) => (
-            <div key={sg.title}>
-              <h4
-                className="mb-2 text-[11px] font-semibold uppercase tracking-[0.10em]"
-                style={{color: 'var(--ks-muted)'}}
-              >
-                {sg.title}
-              </h4>
-              <ul className="space-y-1.5">
-                {sg.items.map((item) => (
-                  <li key={item}>
-                    <Link
-                      to={`/collections/${cat.slug}`}
-                      prefetch="intent"
-                      className="text-sm transition-colors hover:underline"
-                      style={{color: 'var(--ks-ink-2)'}}
-                    >
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        {/* Right grid — categories OR venture tiles */}
+        <div className="col-span-9">
+          {pillar.ventures ? (
+            <VentureGrid onClose={onClose} />
+          ) : (
+            <CategoryGrid catSlugs={pillar.cats} onClose={onClose} />
+          )}
         </div>
       </div>
     </div>
   );
 }
+
+function CategoryGrid({catSlugs, onClose}) {
+  const cats = catSlugs.map((s) => categoryBySlug[s]).filter(Boolean);
+  const cols =
+    cats.length === 4 ? 'grid-cols-2 lg:grid-cols-4' : cats.length === 3 ? 'grid-cols-2 lg:grid-cols-3' : 'grid-cols-2';
+  return (
+    <ul className={`grid gap-3 ${cols}`}>
+      {cats.map((cat) => {
+        const Icon = cat.icon;
+        return (
+          <li key={cat.slug}>
+            <Link
+              to={`/collections/${cat.slug}`}
+              prefetch="intent"
+              onClick={onClose}
+              className="group flex h-full flex-col rounded-2xl p-4 transition-colors"
+              style={{
+                background: 'var(--ks-card-tint)',
+                border: '1px solid var(--ks-line-soft)',
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <div
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-xl"
+                  style={{
+                    background: 'var(--ks-card-solid)',
+                    color: 'var(--ks-ink)',
+                    border: '1px solid var(--ks-line-soft)',
+                  }}
+                >
+                  <Icon className="h-4 w-4" strokeWidth={1.6} />
+                </div>
+                <div className="min-w-0">
+                  <div
+                    className="text-[13px] font-semibold leading-tight"
+                    style={{color: 'var(--ks-ink)'}}
+                  >
+                    {cat.name}
+                  </div>
+                  <p
+                    className="mt-1 text-[11px] leading-snug"
+                    style={{color: 'var(--ks-muted)'}}
+                  >
+                    {cat.blurb}
+                  </p>
+                </div>
+              </div>
+              {cat.subgroups?.length ? (
+                <ul
+                  className="mt-3 space-y-1 pl-[3.25rem] text-[11px]"
+                  style={{color: 'var(--ks-ink-2)'}}
+                >
+                  {cat.subgroups.slice(0, 3).map((sg) => (
+                    <li key={sg.title} className="truncate">
+                      · {sg.title}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              <span
+                className="mt-auto inline-flex items-center gap-1 pt-3 pl-[3.25rem] text-[12px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
+                style={{color: 'var(--ks-ink)'}}
+              >
+                Shop {cat.name}
+                <ArrowRight className="h-3 w-3" />
+              </span>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function VentureGrid({onClose}) {
+  return (
+    <ul className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
+      {businessTypes.map((b) => {
+        const Icon = b.icon;
+        const isNewVenture = b.slug === 'new-venture';
+        return (
+          <li key={b.slug}>
+            <Link
+              to={`/business-type/${b.slug}`}
+              prefetch="intent"
+              onClick={onClose}
+              className="flex items-start gap-2.5 rounded-xl p-2.5 transition-colors"
+              style={
+                isNewVenture
+                  ? {
+                      background: 'var(--ks-blue-soft)',
+                      border: '1px solid rgba(0,113,227,0.18)',
+                    }
+                  : {
+                      background: 'var(--ks-card-tint)',
+                      border: '1px solid var(--ks-line-soft)',
+                    }
+              }
+            >
+              <div
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg"
+                style={
+                  isNewVenture
+                    ? {background: 'var(--ks-blue)', color: '#ffffff'}
+                    : {
+                        background: 'var(--ks-card-solid)',
+                        color: 'var(--ks-ink)',
+                        border: '1px solid var(--ks-line-soft)',
+                      }
+                }
+              >
+                <Icon className="h-3.5 w-3.5" strokeWidth={1.6} />
+              </div>
+              <div className="min-w-0">
+                <div
+                  className="text-[12px] font-semibold leading-tight"
+                  style={{
+                    color: isNewVenture
+                      ? 'var(--ks-blue-dark)'
+                      : 'var(--ks-ink)',
+                  }}
+                >
+                  {b.name}
+                </div>
+                <p
+                  className="mt-0.5 line-clamp-2 text-[10.5px] leading-snug"
+                  style={{
+                    color: isNewVenture
+                      ? 'var(--ks-blue-dark)'
+                      : 'var(--ks-muted)',
+                  }}
+                >
+                  {b.tagline}
+                </p>
+              </div>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
