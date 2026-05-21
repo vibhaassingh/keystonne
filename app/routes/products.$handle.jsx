@@ -263,10 +263,12 @@ export default function ProductDetail() {
                         'flex-1 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors md:flex-none md:px-6',
                         justAdded ? '' : 'apple-button-amber',
                       )}
+                      // Buyer-surface success flash → ink, not emerald.
+                      // See ProductCard for the same discipline.
                       style={
                         justAdded
                           ? {
-                              background: 'var(--ks-emerald)',
+                              background: 'var(--ks-ink)',
                               color: '#ffffff',
                               border: '1px solid transparent',
                             }

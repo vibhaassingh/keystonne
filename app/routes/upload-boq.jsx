@@ -213,11 +213,18 @@ export default function UploadBoq() {
           {/* Summary banner */}
           <div className="premium-panel flex flex-wrap items-center justify-between gap-3 p-6">
             <div className="flex items-center gap-3">
+              {/* Parsed-success chip → ink. Emerald is reserved for
+                  partner money/status; this is a buyer/AI surface
+                  affordance and reads better as a quiet neutral. The
+                  Confidence pills below still use emerald-soft because
+                  they're a categorical status indicator (high vs.
+                  medium vs. low), which earns the colour budget. */}
               <div
                 className="grid h-11 w-11 place-items-center rounded-2xl"
                 style={{
-                  background: 'var(--ks-emerald-soft)',
-                  color: 'var(--ks-emerald-dark)',
+                  background: 'var(--ks-card-tint)',
+                  color: 'var(--ks-ink)',
+                  border: '1px solid var(--ks-line-soft)',
                 }}
               >
                 <Check className="h-5 w-5" strokeWidth={1.6} />

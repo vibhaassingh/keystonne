@@ -201,10 +201,14 @@ export function ProductCard({product}) {
                 'flex-1 inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[12px] font-semibold transition-colors',
                 justAdded ? '' : 'apple-button-amber',
               )}
+              // Success flash uses ink, not emerald. Brief reserves
+              // emerald for partner money/status; in-cart confirmation
+              // on a buyer surface is generic success, so ink is the
+              // right neutral.
               style={
                 justAdded
                   ? {
-                      background: 'var(--ks-emerald)',
+                      background: 'var(--ks-ink)',
                       color: '#ffffff',
                       border: '1px solid transparent',
                     }

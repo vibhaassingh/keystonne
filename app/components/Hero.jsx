@@ -213,20 +213,24 @@ function ProductTheatre() {
           </div>
         </div>
 
-        {/* Status row */}
+        {/* Status row — neutral. Emerald is reserved for partner
+            surfaces; this is the storefront home, so the "locked /
+            attribution" affordance reads in ink instead. The small
+            "Protected" chip in the header strip carries the
+            project-protection semantic at the right scale. */}
         <div
           className="mt-4 flex items-center justify-between rounded-xl px-3 py-2.5"
           style={{
-            background: 'var(--ks-emerald-soft)',
-            border: '1px solid rgba(10,127,86,0.18)',
+            background: 'var(--ks-card-tint)',
+            border: '1px solid var(--ks-line-soft)',
           }}
         >
-          <span className="text-[11px]" style={{color: 'var(--ks-emerald-dark)'}}>
+          <span className="text-[11px]" style={{color: 'var(--ks-ink-2)'}}>
             12 line items locked for this project
           </span>
           <span
             className="text-[10px] font-medium uppercase tracking-[0.10em]"
-            style={{color: 'var(--ks-emerald-dark)'}}
+            style={{color: 'var(--ks-muted)'}}
           >
             30-day attribution
           </span>
