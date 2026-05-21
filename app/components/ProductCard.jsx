@@ -1,6 +1,6 @@
 import {Link} from 'react-router';
 import {useState} from 'react';
-import {Star, FileText, Check, ArrowRight} from 'lucide-react';
+import {Package, FileText, Check, ArrowRight} from 'lucide-react';
 import {formatINR} from '~/lib/utils/formatINR';
 import {categoryBySlug} from '~/lib/mock/categories';
 import {useQuoteCart} from '~/lib/quoteCart';
@@ -31,7 +31,10 @@ import {cn} from '~/lib/utils/cn';
  */
 export function ProductCard({product}) {
   const cat = categoryBySlug[product.category];
-  const Icon = cat?.icon ?? Star;
+  // Fallback to Package (neutral procurement crate) instead of Star —
+  // a star would read as a consumer rating to a quick scan even though
+  // it's only the category-missing fallback.
+  const Icon = cat?.icon ?? Package;
   const canAddToCart =
     typeof product.priceINR === 'number' && product.priceINR < 50_000;
   const {add} = useQuoteCart();

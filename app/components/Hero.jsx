@@ -1,7 +1,6 @@
 import {Link} from 'react-router';
 import {
-  ArrowRight, Sparkles, Snowflake, Flame, Layers, Droplets, Coffee,
-  ChefHat, ShieldCheck, Wand2,
+  ArrowRight, Sparkles, Snowflake, ChefHat, ShieldCheck, Wand2,
 } from 'lucide-react';
 
 /**
@@ -14,10 +13,12 @@ import {
  * device sells itself and the copy serves it.
  *
  * Product-theatre is built entirely from CSS cards (no stock photos),
- * sampling a real procurement workspace state: project header, a
- * refrigeration spec tile, a capex estimate pill, station chips, and
- * a "protected" status row. The numbers match the data the AI Wizard
- * would actually return for an 80-cover cloud kitchen build.
+ * sampling a real procurement workspace state. Three regions only —
+ * project header, the spec + capex pair, and a "protected" status row
+ * at the foot. Stations were dropped in Sprint 9 polish to keep one
+ * dominant idea (the ₹14.2 L capex estimate) instead of a competing
+ * chip rail. The numbers match the data the AI Wizard would actually
+ * return for an 80-cover cloud kitchen build.
  */
 export function Hero() {
   return (
@@ -210,39 +211,6 @@ function ProductTheatre() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Stations chips */}
-        <div className="mt-4">
-          <div
-            className="mb-2 text-[10px] font-medium uppercase tracking-[0.10em]"
-            style={{color: 'var(--ks-muted)'}}
-          >
-            Stations
-          </div>
-          <ul className="flex flex-wrap gap-1.5">
-            {[
-              {icon: ChefHat, label: 'Prep'},
-              {icon: Flame, label: 'Cooking'},
-              {icon: Snowflake, label: 'Refrigeration'},
-              {icon: Droplets, label: 'Wash'},
-              {icon: Layers, label: 'Storage'},
-              {icon: Coffee, label: 'Service'},
-            ].map(({icon: Icon, label}) => (
-              <li
-                key={label}
-                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px]"
-                style={{
-                  background: 'var(--ks-card-tint)',
-                  border: '1px solid var(--ks-line-soft)',
-                  color: 'var(--ks-ink-2)',
-                }}
-              >
-                <Icon className="h-3 w-3" strokeWidth={1.6} />
-                {label}
-              </li>
-            ))}
-          </ul>
         </div>
 
         {/* Status row */}
