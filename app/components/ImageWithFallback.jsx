@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {cn} from '~/lib/utils/cn';
 
 /**
@@ -6,14 +6,20 @@ import {cn} from '~/lib/utils/cn';
  *
  * Phase 1 of the image-intensive catalog pass — most real .webp assets
  * don't exist yet, so the registry in `app/lib/mock/media.js` names
- * paths that may 404. This component renders the named src, listens for
- * the load error, and swaps to a designed fallback (passed via the
- * `fallback` prop, normally a Lucide icon on a neutral well) so the
- * surface stays intact instead of showing a broken-image glyph.
+ * paths that may not resolve. We can't rely on `<img onError>` alone
+ * because some SPA hosts (notably Vercel) serve the SPA index.html as
+ * a 200 fallback for unknown static paths, which leaves the `<img>`
+ * stuck in a perpetual loading state without firing onError.
+ *
+ * Solution: preflight the URL with `new Image()` and only mount the
+ * real `<img>` once it resolves. If it doesn't, we render the fallback
+ * (a Lucide-icon-on-blueprint composition supplied by ProductImage or
+ * CategoryImage) directly. The preflight is async but the reserved
+ * frame uses `aspect-ratio` so there's no CLS during the check.
  *
  * Layout safety:
  *   - `aspect` (default 4/3) sets `aspect-ratio` on the frame so the
- *     space is reserved before the image loads — no CLS.
+ *     space is reserved before the image resolves.
  *   - `fit` ('contain' | 'cover') controls object-fit. Equipment shots
  *     usually want `contain` to keep proportions; category / context
  *     shots want `cover` to fill the frame.
@@ -21,7 +27,7 @@ import {cn} from '~/lib/utils/cn';
  *
  * Accessibility:
  *   - `alt` is required when src is set. For purely decorative usage
- *     pass `alt=""` and add `role="presentation"`.
+ *     pass `alt=""`.
  */
 export function ImageWithFallback({
   src,
@@ -35,8 +41,43 @@ export function ImageWithFallback({
   rounded = 'rounded-[var(--ks-radius-md)]',
   ...rest
 }) {
-  const [errored, setErrored] = useState(false);
-  const showImage = src && !errored;
+  // 'pending' until the preflight resolves; 'ok' if it loaded, 'fail'
+  // if it errored or src is missing. The fallback is shown for both
+  // 'pending' (so users see a designed placeholder during the check)
+  // and 'fail' (so a broken image never appears).
+  const [state, setState] = useState(src ? 'pending' : 'fail');
+
+  useEffect(() => {
+    if (!src) {
+      setState('fail');
+      return undefined;
+    }
+    setState('pending');
+    let cancelled = false;
+    const img = new Image();
+    img.onload = () => {
+      // Reject SPA index.html being served as a 200 fallback —
+      // a valid image has positive natural dimensions.
+      if (cancelled) return;
+      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+        setState('ok');
+      } else {
+        setState('fail');
+      }
+    };
+    img.onerror = () => {
+      if (!cancelled) setState('fail');
+    };
+    img.src = src;
+    return () => {
+      cancelled = true;
+      // Cancel decoding by clearing src so the browser frees the
+      // pending request.
+      img.src = '';
+    };
+  }, [src]);
+
+  const showImage = state === 'ok';
 
   return (
     <div
@@ -57,7 +98,6 @@ export function ImageWithFallback({
           alt={alt}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
-          onError={() => setErrored(true)}
           className={cn('h-full w-full', className)}
           style={{
             objectFit: fit,
