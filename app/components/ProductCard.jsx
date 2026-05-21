@@ -1,40 +1,46 @@
 import {Link} from 'react-router';
 import {useState} from 'react';
-import {Package, FileText, Check, ArrowRight} from 'lucide-react';
+import {FileText, Check, ArrowRight} from 'lucide-react';
 import {formatINR} from '~/lib/utils/formatINR';
 import {categoryBySlug} from '~/lib/mock/categories';
 import {useQuoteCart} from '~/lib/quoteCart';
 import {useAside} from '~/components/Aside';
+import {ProductImage} from '~/components/ProductImage';
 import {cn} from '~/lib/utils/cn';
 
 /**
- * Apple-style dense product card.
+ * Apple-style image-led product card.
  *
- * Layout:
- *   ┌──────────────────────────────┐
- *   │ [neutral image panel · icon] │  + optional badge top-right
- *   ├──────────────────────────────┤
- *   │  CATEGORY eyebrow            │
- *   │  Product name (≤ 2 lines)    │
- *   │  Short commercial use case   │
- *   │  · Dimensions: 1340 × 770 …  │
- *   │  · Capacity: 1,240 L         │
- *   │  · Lead time: 7 days         │
- *   ├──────────────────────────────┤
- *   │  ₹1,29,000 / each   +18% GST │
- *   │  [Add to quote] [Details →]  │
- *   └──────────────────────────────┘
+ * Layout (image now claims ~55% of the card height — WebstaurantStore-
+ * style merchandising density, Apple-restraint colour):
+ *   ┌──────────────────────────────────────────┐
+ *   │  [ProductImage — 4:3]   [count pill]     │
+ *   │  [media badges]                          │
+ *   ├──────────────────────────────────────────┤
+ *   │  CATEGORY eyebrow                        │
+ *   │  Product name (≤ 2 lines)                │
+ *   │  Short commercial use case               │
+ *   │  · Dimensions:  1340 × 770 mm            │
+ *   │  · Capacity:    1,240 L                  │
+ *   │  · Lead time:   7 days                   │
+ *   ├──────────────────────────────────────────┤
+ *   │  ₹1,29,000 /each            +18% GST    │
+ *   │                              Ships in 7d │
+ *   │  [Add to quote]              [Details →]│
+ *   └──────────────────────────────────────────┘
  *
  * CTA discipline (brief §3): amber for procurement-intent actions
  * only ("Add to quote" / "Request quote"); secondary "Details" stays
  * neutral as a blue link.
+ *
+ * Image: ProductImage handles the registry lookup, lazy loading,
+ * fallback rendering, count pill, and media-badges (spec sheet / CAD
+ * / video). When a real .webp lands in public/images/products/* it
+ * appears automatically; until then a designed Lucide-on-blueprint
+ * fallback keeps the card looking like a procurement spec tile.
  */
-export function ProductCard({product}) {
+export function ProductCard({product, priority = false}) {
   const cat = categoryBySlug[product.category];
-  // Fallback to Package (neutral procurement crate) instead of Star —
-  // a star would read as a consumer rating to a quick scan even though
-  // it's only the category-missing fallback.
-  const Icon = cat?.icon ?? Package;
   const canAddToCart =
     typeof product.priceINR === 'number' && product.priceINR < 50_000;
   const {add} = useQuoteCart();
@@ -69,36 +75,26 @@ export function ProductCard({product}) {
         borderRadius: 'var(--ks-radius-md)',
       }}
     >
-      {/* Image panel — neutral surface, soft tint hint from accent */}
+      {/* Image panel — handled by ProductImage with registry-driven
+          metadata. Optional badge from product.badge sits on top. */}
       <Link
         to={`/products/${product.slug}`}
         prefetch="intent"
         className="relative block"
       >
-        <div
-          className="relative grid aspect-[5/4] w-full place-items-center"
-          style={{
-            background: `linear-gradient(180deg, ${tint(product.accent, 0.06)} 0%, ${tint(product.accent, 0.02)} 100%)`,
-          }}
-        >
-          <Icon
-            className="h-14 w-14"
-            strokeWidth={1.4}
-            style={{color: 'var(--ks-ink-2)'}}
-          />
-          {product.badge && (
-            <span
-              className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em]"
-              style={{
-                background: 'var(--ks-card-solid)',
-                color: 'var(--ks-ink)',
-                border: '1px solid var(--ks-line)',
-              }}
-            >
-              {product.badge}
-            </span>
-          )}
-        </div>
+        <ProductImage product={product} variant="card" priority={priority} />
+        {product.badge && (
+          <span
+            className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em]"
+            style={{
+              background: 'var(--ks-card-solid)',
+              color: 'var(--ks-ink)',
+              border: '1px solid var(--ks-line)',
+            }}
+          >
+            {product.badge}
+          </span>
+        )}
       </Link>
 
       <div className="flex flex-1 flex-col p-4">
@@ -252,13 +248,4 @@ function pickSpec(specs, pattern, labelOverrides = []) {
   const k = keys.find((key) => pattern.test(key));
   if (!k) return null;
   return {label: labelOverrides[0] ?? k, value: specs[k]};
-}
-
-/** Take a hex colour and blend with white at given opacity to get a tint. */
-function tint(hex, opacity) {
-  const n = parseInt(hex.slice(1), 16);
-  const r = (n >> 16) & 0xff;
-  const g = (n >> 8) & 0xff;
-  const b = n & 0xff;
-  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
