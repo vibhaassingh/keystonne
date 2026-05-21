@@ -109,7 +109,12 @@ export function MegaNav() {
   return (
     <nav
       aria-label="Browse the catalog"
-      className="relative hidden md:block"
+      // Sticks to the underside of the sticky Header so the two read
+      // as one chrome strip on scroll. Header measures ~69px tall on
+      // md+ (py-3.5 + h-10 search input), so we pin the MegaNav at
+      // 68px with z-30 (one below the header's z-40). The flyout's
+      // `top-full` still anchors to this sticky parent.
+      className="sticky top-[68px] z-30 hidden md:block"
       style={{
         background: 'rgba(255, 255, 255, 0.78)',
         backdropFilter: 'saturate(180%) blur(20px)',
